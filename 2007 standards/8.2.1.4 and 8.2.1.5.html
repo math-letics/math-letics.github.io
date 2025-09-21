@@ -1,0 +1,408 @@
+<!-- Standards (Version 2007) 8.2.1.4 and 8.2.1.5 -->
+
+<script src='../externalJS/quizJS.js'></script>
+
+<script src='../externalJS/random number generator.js'></script>
+
+<script src='../externalJS/gcf.js'></script>
+
+<script>
+// global variables
+var problem;
+var common; // common difference or ratio, depending on the type of problem
+var firstTerm; // first term in the sequence
+var functionName; // name of the function
+var variableName; // name of the variable
+var input1; var input2;
+var output1; var output2;
+var factor; // for reducing
+var numCommon, denCommon, numFirst, denFirst, numOutput1, denOutput1, numOutput2, denOutput2; // fractions
+var commonFraction, firstFraction; // if the common ratio or first term are fractions, set to 'true'
+    
+// generate a new quiz when user clicks button
+function getNewProblems() {
+    resetProblems(); // externalJS
+    
+    document.getElementById('errorMsg').style.display = 'none';
+    
+    var verified = verifyForm(); // make sure that at least one type of problem is selected
+    if (verified) {
+        if (document.getElementById('arithmeticBox').checked) {getArithmeticProblems();}
+        if (document.getElementById('geometricBox').checked) {getGeometricProblems();}
+    
+        // externalJS    
+        shuffleProblems();
+        displayProblems(); 
+            
+        // reveal the "Show answers" button
+        document.getElementById('showAnswersBtn').style.display = 'inline';
+        
+        if (viewAnswers === true) {showAnswers();}
+        else {hideAnswers();}       
+    }
+    else {document.getElementById('errorMsg').style.display = 'inline';}
+
+} // end of getNewProblems()
+
+// add a problem to an array after it has been created
+// CHANGED FROM EXTERNAL JS
+function addToArray(problem) {
+    problem += '&nbsp;&nbsp;<span class="answer">' + answer + '</span>';
+    initialArray[problemNum-1] = problem;
+    problemNum++;
+} // end of addToArray(problem)
+
+// verify that at least one type of problem is selected
+function verifyForm() {
+    var check1 = document.getElementById('arithmeticBox').checked;
+    var check2 = document.getElementById('geometricBox').checked;
+    var qty1 = document.getElementById('arithmeticQty').value;
+    var qty2 = document.getElementById('geometricQty').value;
+    
+    if ((check1===false) && (check2===false)) {return false;} 
+    else if ((check1===false) && (qty2==='0')) {return false;}
+    else if ((qty1==='0') && (check2===false)) {return false;}
+    else if ((qty1==='0') && (qty2==='0')) {return false;}
+    else {return true;}
+} // end of verifyForm()
+
+// get problems for an arithmetic sequence
+function getArithmeticProblems() {    
+    var arithmeticQty = document.getElementById('arithmeticQty').value;
+    for (i=0; i<arithmeticQty; i++) {
+        // get an arithmetic sequence problem
+        
+        common = getRandom(-10, 9); if (common === 0) {common = 10;}
+        
+        firstTerm = getRandom(-99, 99);
+        
+        functionName = getFunctionName();
+        variableName = getVariableName();
+        
+        input1 = getRandom(0, 20);
+        input2 = input1;
+        while (input2===input1) {input2 = getRandom(0, 20);}
+        
+        output1 = common*input1 + firstTerm;
+        output2 = common*input2 + firstTerm;
+        
+        problem = 'If ' + functionName + '(' + variableName + ') is an arithmetic sequence for ';
+        problem += variableName + ' &isin; {0, 1, 2, 3, ... } such that <br />';        
+        problem += functionName + '(' + input1 + ') = ' + output1 + ' and ';
+        problem += functionName + '(' + input2 + ') = ' + output2 + ', ';
+        problem += 'give an expression for ' + functionName + '(' + variableName + ').';
+        
+        // correctly display the coefficient of the formula
+        if (common===1) {answer = functionName + '(' + variableName + ') = ' + variableName;}
+        else if (common===-1) {answer = functionName + '(' + variableName + ') = -' + variableName;}
+        else {answer = functionName + '(' + variableName + ') = ' + common + variableName;}
+        
+        // correctly display the first term of the sequence / y-intercept / constant term; nothing to do if = 0
+        if (firstTerm<0) {answer += ' &ndash; ' + Math.abs(firstTerm);}
+        else if (firstTerm>0) {answer += ' + ' + firstTerm;}
+        else {} // nothing to do; adding zero
+        
+        addToArray(problem); // externalJS
+    }    
+} // end of getArithmeticProblems()
+
+// get problems for a geometric sequence
+function getGeometricProblems() {
+    var geometricQty = document.getElementById('geometricQty').value;
+    
+    for (i=0; i<geometricQty; i++) {            
+        input1 = getRandom(0, 8);
+        input2 = input1; while (input2===input1) {input2 = getRandom(0, 8);}            
+    
+        getGeometricCommon();
+        getGeometricFirst();
+        getGeometricOutputs();
+                
+        functionName = getFunctionName();
+        variableName = getVariableName();
+        
+        problem = 'If ' + functionName + '(' + variableName + ') is a geometric sequence for ';
+        problem += variableName + ' &isin; {0, 1, 2, 3, ... } such that <br />';        
+        problem += functionName + '(' + input1 + ') = ' + output1 + ' and ';
+        problem += functionName + '(' + input2 + ') = ' + output2 + ', ';
+        problem += 'give an expression for ' + functionName + '(' + variableName + ').';
+        answer = functionName + '(' + variableName + ') = ';
+        
+        // display first terms of 1 and -1 appropriately
+        if (firstTerm==1) {} // nothing to do
+        else if (firstTerm==-1) {answer += '&ndash; ';}
+        else {answer += firstTerm;}
+        
+        answer += '(' + common + ')<sup>' + variableName + '</sup>';      
+        
+        addToArray(problem); // externalJS
+    }    
+} // end of getGeometricProblems()
+
+// get the common ratio for a geometric sequence; may be integral or rational
+function getGeometricCommon() {
+    // sometimes the common ratio is an integer, half the time a rational number
+    var random = getRandom(0, 2);
+    if (random!==0) { // common ratio is integer
+        commonFraction = false;
+        common = getRandom(2, 8);
+    }
+    else { // common ratio is a rational number
+        commonFraction = true;
+        numCommon = getRandom(2, 8); if (numCommon===0) {numCommon = 8;}
+        denCommon = numCommon; while (denCommon===numCommon) {denCommon = getRandom(2, 8);}
+        factor = hcf(numCommon, denCommon);
+        numCommon /= factor; denCommon /= factor; // reduce
+        if (denCommon===1) {common = numCommon; commonFraction = false;} // reduced to an integer
+        else {
+            common = '<div class="fraction"><span class="fup">' + numCommon + '</span>';
+            common += '<span class="fdn">' + denCommon + '</span></div>';
+        }
+    }
+} // end of getGeometricCommon()
+
+// get the first term for a geometric sequence; may be integral or rational
+function getGeometricFirst() {
+    var random; 
+    // sometimes the first term is an integer, half the time a rational number
+    if (commonFraction) {
+        random = getRandom(0, 1);
+        if (random==0) { // firstTerm is an integer
+            firstFraction = false;
+            firstTerm = getRandom(-20, 19); if (firstTerm===0) {firstTerm = 20;}
+        }
+        else { // firstTerm is rational
+            firstFraction = true;
+            numFirst = getRandom(-20, 19); if (numFirst===0) {numFirst = 20;}
+            denFirst = getRandom(1, 20);
+            factor = hcf(Math.abs(numFirst), Math.abs(denFirst));
+            numFirst /= factor; denFirst /= factor; // reduce
+            if (denFirst===1) {firstTerm = numFirst; firstFraction = false;} // reduced to an integer
+            else if (denFirst===-1) {firstTerm = -1*numFirst; firstFraction = false;}
+            else {
+                if (numFirst>0) {
+                    firstTerm = '<div class="fraction"><span class="fup">' + numFirst + '</span>';
+                }
+                else {
+                    firstTerm = '&ndash;<div class="fraction"><span class="fup">' + Math.abs(numFirst);
+                    firstTerm +=  '</span>';
+                }                
+                firstTerm += '<span class="fdn">' + denFirst + '</span></div>';
+            }
+        }        
+    }
+    else {
+        random = getRandom(0, 3);
+        if (random==0) { // firstTerm is rational
+            firstFraction = true;
+            numFirst = getRandom(-20, 19); if (numFirst===0) {numFirst = 20;}
+            denFirst = getRandom(1, 20);
+            factor = hcf(Math.abs(numFirst), Math.abs(denFirst));
+            numFirst /= factor; denFirst /= factor; // reduce
+            if (denFirst===1) {firstTerm = numFirst; firstFraction = false;} // reduced to an integer
+            else if (denFirst===-1) {firstTerm = -1*numFirst; firstFraction = false;}
+            else {
+                if (numFirst>0) {
+                    firstTerm = '<div class="fraction"><span class="fup">' + numFirst + '</span>';
+                }
+                else {
+                    firstTerm = '&ndash;<div class="fraction"><span class="fup">' + Math.abs(numFirst);
+                    firstTerm +=  '</span>';
+                }
+                firstTerm += '<span class="fdn">' + denFirst + '</span></div>';
+            }            
+        }
+        else {
+            firstFraction = false;
+            firstTerm = getRandom(-20, 19); if (firstTerm===0) {firstTerm = 20;}            
+        }
+    }
+} // end of getGeometricFirst()
+
+// get the outputs for a geometric sequence; may be integral or rational
+function getGeometricOutputs() {
+        // four cases possible for integral and rational values
+        if (commonFraction && firstFraction) { // both are rational
+            numOutput1 = numFirst * Math.pow(numCommon, input1);
+            denOutput1 = denFirst * Math.pow(denCommon, input1);
+            factor = hcf(Math.abs(numOutput1), Math.abs(denOutput1));
+            numOutput1 /= factor; denOutput1 /= factor; // reduce
+            
+            if (denOutput1==1) {output1 = numOutput1;} // reduced
+            else if (denOutput1==-1) {output1 = -1*numOutput1;}
+            else {
+                if (numOutput1>0) {
+                    output1 = '<div class="fraction"><span class="fup">' + numOutput1 + '</span>';    
+                }
+                else {
+                    output1 = '&ndash;<div class="fraction"><span class="fup">' + Math.abs(numOutput1);
+                    output1 += '</span>';
+                }                
+                output1 += '<span class="fdn">' + denOutput1 + '</span></div>';                
+            }
+            
+            numOutput2 = numFirst * Math.pow(numCommon, input2);
+            denOutput2 = denFirst * Math.pow(denCommon, input2);
+            factor = hcf(Math.abs(numOutput2), Math.abs(denOutput2));
+            numOutput2 /= factor; denOutput2 /= factor; // reduce
+            
+            if (denOutput2==1) {output2 = numOutput2;} // reduced
+            else if (denOutput2==-1) {output2 = -1*numOutput2;}
+            else {
+                if (numOutput2>0) {
+                    output2 = '<div class="fraction"><span class="fup">' + numOutput2 + '</span>';    
+                }
+                else {
+                    output2 = '&ndash;<div class="fraction"><span class="fup">' + Math.abs(numOutput2);
+                    output2 += '</span>';
+                }                
+                output2 += '<span class="fdn">' + denOutput2 + '</span></div>';                
+            }
+        }
+        else if (commonFraction) { // common ratio is rational, first term is integral
+            numOutput1 = firstTerm * Math.pow(numCommon, input1); // functional
+            denOutput1 = Math.pow(denCommon, input1);
+            factor = hcf(Math.abs(numOutput1, denOutput1));
+            numOutput1 /= factor; denOutput1 /= factor; // reduce
+            
+            if (denOutput1==1) {output1 = numOutput1;} // reduced
+            else if (denOutput1==-1) {output1 = -1*numOutput1;}
+            else {
+                if (numOutput1>0) {
+                    output1 = '<div class="fraction"><span class="fup">' + numOutput1 + '</span>';    
+                }
+                else {
+                    output1 = '&ndash;<div class="fraction"><span class="fup">' + Math.abs(numOutput1);
+                    output1 += '</span>';
+                }                
+                output1 += '<span class="fdn">' + denOutput1 + '</span></div>';                
+            }
+            
+            numOutput2 = firstTerm * Math.pow(numCommon, input2); // functional
+            denOutput2 = Math.pow(denCommon, input2);
+            factor = hcf(Math.abs(numOutput2, denOutput2));
+            numOutput2 /= factor; denOutput2 /= factor; // reduce
+            
+            if (denOutput2==1) {output2 = numOutput2;} // reduced
+            else if (denOutput2==-1) {output2 = -1*numOutput2;}
+            else {
+                if (numOutput2>0) {
+                    output2 = '<div class="fraction"><span class="fup">' + numOutput2 + '</span>';    
+                }
+                else {
+                    output2 = '&ndash;<div class="fraction"><span class="fup">' + Math.abs(numOutput2);
+                    output2 += '</span>';
+                }                
+                output2 += '<span class="fdn">' + denOutput2 + '</span></div>';                
+            }
+        }
+        else if (firstFraction) { // first term is rational, common ratio is integral
+            numOutput1 = numFirst * Math.pow(common, input1);
+            denOutput1 = denFirst;
+            factor = hcf(Math.abs(numOutput1), Math.abs(denOutput1));
+            numOutput1 /= factor; denOutput1 /= factor;
+            
+            if (denOutput1==1) {output1 = numOutput1;} // reduced
+            else if (denOutput1==-1) {output1 = -1*numOutput1;}
+            else {
+                if (numOutput1>0) {
+                    output1 = '<div class="fraction"><span class="fup">' + numOutput1 + '</span>';    
+                }
+                else {
+                    output1 = '&ndash;<div class="fraction"><span class="fup">' + Math.abs(numOutput1);
+                    output1 += '</span>';
+                }                
+                output1 += '<span class="fdn">' + denOutput1 + '</span></div>';                 
+            }
+            
+            numOutput2 = numFirst * Math.pow(common, input2);
+            denOutput2 = denFirst;
+            factor = hcf(Math.abs(numOutput2), Math.abs(denOutput2));
+            numOutput2 /= factor; denOutput2 /= factor;
+            
+            if (denOutput2==1) {output2 = numOutput2;} // reduced
+            else if (denOutput2==-1) {output2 = -1*numOutput2;}
+            else {
+                if (numOutput2>0) {
+                    output2 = '<div class="fraction"><span class="fup">' + numOutput2 + '</span>';    
+                }
+                else {
+                    output2 = '&ndash;<div class="fraction"><span class="fup">' + Math.abs(numOutput2);
+                    output2 += '</span>';
+                }                
+                output2 += '<span class="fdn">' + denOutput2 + '</span></div>';                    
+            }            
+        }
+        else { // both are integral
+            output1 = firstTerm * Math.pow(common, input1);
+            output2 = firstTerm * Math.pow(common, input2);
+        }
+} // end of getGeometricOutputs()
+
+// get the function name
+function getFunctionName() {
+    var functionArray = ['a', 'f', 'g', 'h', 'p', 'r', 'y', 'A', 'C', 'L'];
+    random = getRandom(0, 9);
+
+    return functionArray[random]; 
+} // end of getFunctionName()
+
+// get the variable name
+function getVariableName() {
+    var variableArray = ['x', 'n', 't'];
+    random = getRandom(0, 2);
+    
+    return variableArray[random];    
+} // end of getVariableName()
+
+</script>
+
+<body>
+    
+<head>
+    <link rel='stylesheet' href='externalCSS/display fractions.css'>
+    <link rel='stylesheet' href='externalCSS/quiz.css'>
+</head>
+
+Minnesota Department of Education
+<br />Mathematics K-12 Academic Standards
+<br />(2007 version)
+
+<br /><br />
+Standards 8.2.1.4 and 8.2.1.5:<br />
+<span style='font-weight:bold; text-decoration-line:underline;'>8.2.1.4:</span> <!-- functions correctly -->
+<br />Understand that an arithmetic sequence is a linear function that can be expressed in the form
+f(x) = mx + b, where x = 0, 1, 2, 3, ...
+<br />For example: The arithmetic sequence 3, 7, 11, 15, ..., can be expressed as f(x) = 4x + 3
+<br />
+<span style='font-weight:bold; text-decoration-line:underline;'>8.2.1.5:</span> <!-- functions correctly -->
+<br />Understand that a geometric sequence is a non-linear function that can be expressed in the form
+f(x) = ab<sup>x</sup>, where x = 0, 1, 2, 3, ...
+<br />For example: The geometric sequence 6, 12, 24, 48, ..., can be expressed in the form f(x) = 6(2)<sup>x</sup>
+
+<br /><br /><br />
+Select your problem type and quantities...
+<br />
+<input type='checkbox' id='arithmeticBox' checked />
+Arithmetic &nbsp;&nbsp; Qty:
+<input type='number' id='arithmeticQty' value='5' min='1' max='99' />
+<br />
+<input type='checkbox' id='geometricBox' checked />
+Geometric &nbsp;&nbsp; Qty:
+<input type='number' id='geometricQty' value='5' min='1'1 max='99' />
+
+<br />
+
+<input type='button' value='Get new problems' onclick='getNewProblems();' />
+<input type='button' id='hideTextBoxesBtn' value='Hide textboxes' onclick='hideTextBoxes();' />
+<input type='button' id='showTextBoxesBtn' value='Show textboxes' onclick='showTextBoxes();' />
+<input type='button' id='showAnswersBtn' value='Show answers' onclick='showAnswers();' />
+<input type='button' id='hideAnswersBtn' value='Hide answers' onclick='hideAnswers();' style='display:none;' />
+
+<br />
+<div id='errorMsg' style='display:none; color:red;'>Select at least one type of problem above</div>
+
+<br /><br />
+<div id='problemSpace'></div>   
+
+</body>

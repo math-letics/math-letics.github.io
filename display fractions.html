@@ -1,0 +1,47 @@
+<!-- test out displaying fractions using external css -->
+
+<head>
+    <link rel='stylesheet' type='text/css' href='externalCSS/display fractions.css' />
+</head>
+
+
+
+<body>
+
+Within a line of <div class="fraction">
+    <span class="top">1</span>
+    <span class="bottom">100</span>
+</div>
+writing?
+<div>this is another div... does it display on the same line?</div>
+
+But if we put the fractions into a table...
+
+<table>
+    <tr>
+        <td>
+            <span class='top'>1</span>
+            <span class='bottom'>2</span>
+        </td>
+        <td>
+            +
+        </td>
+        <td>
+            <span class='top'>1</span>
+            <span class='bottom'>2</span>
+        </td>
+        <td>
+            =
+        </td>
+        <td>
+            <span class='top'>
+                <input type='text' size='1' id='numeratorText' />
+            </span>
+            <span class='bottom'>
+                <input type='text' size='1' id='denominatorText' />
+            </span>
+        </td>
+    </tr> 
+</table>
+
+</body>

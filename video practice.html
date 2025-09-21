@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Play Video on Button Click</title>
+  <style>
+    #myVideo {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <video id="myVideo" width="640" height="360">
+    <source src="videos/i have a gift.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+
+  <br>
+
+  <button onclick="playVideo()">Play Video</button>
+
+  <script>
+    function playVideo() {
+      const video = document.getElementById("myVideo");
+      video.style.display = "block";  // Show the video
+      video.play();                   // Start playing
+
+      video.onended = function() {
+        alert("Hello");
+      };
+    }
+  </script>
+
+</body>
+</html>

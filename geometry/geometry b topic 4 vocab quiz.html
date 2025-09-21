@@ -1,0 +1,89 @@
+<!-- title:  -->
+
+<script src='../externalJS/random number generator.js'></script>
+
+<script src='../externalJS/shuffle.js'></script>
+
+<script>
+// global variables
+
+var vocabArray = [];
+var definitionArray = [];
+
+// the main function of the page
+function main() {
+
+    // reset the page
+    document.getElementById('column1').innerHTML = '';
+    document.getElementById('column2').innerHTML = '';
+    getTerms();
+    var x = shuffleArray(vocabArray);
+    for (i=0; i<vocabArray.length; i++) {
+        document.getElementById('column1').innerHTML += '<br />' + x[i];
+    }
+    x = shuffleArray(definitionArray);
+    for (i=0; i<definitionArray.length; i++) {
+        var number = i + 1;
+        document.getElementById('column2').innerHTML += '<br />' + number + ')&nbsp;&nbsp;' + x[i];
+    }
+    
+} // end of main()
+
+// get vocab terms and definitions
+function getTerms() {
+    vocabArray[0] = 'rectangular prism';
+    definitionArray[0] = 'A 3d shape made from six rectangles';
+    
+    vocabArray[1] = 'face';
+    definitionArray[1] = 'A flat "side" of a polyhedron';
+    
+    vocabArray[2] = 'volume';
+    definitionArray[2] = 'The amount of space inside a 3d shape';
+    
+    vocabArray[3] = 'square pyramid';
+    definitionArray[3] = 'A 3d shape made from a square and four triangles';
+    
+    vocabArray[4] = 'triangular prism';
+    definitionArray[4] = 'A 3d shape made from two triangles and three rectangles';
+    
+    vocabArray[5] = 'surface';
+    definitionArray[5] = 'The entire "outside" of a 3d shape';
+    
+    vocabArray[6] = 'cylinder';
+    definitionArray[6] = 'A 3d shape made from two circles and a "rolled up" rectangle';
+    
+    vocabArray[7] = 'composite';
+    definitionArray[7] = 'When a shape is made from two or more simpler shapes';
+    
+    // distractors
+    vocabArray[8] = 'length';
+    vocabArray[9] = 'width';
+    vocabArray[10] = 'cube';
+    vocabArray[11] = 'base';
+    vocabArray[12] = 'radius';
+    vocabArray[13] = 'diameter';
+
+} // end of getTerms()
+
+</script>
+
+
+<body>
+<h2>Vocab quiz - Geometry B - Topic 4</h2>
+
+
+<input type='button' value='Click me' onclick='main();' />
+
+<br /><br />
+
+<div id='displayDiv'></div>
+
+<table>
+    <tr>
+        <td id='column1'></td>
+        <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+        <td id='column2'></td>
+    </tr>
+</table>
+
+</body>

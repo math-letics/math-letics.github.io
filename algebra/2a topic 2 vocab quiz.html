@@ -1,0 +1,77 @@
+<!-- title:  -->
+
+<script src='../externalJS/random number generator.js'></script>
+
+<script src='../externalJS/shuffle.js'></script>
+
+<script>
+// global variables
+
+var vocabArray = [];
+var definitionArray = [];
+
+// the main function of the page
+function main() {
+
+    // reset the page
+    document.getElementById('column1').innerHTML = '';
+    document.getElementById('column2').innerHTML = '';
+    getTerms();
+    var x = shuffleArray(vocabArray);
+    for (i=0; i<vocabArray.length; i++) {
+        document.getElementById('column1').innerHTML += '<br />' + x[i];
+    }
+    x = shuffleArray(definitionArray);
+    for (i=0; i<definitionArray.length; i++) {
+        var number = i + 1;
+        document.getElementById('column2').innerHTML += '<br />' + number + ')&nbsp;&nbsp;' + x[i];
+    }
+    
+} // end of main()
+
+// get vocab terms and definitions
+function getTerms() {
+    vocabArray[0] = 'system';
+    definitionArray[0] = 'Two or more equations with two or more variables used at the same time';
+
+    vocabArray[1] = 'solution';
+    definitionArray[1] = 'A set of variable values that make all equations of a system true';
+    
+    vocabArray[2] = 'substitute';
+    definitionArray[2] = 'To replace a variable with an equal value or expression';
+    
+    vocabArray[3] = 'simplify';
+    definitionArray[3] = 'To perform operations that we can';
+    
+    vocabArray[4] = 'opposite';
+    definitionArray[4] = 'The result of switching a number&apos;s sign';
+    
+    // distractors
+    vocabArray[5] = 'intersect';
+    vocabArray[6] = 'elimination';
+    vocabArray[7] = 'equation';
+    vocabArray[8] = 'inequality';
+} // end of getTerms()
+
+</script>
+
+
+<body>
+<h2>Vocab quiz - Algebra 2A - Topic 2</h2>
+
+
+<input type='button' value='Click me' onclick='main();' />
+
+<br /><br />
+
+<div id='displayDiv'></div>
+
+<table>
+    <tr>
+        <td id='column1'></td>
+        <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+        <td id='column2'></td>
+    </tr>
+</table>
+
+</body>

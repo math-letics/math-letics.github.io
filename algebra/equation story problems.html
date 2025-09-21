@@ -1,0 +1,334 @@
+<!-- title: Equation story problems for Algebra 1A  -->
+
+<script src='../externalJS/random number generator.js'>
+</script>
+
+<script src='../externalJS/round_decimal_numbers.js'>
+</script>
+
+<script src='../externalJS/displayDollars.js'>
+</script>
+
+<script src='../externalJS/shuffle.js'>
+</script>
+
+<script>
+// global variables
+
+var temp1, temp2;
+var index; // for the problemArray
+var problemArray = [];
+var before, change, pizzaQty, pizzaFraction, price, debt, pricePerSlice;
+
+// get a story that can be solved with a one-step equation
+function getOneStep() {
+	// reset
+	index = 0;
+	problemArray = [];
+	document.getElementById('problemDiv').innerHTML = '';
+
+	getOneStepAdd(); index++;
+	getOneStepSub(); index++;
+	getOneStepMult(); index++;
+	getOneStepDiv(); index++;
+
+	// shuffle problemArray
+	problemArray = shuffleArray(problemArray);
+
+	// display problems
+	for (i=0; i<index; i++) {
+		temp1 = i + 1;
+		document.getElementById('problemDiv').innerHTML += temp1 + ') ' + problemArray[i] + '<br /><br /><br />';
+	}
+
+} // end of getOneStep()
+
+// get an addition Equation
+function getOneStepAdd() {
+	before = getRandom(101,2000)/100;
+	before = roundDecimalNumber(before, 2);
+	price = getRandom(1, before*100-1)/100;
+	price = roundDecimalNumber(price, 2);
+	change = before - price;
+	change = roundDecimalNumber(change, 2);
+
+	// SOMEHOW, "CHANGE" SOMETIMES COMES OUT GREATER THAN "BEFORE"
+
+	// display correctly
+	before = displayDollarsAndCents(before);
+	change = displayDollarsAndCents(change);
+
+	problemArray[index] = 'You enter a store with ' + before + '.  <br />';
+	problemArray[index] += 'You leave the store with a pizza and ' + change + '.<br /><br />';
+	problemArray[index] += 'What is the price of the pizza?';
+
+} // end of getOneStepAdd()
+
+// get a one-step subtraction problem
+function getOneStepSub() {
+	before = getRandom(101,2000)/100;
+	before = roundDecimalNumber(before, 2);
+	debt = getRandom(1, 2000)/100;
+	debt = roundDecimalNumber(debt, 2);
+
+	// display correctly
+	before = displayDollarsAndCents(before);
+	debt = displayDollarsAndCents(debt);
+
+	problemArray[index] = 'You enter a store with ' + before + '. <br />';
+	problemArray[index] += 'You leave the store with a pizza and a debt of ' + debt + '. <br /><br />';
+	problemArray[index] += 'What is the price of the pizza?';
+
+} // end of getOneStepSub()
+
+// get a one-step multiplication problem
+function getOneStepMult() {
+	pizzaQty = getRandom(2, 99);
+	price = getRandom(101, 2000)/100;
+	price = roundDecimalNumber(price, 2);
+	before = price*pizzaQty;
+	before = roundDecimalNumber(before, 2);
+
+	// display $ correctly
+	before = displayDollarsAndCents(before);
+
+	problemArray[index] = 'You enter a store with ' + before + '. <br />';
+	problemArray[index] += 'You leave the store with ' + pizzaQty + ' pizzas. <br /><br />';
+	problemArray[index] += 'What is the price of each pizza?';
+
+} // end of getOneStepMult()
+
+// get a one-step division problem
+function getOneStepDiv() {
+	pizzaFraction = getRandom(2, 12);
+	pricePerSlice = getRandom(101, 500)/100;
+	pricePerSlice = roundDecimalNumber(pricePerSlice, 2);
+	pricePerSlice = displayDollarsAndCents(pricePerSlice);
+
+	getPizzaFraction();
+
+	problemArray[index] = 'You enter a store with ' + pricePerSlice + '. <br />';
+	problemArray[index] += 'You leave the store with one ' + pizzaFraction + ' of a pizza. <br /><br />';
+	problemArray[index] += 'What is the price of a whole pizza?';
+
+} // end of getOneStepDiv()
+
+// get the correct denominator for a fraction
+function getPizzaFraction() {
+	// get the appropriate fraction
+	switch (pizzaFraction) {
+		case 2: pizzaFraction = 'half'; break;
+		case 3: pizzaFraction = 'third'; break;
+		case 4: pizzaFraction = 'fourth'; break;
+		case 5: pizzaFraction = 'fifth'; break;
+		case 6: pizzaFraction = 'sixth'; break;
+		case 7: pizzaFraction = 'seventh'; break;
+		case 8: pizzaFraction = 'eighth'; break;
+		case 9: pizzaFraction = 'ninth'; break;
+		case 10: pizzaFraction = 'tenth'; break;
+		case 11: pizzaFraction = 'eleventh'; break;
+		case 12: pizzaFraction = 'twelfth'; break;
+		default: alert('error - getPizzaFraction()');
+	}
+} // end of getPizzaFraction()
+
+// get a story that can be solved with a two-step equation
+function getTwoStep() {
+	// reset
+	index = 0;
+	problemArray = [];
+	document.getElementById('problemDiv').innerHTML = '';
+
+	getMultAdd(); index++;
+	getMultSub(); index++;
+	getDivAdd(); index++;
+	getDivSub(); index++;
+
+	// shuffle problemArray
+	problemArray = shuffleArray(problemArray);
+
+	// display problems
+	for (i=0; i<index; i++) {
+		temp1 = i + 1;
+		document.getElementById('problemDiv').innerHTML += temp1 + ') ' + problemArray[i] + '<br /><br /><br />';
+	}
+} // end of getTwoStep()
+
+// get an equation of the form y = mx+b
+function getMultAdd() {
+	pizzaQty = getRandom(2, 99);
+	price = getRandom(101, 2000)/100;
+	price = roundDecimalNumber(price, 2);
+	change = getRandom(101, 2000)/100;
+	change = roundDecimalNumber(change, 2);
+	before = pizzaQty*price + change;
+	before = roundDecimalNumber(before, 2);
+
+	// display correctly
+	before = displayDollarsAndCents(before);
+	change = displayDollarsAndCents(change);
+
+	problemArray[index] = 'You enter a store with ' + before + '.<br />';
+	problemArray[index] += 'You leave the store with ' + pizzaQty + ' pizzas and ' + change + '.<br /><br />';
+	problemArray[index] += 'What is the price of each pizza?';
+
+} // end of getMultAdd()
+
+// get an equation of the form y = mx - b
+function getMultSub() {
+	pizzaQty = getRandom(2, 99);
+	price = getRandom(101, 2000)/100;
+	price = roundDecimalNumber(price, 2);
+	debt = getRandom(1, 100*price*pizzaQty-1)/100;
+	debt = roundDecimalNumber(debt, 2);
+	before = pizzaQty * price - debt;
+	before = roundDecimalNumber(before, 2);
+
+	// display correctly
+	before = displayDollarsAndCents(before);
+	debt = displayDollarsAndCents(debt);
+
+	problemArray[index] = 'You enter a store with ' + before + '.<br />';
+	problemArray[index] += 'You leave the store with ' + pizzaQty + ' pizzas and a debt of ' + debt + '.<br /><br />';
+	problemArray[index] += 'What is the price of each pizza?';
+
+} // end of getMultSub()
+
+// get an equation of the form y = x/m + b
+function getDivAdd() {
+	pizzaFraction = getRandom(2, 12);
+	pricePerSlice = getRandom(101, 500)/100;
+	pricePerSlice = roundDecimalNumber(pricePerSlice, 2);
+	change = getRandom(101, 2000)/100;
+	change = roundDecimalNumber(change, 2);
+	before = pizzaFraction*pricePerSlice + change;
+	before = roundDecimalNumber(before, 2);
+
+	// display correctly
+	change = displayDollarsAndCents(change);
+	before = displayDollarsAndCents(before);
+
+	getPizzaFraction();
+
+	problemArray[index] = 'You enter a store with ' + before + '.<br />';
+	problemArray[index] += 'You leave the store with one ' + pizzaFraction + ' of a pizza and ' + change + '.<br /><br />';
+	problemArray[index] += 'What is the price of a whole pizza?';
+
+} // end of getDivAdd()
+
+// get an equation of the form y = x/m - b
+function getDivSub() {
+	pizzaFraction = getRandom(2, 12);
+	pricePerSlice = getRandom(101, 500)/100;
+	pricePerSlice = roundDecimalNumber(pricePerSlice, 2);
+	debt = getRandom(1, 100*pizzaFraction*pricePerSlice-1)/100;
+	debt = roundDecimalNumber(debt, 2);
+	before = pizzaFraction*pricePerSlice - debt;
+	before = roundDecimalNumber(before, 2);
+
+	// display correctly
+	debt = displayDollarsAndCents(debt);
+	before = displayDollarsAndCents(before);
+
+	getPizzaFraction();
+
+	problemArray[index] = 'You enter a store with ' + before + '.<br />';
+	problemArray[index] += 'You leave the store with one ' + pizzaFraction + ' of a pizza and a debt of ' + debt + '.<br /><br />';
+	problemArray[index] += 'What is the price of a whole pizza?';
+} // end of getDivSub()
+
+// get a story that can be solved with a multi-step equation
+function getMultiStep() {
+	// reset
+	index = 0;
+	problemArray = [];
+	document.getElementById('problemDiv').innerHTML = '';
+
+	getVarBothSides(); index++;
+	getDistributive(); index++;
+
+	// shuffle problemArray
+	problemArray = shuffleArray(problemArray);
+
+	// display problems
+	for (i=0; i<index; i++) {
+		temp1 = i + 1;
+		document.getElementById('problemDiv').innerHTML += temp1 + ') ' + problemArray[i] + '<br /><br /><br />';
+	}
+} // end of getMultiStep()
+
+// get an equation with the variable on both sides
+function getVarBothSides() {
+	var qty1, qty2, change1, change2;
+
+	qty1 = getRandom(2, 10);
+	qty2 = getRandom(2, 9);
+	if (qty2===qty1) {qty2 = 10;}
+	if (qty2 > qty1) {temp1 = qty1; qty1 = qty2; qty2 = temp1;}
+
+	change1 = getRandom(101, 2000)/100;
+	change1 = roundDecimalNumber(change1, 2);
+
+	price = getRandom(101, 2000)/100;
+	price = roundDecimalNumber(price, 2);
+
+	change2 = qty1*price + change1 - qty2*price;
+	change2 = roundDecimalNumber(change2, 2);
+
+	// display things correctly
+	change1 = displayDollarsAndCents(change1);
+	change2 = displayDollarsAndCents(change2);
+
+	problemArray[index] = qty1 + ' apples and a gift card for ' + change1 + ' have the same value as ';
+	problemArray[index] += qty2 + ' apples and a gift card for ' + change2 + '.<br/><br />';
+	problemArray[index] += 'What is the value of each apple?';
+
+} // end of getVarBothSides()
+
+// get an equation where we can distribute
+function getDistributive() {
+	var numBaskets, qtyApples, change1, change2, cost;
+
+	numBaskets = getRandom(2, 10);
+	qtyApples = getRandom(2, 10);
+	price = getRandom(101, 2000)/100;
+	price = roundDecimalNumber(price, 2);
+	change1 = getRandom(101, 2000)/100;
+	change1 = roundDecimalNumber(change1, 2);
+	change2 = getRandom(101, 2000)/100;
+	change2 = roundDecimalNumber(change2, 2);
+	
+	cost = numBaskets*qtyApples*price + numBaskets*change1 + change2;
+	cost = roundDecimalNumber(cost, 2);
+
+	// display correctly
+	cost = displayDollarsAndCents(cost);
+	change1 = displayDollarsAndCents(change1);
+	change2 = displayDollarsAndCents(change2);
+
+	problemArray[index] = numBaskets + ' baskets each contain ' + qtyApples + ' apples and a gift card for ' + change1 + '.<br />';
+	problemArray[index] += 'In addition to the baskets, a gift card for ' + change2 + ' is also purchased.<br /><br />';
+	problemArray[index] += 'If the total cost is ' + cost + ', what is the value of each apple?';
+
+} // end of getDistributive()
+
+</script>
+
+
+<body>
+<h2>Equation story problems for Algebra 1A</h2>
+
+<br />
+
+<input type='button' value='Get one-step' onclick='getOneStep();' />
+&nbsp;&nbsp;
+<input type='button' value='Get two-step' onclick='getTwoStep();' />
+&nbsp;&nbsp;
+<input type='button' value='Get multi-step' onclick='getMultiStep();' />
+
+<br /><br />
+
+<div id='problemDiv'>This is where the problems go</div>
+
+
+</body>

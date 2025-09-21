@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+<style>
+#container {
+  width: 500px;
+  height: 200px;
+  position: relative;
+  background: lightBlue;
+}
+#animate {
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  bottom: 20px;
+  left: 10px;
+  background-color: grey;
+}
+#floor1 {
+    width: 45px;
+    height: 30px;
+    position: absolute;
+    background: green;
+    bottom: 0px;
+    left: 0px;
+}
+#water1 {
+    width: 110px;
+    height: 10px;
+    position: absolute;
+    background: blue;
+    bottom: 0px;
+    left: 45px;
+}
+#floor2 {
+    width: 40px;
+    height: 30px;
+    position: absolute;
+    background: green;
+    bottom: 0px;
+    left: 155px;
+}
+#water2 {
+    width: 110px;
+    height: 10px;
+    position: absolute;
+    background: blue;
+    bottom: 0px;
+    left: 195px; 
+}
+#floor3 {
+    width: 40px;
+    height: 30px;
+    position: absolute;
+    background: green;
+    bottom: 0px;
+    left: 305px;
+}
+#water3 {
+    width: 110px;
+    height: 10px;
+    position: absolute;
+    background: blue;
+    bottom: 0px;
+    left: 345px; 
+}
+#floor4 {
+    width: 45px;
+    height: 30px;
+    position: absolute;
+    background: green;
+    bottom: 0px;
+    left: 455px; 
+}
+</style>
+
+<script>
+  
+// global variables
+var firstAttempt; // so that the user cannot jump more than once per question
+var reset = false; // tells whether or not to reset the position
+var numCorrect = 0; // after 3 consecutive correct answers, reset position, maybe increase the level
+
+// answer the question correctly, jump safely
+function jumpSafe() {
+  var animate = document.getElementById("animate");
+  var posLeft = parseInt(animate.style.left) || 10;
+  var posBottom = parseInt(animate.style.bottom) || 20;
+  var counter = 0;
+
+  var id = setInterval(frame, 5);
+  function frame() {
+    if (counter < 75) {
+      posBottom += 2/3;
+    } else if (counter < 150) {
+      posBottom -= 2/3;
+    }
+    posLeft++;
+    animate.style.left = posLeft + "px";
+    animate.style.bottom = posBottom + "px";
+
+    counter++;
+    if (counter >= 150) {
+      clearInterval(id);
+      giveFeedback();
+    }
+  }
+} // end of jumpSafe()
+
+
+// incorrect answer, jump fails
+function jumpFail() {
+  var animate = document.getElementById("animate");
+  var posLeft = parseInt(animate.style.left) || 10;
+  var posBottom = parseInt(animate.style.bottom) || 20;
+  var counter = 0;
+
+  var id = setInterval(frame, 5);
+  function frame() {
+    if (counter < 55) {
+      posBottom += 10/11;
+    } else if (counter < 110) {
+      posBottom -= 14/11;
+    }
+    posLeft++;
+    animate.style.left = posLeft + "px";
+    animate.style.bottom = posBottom + "px";
+
+    counter++;
+    if (counter >= 110) {
+      clearInterval(id);
+      giveFeedback();
+    }
+  }
+} // end of jumpFail()
+
+// reset the position of the animate object
+function resetPosition() {
+  var animate = document.getElementById("animate");
+  animate.style.left = '10px';
+  animate.style.bottom = '20px';
+} // end of resetPosition()
+
+// get a whole number fact problem
+function newProblem() {
+    // reset
+    document.getElementById('answerInput').value = '';
+    document.getElementById('feedbackDiv').innerHTML = '&nbsp;';
+    firstAttempt = true;
+    if (reset) {resetPosition();}
+    if (numCorrect > 2) {resetPosition(); numCorrect = 0;}
+
+    // numbers to operate with
+    number1 = getRandom(0, 10);
+    number2 = getRandom(0, 10);
+
+    // randomly select which operation
+    var temp1 = getRandom(0, 3);
+    switch (temp1) {
+        case 0: getAddition(); break;
+        case 1: getSubtraction(); break;
+        case 2: getMultiplication(); break;
+        case 3: getDivision(); break;
+        default: alert('error - newProblem()');
+    }
+
+    // display the problem
+    document.getElementById('problemDiv').innerHTML = problem;
+
+    // set focus on the textbox
+    document.getElementById('answerInput').focus();
+} // end of newProblem()
+
+// get an addition problem
+function getAddition() {
+    problem = number1 + ' + ' + number2 + ' = ?';
+    correctAnswer = number1 + number2;
+} // end of getAddition()
+
+// get a subtraction problem
+function getSubtraction() {
+    correctAnswer = number1 + number2;
+
+    // switch things around
+    temp1 = correctAnswer;
+    correctAnswer = number2;
+    number2 = temp1;
+
+    problem = number2 + ' &ndash; ' + number1 + ' = ?';
+} // end of getSubtraction
+
+// get a multiplication problem
+function getMultiplication() {
+    problem = number1 + ' &times; ' + number2 + ' = ? ';
+    correctAnswer = number1*number2;
+} // end of getMultiplication()
+
+// get a division problem
+function getDivision() {
+    // be careful of 0 x 0 = 0 ... no way to rework that into division
+    if (number2===0) {number2 = getRandom(1, 10);}
+
+    correctAnswer = number1 * number2;
+    temp1 = correctAnswer;
+    correctAnswer = number1;
+    number1 = temp1;
+
+    problem = number1 + ' &divide; ' + number2 + ' = ?';
+} // end of getDivision()
+
+// NORMALLY EXTERNAL JS
+// generate a random number
+function getRandom(min, max) {
+
+    var x = Math.floor(Math.random()*(max - min + 1)) + min;
+    // NOTE: using 0.1 and 0.9 as min and max return values of 0.1 or 1.1 every time
+    // This code probably only works for whole numbers
+    
+    return x; 
+
+} // end of getRandom(min, max)
+
+// check the user's answer
+function checkAnswer() {
+    
+    if (firstAttempt) {
+        userAnswer = document.getElementById('answerInput').value;
+        
+        if (userAnswer == correctAnswer && firstAttempt) {
+            result = 'correct';        
+            document.getElementById('newButton').focus();
+            jumpSafe();
+            reset = false;
+            numCorrect++;
+        }
+        else if (userAnswer !== correctAnswer) {
+            result = 'incorrect';        
+            document.getElementById('answerInput').focus();
+            jumpFail();
+            reset = true;
+            numCorrect = 0;
+        }
+        else {alert('error - checkAnswer()');}        
+    }
+    
+    firstAttempt = false;
+    
+} // end of checkAnswer()
+
+// give feedback ... set this in the animation function to run after clear(id)
+function giveFeedback() {
+    if (result === 'correct') {
+        document.getElementById('feedbackDiv').innerHTML = 'Correct!';
+    }
+    else if (result === 'incorrect') {
+        document.getElementById('feedbackDiv').innerHTML = 'Try again!';
+    }
+    else {alert('error - giveFeedback()');}
+} // end of giveFeedback()
+
+</script>
+
+<body onload='document.getElementById("newButton").focus()'>
+
+
+  <div id ="container">
+  
+  <button id='newButton' onclick='newProblem()'>New problem</button>
+  
+  <br /><br />
+  <span id='problemDiv'>Click the button above to get a new problem</span>
+  
+  <br /><br />
+  
+  <input type='number' id='answerInput' />
+  <button onclick='checkAnswer()'>Check answer</button>
+  <span id='feedbackDiv'>&nbsp;</span>
+  <span id='floor1'></span>
+  <span id='water1'></span>
+  <span id='floor2'></span>
+  <span id='water2'></span>
+  <span id='floor3'></span>
+  <span id='water3'></span>
+  <span id='floor4'></span>
+  <span id ="animate">The wolf</span>
+</div>
+
+
+
+
+
+
+</body>
+</html>

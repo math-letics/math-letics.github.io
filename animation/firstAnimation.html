@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<style>
+#container {
+  width: 500px;
+  height: 500px;
+  position: relative;
+  background: lightBlue;
+}
+#animate {
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  bottom: 20px;
+  left: 0px;
+  background-color: red;
+}
+#floor1 {
+    width: 300px;
+    height: 30px;
+    position: absolute;
+    background: green;
+    bottom: 0px;
+}
+#floor2 {
+    width: 100px;
+    height: 10px;
+    position: absolute;
+    background: blue;
+    bottom: 0px;
+    left: 300px;
+}
+#floor3 {
+    width: 100px;
+    height: 30px;
+    position: absolute;
+    background: green;
+    bottom: 0px;
+    left: 400px;
+}
+</style>
+
+<script>
+// 
+function moveDiagonal() {
+  let id = null;
+  const elem = document.getElementById("animate");   
+  let posLeft = 0;
+  let posBottom = 20;
+  clearInterval(id);
+  id = setInterval(frame, 5);
+  function frame() {
+    if (posBottom == 450) {
+      clearInterval(id);
+    } else {
+      posLeft++;
+      posBottom++;
+      elem.style.bottom = posBottom + "px"; 
+      elem.style.left = posLeft + "px"; 
+    }
+  }
+} // end of moveDiagonal()
+
+//
+function moveRight() {
+  let id = null;
+  const elem = document.getElementById("animate");   
+  let posLeft = 0;
+  clearInterval(id);
+  id = setInterval(frame, 5);
+  function frame() {
+    if (posLeft == 450) {
+      clearInterval(id);
+    } else {
+      posLeft++;
+      elem.style.left = posLeft + "px"; 
+    }
+  }   
+} // end of moveRight()
+
+//
+function runJumpTriangle() {
+  let id = null;
+  const elem = document.getElementById("animate");   
+  let posLeft = 0;
+  let posBottom = 20;
+  clearInterval(id);
+  id = setInterval(frame, 5);
+  function frame() {
+    if (posLeft < 250) {
+        posLeft++;
+        elem.style.left = posLeft + 'px';
+    }
+    else if (posLeft <= 300) {
+        posLeft++;
+        posBottom++;
+        elem.style.left = posLeft + 'px';
+        elem.style.bottom = posBottom + 'px';
+    }
+    else if (posLeft <= 350) {
+        posLeft++;
+        posBottom--;
+        elem.style.left = posLeft + 'px';
+        elem.style.bottom = posBottom + 'px';
+    }
+  }   
+} // end of runJumpTriangle()
+
+// when user gets a correct answer -- make the jump
+function correctAnimation() {
+  let id = null;
+  const elem = document.getElementById("animate");   
+  let posLeft = 0;
+  let posBottom = 20;
+  clearInterval(id);
+  id = setInterval(frame, 5);
+  function frame() {
+    if (posLeft < 250) {
+        posLeft++;
+        elem.style.left = posLeft + 'px';
+    }
+    else if (posLeft <= 325) {
+        posLeft++;
+        posBottom += 4/3;
+        elem.style.left = posLeft + 'px';
+        elem.style.bottom = posBottom + 'px';
+    }
+    else if (posLeft <= 400) {
+        posLeft++;
+        posBottom -= 4/3;
+        elem.style.left = posLeft + 'px';
+        elem.style.bottom = posBottom + 'px';
+    }
+  }   
+} // end of correctAnimation()
+
+// when user gets an incorrect answer -- jump fails
+function incorrectAnimation() {
+  let id = null;
+  const elem = document.getElementById("animate");   
+  let posLeft = 0;
+  let posBottom = 20;
+  clearInterval(id);
+  id = setInterval(frame, 5);
+  function frame() {
+    if (posLeft < 250) {
+        posLeft++;
+        elem.style.left = posLeft + 'px';
+    }
+    else if (posLeft <= 300) {
+        posLeft++;
+        posBottom += 2;
+        elem.style.left = posLeft + 'px';
+        elem.style.bottom = posBottom + 'px';
+    }
+    else if (posLeft <= 350) {
+        posLeft++;
+        posBottom -= 12/5;
+        elem.style.left = posLeft + 'px';
+        elem.style.bottom = posBottom + 'px';
+    }
+  }   
+} // end of incorrectAnimation()
+
+</script>
+
+<body>
+
+<button onclick="moveDiagonal()">Diagonal</button>
+<button onclick='moveRight()'>Right</button>
+<button onclick='runJumpTriangle()'>Run and Jump</button>
+<button onclick='correctAnimation()'>Correct</button>
+<button onclick='incorrectAnimation()'>Incorrect</button>
+
+
+<div id ="container">
+  <span id='positionSpan'></span>
+  <span id='floor1'></span>
+  <span id='floor2'></span>
+  <span id='floor3'></span>
+  <span id ="animate"></span>
+</div>
+
+
+
+</body>
+</html>

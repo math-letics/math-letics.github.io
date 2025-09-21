@@ -1,0 +1,89 @@
+<!-- title:  -->
+
+<script src='../externalJS/random number generator.js'></script>
+
+<script src='../externalJS/shuffle.js'></script>
+
+<script>
+// global variables
+
+var vocabArray = [];
+var definitionArray = [];
+
+// the main function of the page
+function main() {
+
+    // reset the page
+    document.getElementById('column1').innerHTML = '';
+    document.getElementById('column2').innerHTML = '';
+    getTerms();
+    var x = shuffleArray(vocabArray);
+    for (i=0; i<vocabArray.length; i++) {
+        document.getElementById('column1').innerHTML += '<br />' + x[i];
+    }
+    x = shuffleArray(definitionArray);
+    for (i=0; i<definitionArray.length; i++) {
+        var number = i + 1;
+        document.getElementById('column2').innerHTML += '<br />' + number + ')&nbsp;&nbsp;' + x[i];
+    }
+    
+} // end of main()
+
+// get vocab terms and definitions
+function getTerms() {
+    vocabArray[0] = 'x-intercept';
+    definitionArray[0] = 'Where a graph crosses the x-axis';
+
+    vocabArray[1] = 'y-intercept';
+    definitionArray[1] = 'Where a graph crosses the y-axis';
+    
+    vocabArray[2] = 'horizontal';
+    definitionArray[2] = 'Only moving left and right';
+    
+    vocabArray[3] = 'vertical';
+    definitionArray[3] = 'Only moving up and down';
+    
+    vocabArray[4] = 'undefined';
+    definitionArray[4] = 'The result we get when we try to divide by zero';
+    
+    vocabArray[5] = 'slope-intercept form';
+    definitionArray[5] = 'An equation written as y = mx + b';
+    
+    vocabArray[6] = 'coefficient';
+    definitionArray[6] = 'A number multiplied by a variable';
+    
+    vocabArray[7] = 'slope';
+    definitionArray[7] = 'The rate of change; also called "rise over run"';
+    
+    // distractors
+    vocabArray[8] = 'sum';
+    vocabArray[9] = 'difference';
+    vocabArray[10] = 'linear';
+    vocabArray[11] = 'table';
+    vocabArray[12] = 'proportion';
+    vocabArray[13] = 'coordinates';
+
+} // end of getTerms()
+
+</script>
+
+
+<body>
+<h2>Vocab quiz - Algebra 1B - Topic 2</h2>
+
+
+<input type='button' value='Click me' onclick='main();' />
+
+<br /><br />
+
+<div id='displayDiv'></div>
+
+<table>
+    <tr>
+        <td id='column1'></td>
+        <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+        <td id='column2'></td>
+    </tr>
+</table>
+
+</body>

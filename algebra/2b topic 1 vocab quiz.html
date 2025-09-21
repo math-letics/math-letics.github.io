@@ -1,0 +1,92 @@
+<!-- title:  -->
+
+<script src='../externalJS/random number generator.js'></script>
+
+<script src='../externalJS/shuffle.js'></script>
+
+<script>
+// global variables
+
+var vocabArray = [];
+var definitionArray = [];
+
+// the main function of the page
+function main() {
+
+    // reset the page
+    document.getElementById('column1').innerHTML = '';
+    document.getElementById('column2').innerHTML = '';
+    getTerms();
+    var x = shuffleArray(vocabArray);
+    for (i=0; i<vocabArray.length; i++) {
+        document.getElementById('column1').innerHTML += '<br />' + x[i];
+    }
+    x = shuffleArray(definitionArray);
+    for (i=0; i<definitionArray.length; i++) {
+        var number = i + 1;
+        document.getElementById('column2').innerHTML += '<br />' + number + ')&nbsp;&nbsp;' + x[i];
+    }
+    
+} // end of main()
+
+// get vocab terms and definitions
+function getTerms() {
+    vocabArray[0] = 'vertex';
+    definitionArray[0] = 'Either the top or bottom of a parabola';
+    
+    vocabArray[1] = 'parabola';
+    definitionArray[1] = 'The shape of the graphs of quadratic functions';
+    
+    vocabArray[2] = 'axis of symmetry';
+    definitionArray[2] = 'A vertical line through the vertex of a parabola';
+    
+    vocabArray[3] = 'y-intercept';
+    definitionArray[3] = 'Where a graph crosses the y-axis';
+    
+    vocabArray[4] = 'x-intercept';
+    definitionArray[4] = 'Where a graph crosses the x-axis';
+
+    vocabArray[5] = 'standard form';
+    definitionArray[5] = 'A quadratic equation written as y = <i>ax</i><sup>2</sup> + <i>bx</i> + <i>c</i>';
+
+    vocabArray[6] = 'zero of a function';
+    definitionArray[6] = 'Another word/phrase for "x-intercept"';
+
+    vocabArray[7] = 'domain';
+    definitionArray[7] = 'Possible x-values of a function';
+
+    vocabArray[8] = 'range';
+    definitionArray[8] = 'Possible y-values of a function';
+    
+    // distractors
+    vocabArray[9] = 'quadratic';
+    vocabArray[10] = 'coordinates';
+    vocabArray[11] = 'substitute';
+    vocabArray[12] = 'function notation';
+    vocabArray[13] = 'maximum height';
+
+
+} // end of getTerms()
+
+</script>
+
+
+<body>
+<h2>Vocab quiz - Algebra 2B - Topic 1</h2>
+
+
+<input type='button' value='Click me' onclick='main();' />
+
+<br /><br />
+
+<div id='displayDiv'></div>
+
+<table>
+    <tr>
+        <td id='column1'></td>
+        <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+        <td id='column2'></td>
+    </tr>
+</table>
+
+</body>

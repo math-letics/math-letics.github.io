@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wolf Math Jump</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        canvas {
+            border: 2px solid black;
+            background-color: lightblue;
+        }
+        #question-container {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Wolf Math Jump</h1>
+    <canvas id="gameCanvas" width="800" height="400"></canvas>
+    <div id="question-container">
+        <p id="question"></p>
+        <input type="number" id="answer" />
+        <button onclick="checkAnswer()">Submit</button>
+    </div>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let wolf = { x: 50, y: 300, width: 50, height: 50 };
+        let gaps = [200, 400, 600];
+        let currentGap = 0;
+        let questions = [
+            { q: "5 + 3", a: 8 },
+            { q: "10 - 4", a: 6 },
+            { q: "2 x 3", a: 6 }
+        ];
+        
+        function drawGame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "green";
+            ctx.fillRect(0, 350, canvas.width, 50);
+            
+            ctx.fillStyle = "brown";
+            gaps.forEach(gap => {
+                ctx.clearRect(gap, 350, 50, 50);
+            });
+            
+            ctx.fillStyle = "gray";
+            ctx.fillRect(wolf.x, wolf.y, wolf.width, wolf.height);
+        }
+        
+        function askQuestion() {
+            if (currentGap < questions.length) {
+                document.getElementById("question").textContent = questions[currentGap].q;
+            } else {
+                document.getElementById("question-container").innerHTML = "<h2>You Win!</h2>";
+            }
+        }
+        
+        function checkAnswer() {
+            let userAnswer = parseInt(document.getElementById("answer").value);
+            if (userAnswer === questions[currentGap].a) {
+                wolf.x = gaps[currentGap] + 60;
+                currentGap++;
+                drawGame();
+                askQuestion();
+            } else {
+                alert("Incorrect! Try again.");
+            }
+        }
+        
+        drawGame();
+        askQuestion();
+    </script>
+</body>
+</html>

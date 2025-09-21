@@ -1,0 +1,136 @@
+<!-- title: Random data generator -->
+
+
+<script>
+// would be external js, but this is for my phone
+// generate a random number
+function getRandom(min, max) {
+
+    var x = Math.floor(Math.random()*(max - min + 1)) + min;
+    // NOTE: using 0.1 and 0.9 as min and max return values of 0.1 or 1.1 every time
+    // This code probably only works for whole numbers
+    
+    return x; 
+
+} // end of getRandom(min, max)
+
+</script>
+
+<script>
+// global variables
+
+var min, max, n, ordered, divisor;
+var dataArray = [];
+var dataList;
+var temp1;
+
+// the main function of the page
+function main() {
+    // reset the page
+    document.getElementById('errorDiv').style.visibility = 'hidden';
+        
+    getUserInput(); // min, max, n, ordered, division
+    generateData();
+    displayData();
+} // end of main()
+
+// get user input
+function getUserInput() {
+    min = document.getElementById('minNumber').value;
+    min = parseInt(min);
+    max = document.getElementById('maxNumber').value;
+    max = parseInt(max);
+    n = document.getElementById('nNumber').value;
+    n = parseInt(n);
+    ordered = document.getElementById('orderedBox').checked;
+    if (document.getElementById('one').checked) {divisor = 1;}
+    if (document.getElementById('ten').checked) {divisor = 10;}
+    if (document.getElementById('hundred').checked) {divisor = 100;}
+} // end of getUserInput()
+
+// generate the data set
+function generateData() {
+    // clear the array
+    dataArray = [];
+    if (document.getElementById('repeatBox').checked) {
+        for (i=0; i<n; i++) {
+            dataArray[i] = getRandom(min, max)/divisor;
+        }        
+    }
+    else { // do not allow repeated numbers
+        // make sure the range does not exceed n
+        var range = max - min + 1;
+        if (n > range) {
+            document.getElementById('errorDiv').style.visibility = 'visible';
+        }
+        else {
+            var sampleArray = []; // store all possible numbers   
+            for (i=0; i<max-min+1; i++) {
+                sampleArray[i] = min + i;
+            }
+            for (i=0; i<n; i++) {
+                temp1 = getRandom(0, max-min-i);
+                dataArray[i] = sampleArray[temp1]/divisor;
+                sampleArray[temp1] = sampleArray[sampleArray.length-1-i];
+            }            
+        }
+    }
+    if (ordered) {
+        dataArray.sort(function(a,b){return a-b;});
+    }
+} // end of generateData()
+
+// display the data set
+function displayData() {
+    dataList = '';
+    for (i=0; i<dataArray.length-1; i++) {
+        dataList += dataArray[i] + ', ';
+    }
+    dataList += dataArray[dataArray.length-1];
+    
+    document.getElementById('displayDiv').innerHTML = dataList;
+} // end of displayData
+
+</script>
+
+<style>
+    input[type='number'] {
+        width: 50px;
+    }
+</style>
+
+<body>
+<h2>Random data generator</h2>
+
+<input type='number' value='1' id='minNumber' /> Minimum
+<br />
+<input type='number' value='10' id='maxNumber' /> Maximum
+<br />
+<input type='number' id='nNumber' /> n
+<br />
+<input type='checkbox' id='repeatBox' checked />Allow numbers to repeat
+<br />
+<input type='checkbox' id='orderedBox' /> Order least to greatest
+<br />
+<input type='radio' name='divide' id='one' checked />
+Divide all numbers by 1<br />
+<input type='radio' name='divide' id='ten' />
+Divide all numbers by 10<br />
+<input type='radio' name='divide' id='hundred' />
+Divide all numbers by 100
+
+<br /><br />
+
+<div id='errorDiv' style='color:red; visibility:hidden;'>
+    You are asking for too many numbers to not repeat.<br />
+    Either decrease the minimum, increase the maximum, decrease n,
+    <br />or select "Allow numbers to repeat"
+</div>
+
+<input type='button' value='Get data' onclick='main();' />
+
+<br />
+
+<div id='displayDiv'></div>
+
+</body>

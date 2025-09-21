@@ -1,0 +1,170 @@
+<!-- title: one-step equations -->
+
+<script src='../externalJS/random number generator.js'>
+</script>
+
+<script>
+// global variables
+var variableArray = ['a', 'c', 'f', 'h', 'k', 'm', 'n', 'r', 'u', 'v', 'w', 'x', 'y'];
+var varLetter; // a randomly chosen variable letter from the variableArray
+var expression, equation;
+var operation;
+var term1, term2, sum;
+var factor1, factor2, product;
+var problem, answer;
+var userInput;
+var temp1, temp2;
+
+// the main function of the page
+function main() {
+
+    // reset the webpage
+    document.getElementById('problemDiv').innerHTML = '';
+    document.getElementById('feedbackDiv').innerHTML = '';
+    document.getElementById('answerDiv').innerHTML = '';
+
+    getVariable();
+    getOperation();
+    getValues();
+    getEquation();
+    
+    displayProblem();
+    
+} // end of main()
+
+// choose which letter to use for the variable
+function getVariable() {
+    temp1 = getRandom(0, variableArray.length - 1);
+    varLetter = variableArray[temp1];
+} // end of getVariable()
+
+// choice of operation will determine values used
+function getOperation() {
+    temp1 = getRandom(1, 4);
+    switch (temp1) {
+        case 1: operation = 'add'; break;
+        case 2: operation = 'subtract'; break;
+        case 3: operation = 'multiply'; break;
+        case 4: operation = 'divide'; break;
+        default: alert('error - getOperation()');
+    }
+} // end of getOperation()
+
+// get values for the equation
+function getValues() {
+    if (operation==='add' || operation==='subtract') {
+        // double or triple digit
+        temp1 = getRandom(0, 1);
+        if (temp1===0) { // double digit
+            term1 = getRandom(10, 99);
+            term2 = getRandom(10, 99);
+        }
+        else if (temp1===1) { // triple digit
+            term1 = getRandom(100, 999);
+            term2 = getRandom(100, 999);
+        }
+        else {alert('error - getValues()');}
+        
+        sum = term1 + term2;        
+    }
+    else if (operation==='multiply' || operation==='divide') {
+        // only double digit
+        factor1 = getRandom(10, 99);
+        factor2 = getRandom(10, 99);
+        
+        product = factor1 * factor2;
+    }
+    else {alert('error - getValues()');}
+} // end of getValues()
+
+// create the equation to solve
+function getEquation() {
+    temp1 = getRandom(0, 1); // used later to determine which side has the variable
+    if (operation==='add') {
+        expression = varLetter + ' + ' + term2;
+        // use value of temp1 from earlier
+        if (temp1===0) {equation = expression + ' = ' + sum;}
+        else if (temp1===1) {equation = sum + ' = ' + expression;}
+        else {alert('error - getEquation() - add');}
+        
+        answer = term1;
+    }
+    else if (operation==='subtract') {
+        expression = varLetter + ' &ndash; ' + term1;
+        // use value of temp1 from earlier
+        if (temp1===0) {equation = expression + ' = ' + term2;}
+        else if (temp1===1) {equation = term2 + ' = ' + expression;}
+        else {alert('error - getEquation() - subtract');}
+        
+        answer = sum;
+    }
+    else if (operation==='multiply') {
+        expression = factor1 + varLetter;
+        // use value of temp1 from earlier
+        if (temp1===0) {equation = expression + ' = ' + product;}
+        else if (temp1===1) {equation = product + ' = ' + expression;}
+        else {alert('error - getEquation() - multiply');}
+        
+        answer = factor2;
+    }
+    else if (operation==='divide') {
+        expression = varLetter + ' &divide; ' + factor1;
+        // value of temp1 from earlier
+        if (temp1===0) {equation = expression + ' = ' + factor2;}
+        else if (temp1===1) {equation = factor2 + ' = ' + expression;}
+        else {alert('error - GetEquation() - divide');}
+        
+        answer = product;
+    }
+    else {alert('error - getEquation() - missing operation');}
+    
+} // end of getEquation()
+
+// display the problem on the webpage
+function displayProblem() {
+    problem = 'Solve for ' + varLetter + '.<br /><br />';
+    problem += equation;
+    
+    document.getElementById('problemDiv').innerHTML = problem;
+} // end of displayProblem()
+
+// check the answer input by user
+function checkAnswer() {
+    userInput = document.getElementById('userText').value;
+    if (userInput==answer) {document.getElementById('feedbackDiv').innerHTML = 'Correct!';}
+    else {document.getElementById('feedbackDiv').innerHTML = 'Try again!';}
+} // end of checkAnswer()
+
+// show the answer
+function showAnswer() {
+    document.getElementById('answerDiv').innerHTML = varLetter + ' = ' + answer;
+} // end of showAnswer()
+
+</script>
+
+
+<body>
+<h3>Solve one-step equations - Flash cards</h3>
+(When this looks complete, go back to template)
+
+<br /><br />
+
+<input type='button' value='Click me' onclick='main();' />
+
+<br /><br />
+
+<div id='problemDiv'></div>
+
+<br /><br />
+
+Type your answer here<br />
+<span id='variableSpan'></span> = <input type='text' id='userText' /><br />
+<div id='feedbackDiv'></div><br />
+<input type='button' value='Check my answer' onclick='checkAnswer();' />
+
+<br /><br />
+
+<div id='answerDiv'></div><br />
+<input type='button' value='Show answer' onclick='showAnswer();' />
+
+</body>

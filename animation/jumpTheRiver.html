@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<style>
+#container {
+  width: 500px;
+  height: 200px;
+  position: relative;
+  background: lightBlue;
+}
+#animate {
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  bottom: 20px;
+  left: 0px;
+  background-color: red;
+}
+#floor1 {
+    width: 300px;
+    height: 30px;
+    position: absolute;
+    background: green;
+    bottom: 0px;
+}
+#floor2 {
+    width: 100px;
+    height: 10px;
+    position: absolute;
+    background: blue;
+    bottom: 0px;
+    left: 300px;
+}
+#floor3 {
+    width: 100px;
+    height: 30px;
+    position: absolute;
+    background: green;
+    bottom: 0px;
+    left: 400px;
+}
+</style>
+
+<script>
+
+var userAnswer = 'incorrect';
+var jumpPoint, landPoint, peakPoint, fallDistance;
+
+// wrong answer **DELETE THIS ONCE THINGS WORK CORRECTLY
+function wrongAnswer() {
+    userAnswer = 'incorrect';
+    animateJump();
+}
+
+// right answer **DELETE THIS ONCE THINGS WORK CORRECTLY
+function rightAnswer() {
+    userAnswer = 'correct';
+    animateJump();
+}
+
+
+// check the answer
+function checkAnswer() {
+    animateJump();
+} // end of checkAnswer()
+
+// animated the jump
+function animateJump() {
+  // code from W3schools
+  let id = null;
+  const elem = document.getElementById("animate");   
+  let posLeft = 0; elem.style.left = posLeft + 'px';
+  let posBottom = 20; elem.style.bottom = posBottom + 'px';
+  clearInterval(id);   
+
+
+  // animation depends on answer
+  if (userAnswer === 'correct') {
+    jumpPoint = 250;
+    peakPoint = 325;
+    landPoint = 400;
+    fallDistance = 100;
+  }
+  else if (userAnswer === 'incorrect') {
+    jumpPoint = 215;
+    peakPoint = 275;
+    landPoint = 350;
+    fallDistance = 120;
+  }
+
+  // start the animation
+  id = setInterval(frame, 5);
+  function frame() {
+    if (posLeft < jumpPoint) { // approaching the jump
+        posLeft++;
+        elem.style.left = posLeft + 'px';
+    }
+    else if (posLeft <= peakPoint) { // jumping, on the way up
+        posLeft++;
+        posBottom += 100/(peakPoint-jumpPoint);
+        elem.style.left = posLeft + 'px';
+        elem.style.bottom = posBottom + 'px';
+    }
+    else if (posLeft <= landPoint) { // coming down from the jump
+        posLeft++;
+        posBottom -= fallDistance/(landPoint-peakPoint);
+        elem.style.left = posLeft + 'px';
+        elem.style.bottom = posBottom + 'px';
+    }
+    else {clearInteval(id);}
+  }
+} // end of animateJump()
+
+</script>
+
+<body>
+
+<button onclick='checkAnswer()'>Check answer</button>
+<button onclick='rightAnswer()'>Correct</button>
+<button onclick='wrongAnswer()'>Incorrect</button>
+
+
+<div id ="container">
+  <span id='positionSpan'></span>
+  <span id='floor1'></span>
+  <span id='floor2'></span>
+  <span id='floor3'></span>
+  <span id ="animate"></span>
+</div>
+
+<form id='form'>
+<input type='text' id='userText' />
+<input type='submit' onclick='checkAnswer()' />
+</form>
+
+
+
+</body>
+</html>

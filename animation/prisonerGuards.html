@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html>
+<style>
+#container {
+  width: 1120px;
+  height: 600px;
+  position: relative;
+  background: lightBlue;
+}
+#guard1LeftSpan {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  bottom: 40px;
+  left: 10px;
+  background-color: lightGreen;
+  text-align: center;
+  visibility: visible;
+}
+#guard1RightSpan {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  bottom: 40px;
+  left: 820px;
+  background-color: lightGreen;
+  text-align: center;
+  visibility: hidden;
+}
+#guard2LeftSpan {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  bottom: 40px;
+  left: 60px;
+  background-color: lightGreen;
+  text-align: center;
+  visibility: visible;
+}
+#guard2RightSpan {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  bottom: 40px;
+  left: 870px;
+  background-color: lightGreen;
+  text-align: center;
+  visibility: hidden;
+}
+#guard3LeftSpan {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  bottom: 40px;
+  left: 110px;
+  background-color: lightGreen;
+  text-align: center;
+  visibility: visible;
+}
+#guard3RightSpan {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  bottom: 40px;
+  left: 920px;
+  background-color: lightGreen;
+  text-align: center;
+  visibility: hidden;
+}
+#prisoner1LeftSpan {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  bottom: 40px;
+  left: 160px;
+  background-color: violet;
+  text-align: center;
+  visibility: visible;
+}
+#prisoner1RightSpan {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  bottom: 40px;
+  left: 970px;
+  background-color: violet;
+  text-align: center;
+  visibility: hidden;
+}
+#prisoner2LeftSpan {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  bottom: 40px;
+  left: 210px;
+  background-color: violet;
+  text-align: center;
+  visibility: visible;
+}
+#prisoner2RightSpan {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  bottom: 40px;
+  left: 1020px;
+  background-color: violet;
+  text-align: center;
+  visibility: hidden;
+}
+#prisoner3LeftSpan {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  bottom: 40px;
+  left: 260px;
+  background-color: violet;
+  text-align: center;
+  visibility: visible;
+}
+#prisoner3RightSpan {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  bottom: 40px;
+  left: 1070px;
+  background-color: violet;
+  text-align: center;
+  visibility: hidden;
+}
+#raftSpan {
+  width: 110px;
+  height: 40px;
+  position: absolute;
+  bottom: 40px;
+  left: 310px;
+  background-color: brown; 
+}
+#landLeftSpan {
+    width: 310px;
+    height: 60px;
+    position: absolute;
+    background: green;
+    bottom: 0px;
+    left: 0px;
+}
+#waterSpan {
+    width: 500px;
+    height: 45px;
+    position: absolute;
+    background: blue;
+    bottom: 0px;
+    left: 310px;
+}
+#landRightSpan {
+    width: 310px;
+    height: 60px;
+    position: absolute;
+    background: green;
+    bottom: 0px;
+    left: 810px;
+}
+#cargo1Span {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  bottom: 60px;
+  left: 320px;  
+  outline-width: 1px;
+  text-align: center;
+}
+#cargo2Span {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  bottom: 60px;
+  left: 370px;  
+  outline-width: 1px;
+  text-align: center;
+}
+</style>
+
+<script>
+
+var temp1, temp2;
+var numberOfGuardsLeft, numberOfGuardsRight, numberOfGuardsRaft;
+var numberOfPrisonersLeft, numberOfPrisonersRight, numberOfPrisonersRaft;
+
+// positions... 0 is on left, 1 is on raft, 2 is on right
+let guard1Position = 0;
+let guard2Position = 0;
+let guard3Position = 0;
+let prisoner1Position = 0;
+let prisoner2Position = 0;
+let prisoner3Position = 0;
+let raftIsOnLeft = true; // Track raft side (starts on the left)
+
+
+function move(id, from, to, onComplete) {
+  const elem = document.getElementById(id);   
+  let pos = from;
+  const step = from < to ? 1 : -1;
+
+  clearInterval(elem._intervalId);
+  elem._intervalId = setInterval(() => {
+    if (pos === to) {
+      clearInterval(elem._intervalId);
+      if (onComplete) onComplete();
+    } else {
+      pos += step;
+      elem.style.left = pos + 'px';
+    }
+  }, 5);
+} // end of move();
+
+function crossTheRiver() {
+  // check to make sure rules are not broken, e.g. cabbage not left with rabbit
+  var verified = verifyForm();
+  if (verified) { 
+    
+    let completed = 0;
+    const checkAllDone = () => {
+      completed++;
+      if (completed === 3) {
+        // code to execute after the raft has crossed  
+      }
+    };
+  
+    if (raftIsOnLeft) {
+      move('cargo1Span', 320, 710, checkAllDone);
+      move('cargo2Span', 370, 760, checkAllDone);
+      move('raftSpan', 310, 700, checkAllDone);
+    } else {
+      move('cargo1Span', 710, 320, checkAllDone);
+      move('cargo2Span', 760, 370, checkAllDone);
+      move('raftSpan', 700, 310, checkAllDone);
+    }
+  
+    raftIsOnLeft = !raftIsOnLeft; // Toggle side
+  }  
+  else { // rules are being broken, do not allow crossing
+  }
+} // end of crossTheRiver()
+
+// make sure rules are followed
+function verifyForm() {
+    // return true if. rules are followed
+    // return false if. rules are not followed
+    
+    // prisoners outnumber 1 or 2 guards
+    // count the number of guards and prisoners on each side
+    countPeople();
+    if (numberOfGuardsLeft!==0) {
+        if (numberOfGuardsLeft<numberOfPrisonersLeft) {
+          alert('Prisoners cannot outnumber guards. You will have ' +
+                numberOfGuardsLeft + ' guards on the left and ' +
+                numberOfPrisonersLeft + ' prisoners on the left.');
+          return false;
+        }
+    }
+    if (numberOfGuardsRight!==0) {
+        if (numberOfGuardsRight<numberOfPrisonersRight) {
+          alert('Prisoners cannot outnumber guards. You will have ' +
+                numberOfGuardsRight + ' guards on the right and ' +
+                numberOfPrisonersRight + ' prisoners on the right.');
+            return false;
+        }
+    }
+    // get who is in the boat
+    temp1 = document.getElementById('cargo1Span').innerHTML;
+    temp2 = document.getElementById('cargo2Span').innerHTML;
+    
+    // boat is empty
+    if (temp1==='' && temp2==='') {
+      alert('Someone needs to drive the boat.  Click on a person to move them to the boat.');
+      return false;
+    }
+    
+    // p2 and/or p3 are the only ones in the boat
+    if ((temp1==='P2'&&temp2==='P3')||
+    (temp1==='P3'&&temp2==='P2')||
+    (temp1==='P2'&&temp2==='')||
+    (temp1===''&&temp2==='P2')||
+    (temp1==='P3'&&temp2==='')||
+    (temp1===''&&temp2==='P3')) {
+        alert('Only G1*, G2*, G3*, and P1* can drive the boat.');
+        return false;
+    }
+    
+    else {return true;}
+
+} // end of verifyForm();
+
+function countPeople() {
+    numberOfGuardsLeft = 0; numberOfGuardsRight = 0; numberOfGuardsRaft = 0;
+    numberOfPrisonersLeft = 0; numberOfPrisonersRight = 0; numberOfPrisonersRaft = 0;    
+    
+    // who is on the raft?
+    temp1 = document.getElementById('cargo1Span').innerHTML;
+    temp2 = document.getElementById('cargo2Span').innerHTML;
+    if (temp1==='G1*' || temp1==='G2*' || temp1==='G3*') {numberOfGuardsRaft++;}
+    else if (temp1==='P1*' || temp1==='P2' || temp1==='P3') {numberOfPrisonersRaft++;}
+    if (temp2==='G1*' || temp2==='G2*' || temp2==='G3*') {numberOfGuardsRaft++;}
+    if (temp2==='P1*' || temp2==='P2' || temp2==='P3') {numberOfPrisonersRaft++;}
+    
+    if (document.getElementById('guard1LeftSpan').style.visibility==='visible') {numberOfGuardsLeft++;}
+    if (document.getElementById('guard2LeftSpan').style.visibility==='visible') {numberOfGuardsLeft++;}
+    if (document.getElementById('guard3LeftSpan').style.visibility==='visible') {numberOfGuardsLeft++;}
+    if (document.getElementById('prisoner1LeftSpan').style.visibility==='visible') {numberOfPrisonersLeft++;}
+    if (document.getElementById('prisoner2LeftSpan').style.visibility==='visible') {numberOfPrisonersLeft++;}
+    if (document.getElementById('prisoner3LeftSpan').style.visibility==='visible') {numberOfPrisonersLeft++;} 
+
+    if (document.getElementById('guard1RightSpan').style.visibility==='visible') {numberOfGuardsRight++;}
+    if (document.getElementById('guard2RightSpan').style.visibility==='visible') {numberOfGuardsRight++;}
+    if (document.getElementById('guard3RightSpan').style.visibility==='visible') {numberOfGuardsRight++;}
+    if (document.getElementById('prisoner1RightSpan').style.visibility==='visible') {numberOfPrisonersRight++;}
+    if (document.getElementById('prisoner2RightSpan').style.visibility==='visible') {numberOfPrisonersRight++;}
+    if (document.getElementById('prisoner3RightSpan').style.visibility==='visible') {numberOfPrisonersRight++;}
+   
+    // count the people on the raft as left or right based on where the raft is going
+    if (!raftIsOnLeft) { // on the right, heading left
+        numberOfGuardsLeft += numberOfGuardsRaft;
+        numberOfPrisonersLeft += numberOfPrisonersRaft;
+    }
+    else if (raftIsOnLeft) { // on the left, heading right
+        numberOfGuardsRight += numberOfGuardsRaft;
+        numberOfPrisonersRight += numberOfPrisonersRaft;
+    }
+} // end of countPeople()
+
+// argument is guard1, prisoner1, etc
+// abbrev is G1*, P1*, P2, etc
+// side is left or right
+function load(argument, abbrev, side) {
+    var argumentSpan;
+    if (raftIsOnLeft && side==='left') {
+        argumentSpan = argument + 'LeftSpan';
+        
+        if (document.getElementById('cargo1Span').innerHTML==='') {  
+            document.getElementById('cargo1Span').innerHTML = abbrev;
+            if (abbrev==='P1*'||abbrev==='P2'||abbrev==='P3') { temp1 = 'violet';}
+            else if (abbrev==='G1*'||abbrev==='G2*'||abbrev==='G3*') {temp1 = 'lightGreen';}
+            document.getElementById('cargo1Span').style.backgroundColor = temp1;
+            document.getElementById(argumentSpan).style.visibility = 'hidden';
+        }
+        else if (document.getElementById('cargo2Span').innerHTML==='') {  
+            document.getElementById('cargo2Span').innerHTML = abbrev;
+            if (abbrev==='P1*'||abbrev==='P2'||abbrev==='P3') { temp1 = 'violet';}
+            else if (abbrev==='G1*'||abbrev==='G2*'||abbrev==='G3*') {temp1 = 'lightGreen';}
+            document.getElementById('cargo2Span').style.backgroundColor = temp1;
+            document.getElementById(argumentSpan).style.visibility = 'hidden';            
+        }
+        else {alert('The boat is full.  Remove someone from the boat or cross the river.');}
+    }
+    else if (!raftIsOnLeft && side==='right') {
+        argumentSpan = argument + 'RightSpan';
+        if (document.getElementById('cargo1Span').innerHTML==='') {  
+            document.getElementById('cargo1Span').innerHTML = abbrev;
+            if (abbrev==='P1*'||abbrev==='P2'||abbrev==='P3') { temp1 = 'violet';}
+            else if (abbrev==='G1*'||abbrev==='G2*'||abbrev==='G3*') {temp1 = 'lightGreen';}
+            document.getElementById('cargo1Span').style.backgroundColor = temp1;
+            document.getElementById(argumentSpan).style.visibility = 'hidden';
+        }
+        else if (document.getElementById('cargo2Span').innerHTML==='') {  
+            document.getElementById('cargo2Span').innerHTML = abbrev;
+            if (abbrev==='P1*'||abbrev==='P2'||abbrev==='P3') { temp1 = 'violet';}
+            else if (abbrev==='G1*'||abbrev==='G2*'||abbrev==='G3*') {temp1 = 'lightGreen';}
+            document.getElementById('cargo2Span').style.backgroundColor = temp1;
+            document.getElementById(argumentSpan).style.visibility = 'hidden';            
+        }
+        else {alert('The boat is full.  Remove someone from the boat or cross the river.');}
+    }
+
+} // end of load(argument)
+
+// cargoSpan is either cargo1Span or cargo2Span
+function unload(cargoSpan) {
+    switch (document.getElementById(cargoSpan).innerHTML) {
+        case 'G1*':
+          if (raftIsOnLeft) {
+            document.getElementById('guard1LeftSpan').style.visibility = 'visible';
+            guard1Position = 0;  
+          }
+          else if (!raftIsOnLeft) {
+            document.getElementById('guard1RightSpan').style.visibility = 'visible';
+            guard1Position = 2;
+          }
+          break;
+        case 'G2*':
+          if (raftIsOnLeft) {
+            document.getElementById('guard2LeftSpan').style.visibility = 'visible';
+            guard2Position = 0;              
+          }
+          else if (!raftIsOnLeft) {
+            document.getElementById('guard2RightSpan').style.visibility = 'visible';
+            guard2Position = 2;
+          }
+          break;
+        case 'G3*':
+          if (raftIsOnLeft) {
+            document.getElementById('guard3LeftSpan').style.visibility = 'visible';
+            guard3Position = 0;
+          }
+          else if (!raftIsOnLeft) {
+            document.getElementById('guard3RightSpan').style.visibility = 'visible';
+            guard3Position = 2;
+          }
+          break;
+        case 'P1*':
+          if (raftIsOnLeft) {
+            document.getElementById('prisoner1LeftSpan').style.visibility = 'visible';
+            prisoner1Position = 0;
+          }
+          else if (!raftIsOnLeft) {
+            document.getElementById('prisoner1RightSpan').style.visibility = 'visible';            
+            prisoner1Position = 2;
+          }
+          break;
+        case 'P2':
+          if (raftIsOnLeft) {
+            document.getElementById('prisoner2LeftSpan').style.visibility = 'visible';
+            prisoner2Position = 0;
+          }
+          else if (!raftIsOnLeft) {
+            document.getElementById('prisoner2RightSpan').style.visibility = 'visible';
+            prisoner2Position = 2;
+          }
+          break;
+        case 'P3':
+          if (raftIsOnLeft) {
+            document.getElementById('prisoner3LeftSpan').style.visibility = 'visible';
+            prisoner3Position = 0;
+          }
+          else if (!raftIsOnLeft) {
+            document.getElementById('prisoner3RightSpan').style.visibility = 'visible';
+            prisoner3Position = 2;
+          }
+          break;
+    }
+    document.getElementById(cargoSpan).innerHTML = '';
+    document.getElementById(cargoSpan).style.backgroundColor = 'transparent';
+    checkForCompletion();
+} // end of unload(cargoSpan)
+
+function checkForCompletion() {
+  if (prisoner1Position===2 && prisoner2Position===2 && prisoner3Position===2 &&
+  guard1Position===2 && guard2Position===2 && guard3Position===2) {
+        alert('You did it!  Nice work!');
+        location.reload();
+  }
+} // end of checkForCompletion()
+
+</script>
+
+
+<body>
+  <div id ="container">
+    Three guards and three prisoners all need to get across a river.  <br /><br />
+    Rules:<br />
+    &nbsp;&nbsp; - A maximum of two people can fit in the boat<br />
+    &nbsp;&nbsp; - If there are any guards (G) on either side, they cannot be outnumbered by prisoners (P)<br />
+    &nbsp;&nbsp; - The only people who can drive the boat are G1, G2, G3, and P1 (*)<br /><br />
+    Can you get everyone across the river?<br /><br />
+    Click on a person to move them on or off of the boat.
+    <br /><br />&nbsp;&nbsp;
+    <button onclick='location.reload();'>Restart</button>
+    <br /><br />&nbsp;&nbsp;
+
+    <div style='text-align: center;' >
+      <button  onclick='crossTheRiver()'>Cross the river</button>
+    </div>
+    <span id='landLeftSpan'></span>
+    <span id='waterSpan'></span>
+    <span id='landRightSpan'></span>
+    <span id ='guard1LeftSpan' style='visibility:visible;' onclick='load("guard1", "G1*", "left");'>G1*</span>
+    <span id='guard2LeftSpan' style='visibility:visible;' onclick='load("guard2", "G2*", "left");'>G2*</span>
+    <span id='guard3LeftSpan' style='visibility:visible;' onclick='load("guard3", "G3*", "left");'>G3*</span>
+    <span id ='prisoner1LeftSpan' style='visibility:visible;' onclick='load("prisoner1", "P1*", "left");'>P1*</span>
+    <span id='prisoner2LeftSpan' style='visibility:visible;' onclick='load("prisoner2", "P2", "left");'>P2</span>
+    <span id='prisoner3LeftSpan' style='visibility:visible;' onclick='load("prisoner3", "P3", "left");'>P3</span>
+    <span id ='guard1RightSpan'onclick='load("guard1", "G1*", "right");'>G1*</span>
+    <span id='guard2RightSpan' onclick='load("guard2", "G2*", "right");'>G2*</span>
+    <span id='guard3RightSpan' onclick='load("guard3", "G3*", "right");'>G3*</span>
+    <span id ='prisoner1RightSpan' onclick='load("prisoner1", "P1*", "right");'>P1*</span>
+    <span id='prisoner2RightSpan' onclick='load("prisoner2", "P2", "right");'>P2</span>
+    <span id='prisoner3RightSpan' onclick='load("prisoner3", "P3", "right");'>P3</span>
+    <span id='raftSpan'></span>
+    <span id='cargo1Span' onclick='unload("cargo1Span");'></span>
+    <span id='cargo2Span' onclick='unload("cargo2Span");'></span>
+  </div>
+
+</body>
+</html>

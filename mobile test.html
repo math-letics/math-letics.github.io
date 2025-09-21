@@ -1,0 +1,43 @@
+<!-- title:  -->
+
+<script src='../externalJS/random number generator.js'>
+</script>
+
+<script>
+// global variables
+
+var temp1, temp2;
+
+// the main function of the page
+function main() {
+    temp1 = getRandom(0, 1);
+    document.getElementById('displayDiv').innerHTML = temp1;
+    
+} // end of main()
+
+// generate a random number
+function getRandom(min, max) {
+
+    var x = Math.floor(Math.random()*(max - min + 1)) + min;
+    // NOTE: using 0.1 and 0.9 as min and max return values of 0.1 or 1.1 every time
+    // This code probably only works for whole numbers
+    
+    return x; 
+
+} // end of getRandom(min, max)
+
+</script>
+
+
+<body>
+<h2>Webpage title</h2>
+
+<br /><br />
+
+<input type='button' value='Click me' onclick='main();' />
+
+<br /><br />
+
+<div id='displayDiv'>This is the display div</div>
+
+</body>

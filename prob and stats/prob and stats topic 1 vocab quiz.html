@@ -1,0 +1,70 @@
+<!-- title:  -->
+
+<script src='../externalJS/random number generator.js'></script>
+
+<script src='../externalJS/shuffle.js'></script>
+
+<script>
+// global variables
+
+var vocabArray = [];
+var definitionArray = [];
+
+// the main function of the page
+function main() {
+
+    // reset the page
+    document.getElementById('column1').innerHTML = '';
+    document.getElementById('column2').innerHTML = '';
+    getTerms();
+    var x = shuffleArray(vocabArray);
+    for (i=0; i<vocabArray.length; i++) {
+        document.getElementById('column1').innerHTML += '<br />' + x[i];
+    }
+    x = shuffleArray(definitionArray);
+    for (i=0; i<definitionArray.length; i++) {
+        var number = i + 1;
+        document.getElementById('column2').innerHTML += '<br />' + number + ')&nbsp;&nbsp;' + x[i];
+    }
+    
+} // end of main()
+
+// get vocab terms and definitions
+function getTerms() {
+    vocabArray[0] = 'quantitative';
+    definitionArray[0] = 'Representing a number';
+    
+    
+
+/* distractors...
+categorical
+variable
+individual - distractor?
+frequency - distractor?
+*/
+
+} // end of getTerms()
+
+</script>
+
+
+<body>
+<h2>Vocab quiz - Prob and Stats - Topic 1</h2>
+**Come back to this later**
+
+
+<input type='button' value='Click me' onclick='main();' />
+
+<br /><br />
+
+<div id='displayDiv'></div>
+
+<table>
+    <tr>
+        <td id='column1'></td>
+        <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+        <td id='column2'></td>
+    </tr>
+</table>
+
+</body>

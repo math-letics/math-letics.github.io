@@ -1,0 +1,89 @@
+<!-- title:  -->
+
+<script src='../externalJS/random number generator.js'></script>
+
+<script src='../externalJS/shuffle.js'></script>
+
+<script>
+// global variables
+
+var vocabArray = [];
+var definitionArray = [];
+
+// the main function of the page
+function main() {
+
+    // reset the page
+    document.getElementById('column1').innerHTML = '';
+    document.getElementById('column2').innerHTML = '';
+    getTerms();
+    var x = shuffleArray(vocabArray);
+    for (i=0; i<vocabArray.length; i++) {
+        document.getElementById('column1').innerHTML += '<br />' + x[i];
+    }
+    x = shuffleArray(definitionArray);
+    for (i=0; i<definitionArray.length; i++) {
+        var number = i + 1;
+        document.getElementById('column2').innerHTML += '<br />' + number + ')&nbsp;&nbsp;' + x[i];
+    }
+    
+} // end of main()
+
+// get vocab terms and definitions
+function getTerms() {
+    vocabArray[0] = 'square root';
+    definitionArray[0] = 'Cancels a "square" (exponent of 2)';
+    
+    vocabArray[1] = '45-45-90';
+    definitionArray[1] = 'A triangle whose sides are in the ratio 1:1:&radic;<span style="text-decoration:overline">2</span>';
+    
+    vocabArray[2] = '30-60-90';
+    definitionArray[2] = 'A triangle whose sides are in the ratio 1:2:&radic;<span style="text-decoration:overline">3</span>';
+
+    vocabArray[3] = 'legs';
+    definitionArray[3] = 'Sides of a triangle that make a 90-degree angle';
+    
+    vocabArray[4] = 'hypotenuse';
+    definitionArray[4] = 'A side of a triangle opposite from a 90-degree angle';
+    
+    vocabArray[5] = 'perfect square';
+    definitionArray[5] = 'A number that can be written as a whole number squared';
+    
+    vocabArray[6] = 'prime factorization';
+    definitionArray[6] = 'When we write a number as a product of only prime numbers';
+    
+    vocabArray[7] = 'similar triangles';
+    definitionArray[7] = '"Zooming in or out" to change side lengths, but not angles';
+    
+    // distractors
+    vocabArray[8] = 'factor tree';
+    vocabArray[9] = 'isosceles';
+    vocabArray[10] = 'rationalize';
+    vocabArray[11] = 'equilateral';
+    vocabArray[12] = 'simplify';
+    
+
+} // end of getTerms()
+
+</script>
+
+
+<body>
+<h2>Vocab quiz - Geometry B - Topic 1</h2>
+
+
+<input type='button' value='Click me' onclick='main();' />
+
+<br /><br />
+
+<div id='displayDiv'></div>
+
+<table>
+    <tr>
+        <td id='column1'></td>
+        <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+        <td id='column2'></td>
+    </tr>
+</table>
+
+</body>

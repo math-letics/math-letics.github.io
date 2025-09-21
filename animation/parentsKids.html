@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html>
+<style>
+#container {
+  width: 1000px;
+  height: 600px;
+  position: relative;
+  background: lightBlue;
+}
+#adult1LeftSpan {
+  width: 60px;
+  height: 60px;
+  position: absolute;
+  bottom: 40px;
+  left: 10px;
+  background-color: gray;
+  text-align: center;
+}
+#adult1RightSpan {
+  width: 60px;
+  height: 60px;
+  position: absolute;
+  bottom: 40px;
+  left: 760px;
+  background-color: gray;
+  text-align: center;
+  visibility: hidden;
+}
+#adult2LeftSpan {
+  width: 60px;
+  height: 60px;
+  position: absolute;
+  bottom: 40px;
+  left: 80px;
+  background-color: gray;
+  text-align: center;
+}
+#adult2RightSpan {
+  width: 60px;
+  height: 60px;
+  position: absolute;
+  bottom: 40px;
+  left: 830px;
+  background-color: gray;
+  text-align: center;
+  visibility: hidden;
+}
+#kid1LeftSpan {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  bottom: 40px;
+  left: 150px;
+  background-color: lightGreen;
+  text-align: center;
+}
+#kid1RightSpan {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  bottom: 40px;
+  left: 900px;
+  background-color: lightGreen;
+  text-align: center;
+  visibility: hidden;
+}
+#kid2LeftSpan {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  bottom: 40px;
+  left: 200px;
+  background-color: lightGreen;
+  text-align: center;
+}
+#kid2RightSpan {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  bottom: 40px;
+  left: 950px;
+  background-color: lightGreen;
+  text-align: center;
+  visibility: hidden;
+}
+#raftSpan {
+  width: 110px;
+  height: 40px;
+  position: absolute;
+  bottom: 40px;
+  left: 250px;
+  background-color: brown; 
+}
+#landLeftSpan {
+    width: 250px;
+    height: 60px;
+    position: absolute;
+    background: green;
+    bottom: 0px;
+    left: 0px;
+}
+#waterSpan {
+    width: 500px;
+    height: 45px;
+    position: absolute;
+    background: blue;
+    bottom: 0px;
+    left: 250px;
+}
+#landRightSpan {
+    width: 250px;
+    height: 60px;
+    position: absolute;
+    background: green;
+    bottom: 0px;
+    left: 750px;
+}
+#adultCargoSpan {
+  width: 60px;
+  height: 60px;
+  position: absolute;
+  bottom: 260px;
+  left: 275px;
+  text-align: center;
+}
+#kid1CargoSpan {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  bottom: 260px;
+  left: 260px;  
+  outline-width: 1px;
+  text-align: center;
+}
+#kid2CargoSpan {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  bottom: 260px;
+  left: 310px;  
+  outline-width: 1px;
+  text-align: center;
+}
+</style>
+
+<script>
+
+var temp1, temp2;
+
+// positions... 0 is on left, 1 is on raft, 2 is on right
+let adult1Position = 0;
+let adult2Position = 0;
+let kid1Position = 0;
+let kid2Position = 0;
+let raftIsOnLeft = true; // Track raft side (starts on the left)
+
+
+function move(id, from, to, onComplete) {
+  const elem = document.getElementById(id);   
+  let pos = from;
+  const step = from < to ? 1 : -1;
+
+  clearInterval(elem._intervalId);
+  elem._intervalId = setInterval(() => {
+    if (pos === to) {
+      clearInterval(elem._intervalId);
+      if (onComplete) onComplete();
+    } else {
+      pos += step;
+      elem.style.left = pos + 'px';
+    }
+  }, 5);
+} // end of move();
+
+function crossTheRiver() {
+  // check to make sure rules are not broken, e.g. cabbage not left with rabbit
+  
+  var verified = verifyForm();
+  
+  if (verified) { 
+    
+    let completed = 0;
+    const checkAllDone = () => {
+      completed++;
+      if (completed === 4) {
+        // code to execute after the raft has crossed
+      }
+    }
+  ;
+  
+    if (raftIsOnLeft) {
+      move('adultCargoSpan', 275, 665, checkAllDone);
+      move('kid1CargoSpan', 260, 650, checkAllDone);
+      move('kid2CargoSpan', 310, 700, checkAllDone);
+      move('raftSpan', 250, 640, checkAllDone);
+    } else {
+      move('adultCargoSpan', 665, 275, checkAllDone);
+      move('kid1CargoSpan', 650, 260, checkAllDone);
+      move('kid2CargoSpan', 700, 310, checkAllDone);
+      move('raftSpan', 640, 250, checkAllDone);
+    }
+  
+    raftIsOnLeft = !raftIsOnLeft; // Toggle side
+  }  
+  else { // rules are being broken, do not allow crossing
+  }
+} // end of crossTheRiver()
+
+// make sure rules are followed
+function verifyForm() {
+    // return true if. rules are followed
+    // return false if. rules are not followed
+    if (document.getElementById('adultCargoSpan').innerHTML==='' &&
+        document.getElementById('kid1CargoSpan').innerHTML==='' &&
+        document.getElementById('kid2CargoSpan').innerHTML==='') {
+          alert('Someone needs to drive the boat.  Click on a person to move them to the boat.');
+          return false;
+    }
+    else {return true;}
+
+} // end of verifyForm();
+
+
+// span is adult1, kid1, etc
+// inner (innerHTML) is Adult1, Kid1, etc
+// side is left or right
+function load(span, inner, side) {
+    if (span==='adult1' || span==='adult2') { // load an adult
+      if (raftIsOnLeft && side==='left') {
+        // make sure there is room
+        if (document.getElementById('adultCargoSpan').innerHTML !== '' ||
+        document.getElementById('kid1CargoSpan').innerHTML !== '' ||
+        document.getElementById('kid2CargoSpan').innerHTML !== '') {
+            alert('There is not enough space.  Move everyone off the boat or cross the river.');
+        }
+        else {
+          document.getElementById('adultCargoSpan').innerHTML = inner;
+          document.getElementById('adultCargoSpan').style.backgroundColor = 'gray';
+          document.getElementById('adultCargoSpan').style.bottom = '60px';
+          span += 'LeftSpan';
+          document.getElementById(span).style.visibility = 'hidden';
+        }
+      }
+      else if (!raftIsOnLeft && side==='right') {
+        if (document.getElementById('adultCargoSpan').innerHTML !== '' ||
+        document.getElementById('kid1CargoSpan').innerHTML !== '') {
+            alert('There is not enough space.  Move everyone off the boat or cross the river.');
+        }
+        else {
+          document.getElementById('adultCargoSpan').innerHTML = inner;
+          document.getElementById('adultCargoSpan').style.backgroundColor = 'gray';
+          document.getElementById('adultCargoSpan').style.bottom = '60px';
+          span += 'RightSpan';
+          document.getElementById(span).style.visibility = 'hidden';
+        }        
+      }
+    }
+    else if(span==='kid1' || span==='kid2') { // load a kid
+        if (raftIsOnLeft && side==='left') {
+          // make sure there is room
+          if (document.getElementById('adultCargoSpan').innerHTML !== '') {
+            alert('There is not enough space.  Move everyone off the boat or cross the river.');
+          }
+          else {
+            // put the kid in the first open spot
+            if (document.getElementById('kid1CargoSpan').innerHTML === '') {temp1 = 'kid1CargoSpan';}
+            else {temp1 = 'kid2CargoSpan';}
+            document.getElementById(temp1).innerHTML = inner;
+            document.getElementById(temp1).style.backgroundColor = 'lightGreen';
+            document.getElementById(temp1).style.bottom = '60px';            
+            span += 'LeftSpan';
+            document.getElementById(span).style.visibility = 'hidden';           
+          }
+        }
+        else if (!raftIsOnLeft && side==='right') {
+          if (document.getElementById('adultCargoSpan').innerHTML !== '') {
+            alert('There is not enough space.  Move everyone off the boat or cross the river.');
+          }
+          else {
+            // put the kid in the first open spot
+            if (document.getElementById('kid1CargoSpan').innerHTML === '') {temp1 = 'kid1CargoSpan';}
+            else {temp1 = 'kid2CargoSpan';}
+            document.getElementById(temp1).innerHTML = inner;
+            document.getElementById(temp1).style.backgroundColor = 'lightGreen';
+            document.getElementById(temp1).style.bottom = '60px';            
+            span += 'RightSpan';
+            document.getElementById(span).style.visibility = 'hidden';           
+          }          
+        }
+    }
+    else {alert('error- load(span, inner, side)');}
+} // end of load(span, inner, side)
+
+// span is adultCargoSpan, kid1CargoSpan, kid2CargoSpan
+function unload(span) {
+  switch (document.getElementById(span).innerHTML) {
+    case 'Adult1': 
+      if (raftIsOnLeft) {
+        document.getElementById('adult1LeftSpan').style.visibility = 'visible';
+        adult1Position = 0;
+      }
+      else if (!raftIsOnLeft) {
+        document.getElementById('adult1RightSpan').style.visibility = 'visible';
+        adult1Position = 2;
+      }
+      break;
+    case 'Adult2':
+      if (raftIsOnLeft) {
+        document.getElementById('adult2LeftSpan').style.visibility = 'visible';
+        adult2Position = 0;  
+      }
+      else if (!raftIsOnLeft) {
+        document.getElementById('adult2RightSpan').style.visibility = 'visible';
+        adult2Position = 2;  
+      }
+      break;
+    case 'Kid1':
+      if (raftIsOnLeft) {
+        document.getElementById('kid1LeftSpan').style.visibility = 'visible';
+        kid1Position = 0;  
+      }
+      else if (!raftIsOnLeft) {
+        document.getElementById('kid1RightSpan').style.visibility = 'visible';
+        kid1Position = 2;  
+      }
+      break;
+    case 'Kid2':
+      if (raftIsOnLeft) {
+        document.getElementById('kid2LeftSpan').style.visibility = 'visible';
+        kid2Position = 0;  
+      }
+      else if (!raftIsOnLeft) {
+        document.getElementById('kid2RightSpan').style.visibility = 'visible';
+        kid2Position = 2;
+      }
+      break;
+    default: alert('error - unload(span)');
+  }
+  document.getElementById(span).style.background = 'lightBlue';
+  document.getElementById(span).style.bottom = '160px';
+  document.getElementById(span).innerHTML = '';
+  checkForCompletion();
+} // end of unload(span)
+
+function checkForCompletion() {
+        if (adult1Position===2 && adult2Position===2 && kid1Position===2 && kid2Position===2) {
+          alert('You did it!  Nice work!');
+          location.reload();
+        }
+} // end of checkForCompletion()
+
+</script>
+
+
+<body>
+  <div id ="container">
+    Two adults and two kids need to get across a river.<br /><br />
+    Rules:<br />
+    &nbsp;&nbsp; - Two kids can fit in the boat together<br />
+    &nbsp;&nbsp; - If an adult is in the boat, there is not enough space for a second person<br />
+    &nbsp;&nbsp; - Everyone can drive the boat<br /><br />
+    Can you get everyone across the river?<br /><br />
+    Click on a person to move them on or off of the boat.
+    <br /><br />&nbsp;&nbsp;
+    <button onclick='location.reload();'>Restart</button>
+    <br /><br />&nbsp;&nbsp;
+
+    <div style='text-align: center;' >
+      <button  onclick='crossTheRiver()'>Cross the river</button>
+    </div>
+    <span id='landLeftSpan'></span>
+    <span id='waterSpan'></span>
+    <span id='landRightSpan'></span>
+    <span id ='adult1LeftSpan'  onclick='load("adult1", "Adult1", "left");'>Adult1</span>
+    <span id='adult2LeftSpan' onclick='load("adult2", "Adult2", "left");'>Adult2</span>
+    <span id='kid1LeftSpan' onclick='load("kid1", "Kid1", "left");'>Kid1</span>
+    <span id ='kid2LeftSpan' onclick='load("kid2", "Kid2", "left");'>Kid2</span>
+    <span id ='adult1RightSpan' onclick='load("adult1", "Adult1", "right");'>Adult1</span>
+    <span id='adult2RightSpan' onclick='load("adult2", "Adult2", "right");'>Adult2</span>
+    <span id='kid1RightSpan' onclick='load("kid1", "Kid1", "right");'>Kid1</span>
+    <span id ='kid2RightSpan' onclick='load("kid2", "Kid2", "right");'>Kid2</span>
+    <span id='raftSpan'></span>
+    <span id='adultCargoSpan' onclick='unload("adultCargoSpan");'></span>
+    <span id='kid1CargoSpan' onclick='unload("kid1CargoSpan");'></span>
+    <span id='kid2CargoSpan' onclick='unload("kid2CargoSpan");'></span>
+  </div>
+
+</body>
+</html>

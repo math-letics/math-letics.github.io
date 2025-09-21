@@ -1,0 +1,45 @@
+<!-- Story problems for integer addition and subtraction  -->
+
+<script src='../externalJS/random number generator.js'>
+</script>
+
+<script>
+// global variables
+
+var temp1, temp2;
+
+// the main function of the page
+function main() {
+
+// reset the page
+document.getElementById('displayDiv').innerHTML = '';
+
+
+
+} // end of main()
+
+</script>
+
+
+<body>
+<h2>Integer Addition and Subtraction Story Problems</h2>
+
+Choose your operation(s):<br />
+<input type='checkbox' id='addCheck' checked /> Addition
+<br />
+<input type='checkbox' id='subCheck' checked /> Subtraction
+
+<br /><br />
+
+Choose your quantity:<br />
+<input type='number' id='problemNum' min='1' max='10' value='4' />
+
+<br /><br />
+
+<input type='button' value='Get problems' onclick='main();' />
+
+<br /><br />
+
+<div id='displayDiv'></div>
+
+</body>

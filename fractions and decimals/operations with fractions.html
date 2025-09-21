@@ -1,0 +1,316 @@
+<!-- title: operations with fractions -->
+
+<script src='../externalJS/random number generator.js'>
+</script>
+
+
+<script src='../externalJS/gcf.js'>
+</script>
+
+<script>
+// global variables
+var whole1, whole2, wholeAnswer; // whole numbers
+var num1, num2, numAnswer; // numerators
+var den1, den2, denAnswer; // denominators
+var operation;
+var temp1, temp2;
+var numberOfTypes;
+var typesArray = [];
+var maxDen, minDen;
+
+// the main function of the page
+function main() {
+
+    var verified = verify();
+    if (verified) {
+        getTypes();
+        getNumbers();
+        getOperation();
+        getAnswer();
+        displayProblem();       
+    }
+    else {document.getElementById('errorMessageDiv').style.visibility = 'visible';}
+    
+    document.getElementById('instructionsDiv').style.visibility = 'visible';
+
+} // end of main()
+
+// verify that at least one operation is selected
+function verify() {
+    var operationSelected = true;
+    var typeSelected = true;
+    
+    if (document.getElementById('properCheck').checked === false &&
+        document.getElementById('mixedCheck').checked === false &&
+        document.getElementById('improperCheck').checked === false)
+        {
+            typeSelected = false;
+            document.getElementById('typeErrorDiv').style.visibility = 'visible';    
+        }
+    else {document.getElementById('typeErrorDiv').style.visibility = 'hidden';}
+    
+    if (document.getElementById('addCheck').checked === false &&
+        document.getElementById('subtractCheck').checked === false &&
+        document.getElementById('multiplyCheck').checked === false &&
+        document.getElementById('divideCheck').checked === false)
+        {
+            operationSelected = false;
+            document.getElementById('operationErrorDiv').style.visibility = 'visible';    
+        }
+    else {document.getElementById('operationErrorDiv').style.visibility = 'hidden'; }
+    
+    if (typeSelected===false || operationSelected===false) {
+        return false;
+    }
+    else {return true;}
+} // end of verify()
+
+// get the types of fractions to be used
+function getTypes() {
+    numberOfTypes = 0;
+    if (document.getElementById('properCheck').checked) {
+        typesArray[numberOfTypes] = 'proper';
+        numberOfTypes++;
+    }
+    if (document.getElementById('mixedCheck').checked) {
+        typesArray[numberOfTypes] = 'mixed';
+        numberOfTypes++;
+    }
+    if (document.getElementById('improperCheck').checked) {
+        typesArray[numberOfTypes] = 'improper';
+        numberOfTypes++;
+    }
+} // end of getTypes()
+
+// get the numbers to use in the problem
+function getNumbers() {
+    maxDen = parseInt(document.getElementById('maxDenNumber').value);
+    minDen = parseInt(document.getElementById('maxDenNumber').min);
+    
+    // get the first fraction
+    temp1 = getRandom(0, numberOfTypes-1);
+    if (typesArray[temp1]==='mixed') {
+        whole1 = getRandom(1, 9);
+        num1 = getRandom(1, maxDen-1);
+        den1 = getRandom(num1+1, maxDen);
+    }
+    else {
+        whole1 = 0;    
+        if (typesArray[temp1]==='proper') {
+            num1 = getRandom(1, maxDen-1);
+            den1 = getRandom(num1+1, maxDen);
+        }
+        else {
+            num1 = getRandom(minDen+1, maxDen+1);
+            den1 = getRandom(3, num1-1);
+        }    
+    }
+    // get the second fraction
+    temp1 = getRandom(0, numberOfTypes-1);
+    if (typesArray[temp1]==='mixed'){
+        whole2 = getRandom(1, 9);
+        num2 = getRandom(1, maxDen-1);
+        den2 = getRandom(num2+1, maxDen);
+    }
+    else {
+        whole2 = 0;
+        if (typesArray[temp1]==='proper') {
+            num2 = getRandom(1, maxDen-1);
+            den2 = getRandom(num2+1, maxDen);
+        }
+        else {
+            num2 = getRandom(minDen+1, maxDen+1); 
+            den2 = getRandom(3, num2-1); 
+        }
+    }
+} // end of getNumbers()
+
+// get the operation to use in the problem
+function getOperation() {
+    
+    var tempArray = [];
+    temp1 = 0;
+    if (document.getElementById('addCheck').checked) {
+        tempArray[temp1] = '+';
+        temp1++;
+    }
+    if (document.getElementById('subtractCheck').checked) {
+        tempArray[temp1] = '&ndash;';
+        temp1++;
+    }
+    if (document.getElementById('multiplyCheck').checked) {
+        tempArray[temp1] = '&times;';
+        temp1++;
+    }
+    if (document.getElementById('divideCheck').checked) {
+        tempArray[temp1] = '&divide;';
+        temp1++;
+    }
+    
+    temp2 = getRandom(0, temp1-1);
+
+    operation = tempArray[temp2];
+} // end of getOperation()
+
+// calculate the answer
+function getAnswer() {
+    if (operation==='+') {
+        wholeAnswer = whole1 + whole2;
+        numAnswer = num1*den2 + num2*den1;
+        denAnswer = den1*den2;  
+    }
+    else if (operation==='&ndash;') {
+        wholeAnswer = whole1 - whole2;
+        numAnswer = num1*den2 - num2*den1;
+        denAnswer = den1*den2;
+    }
+    else if (operation==='&times;') {
+        // for starters, we will only display proper and improper fractions
+        wholeAnswer = 0;
+        numAnswer = (den1*whole1 + num1)*(den2*whole2 + num2);
+        denAnswer = den1*den2;
+    }
+    else if (operation==='&divide;') {
+        // again, at the star, we will only display proper and improper fractions
+        wholeAnswer = 0;
+        numAnswer = (den1*whole1 + num1)*den2;
+        denAnswer = den1*(den2*whole2 + num2);
+    }
+    
+    // whole number answers
+    if (numAnswer===0) {
+        document.getElementById('numAnswerSpan').style.visibility = 'hidden';
+        document.getElementById('denAnswerSpan').style.visibility = 'hidden';
+    }
+    else {// reduce the answer
+        temp1 = getGCF(numAnswer, denAnswer);
+        numAnswer /= temp1;
+        denAnswer /= temp1;
+        document.getElementById('numAnswerSpan').style.visibility = 'visible';
+        document.getElementById('denAnswerSpan').style.visibility = 'visible';
+    }   
+
+} // end of getAnswer()
+
+// display the problem
+function displayProblem() {
+    if (whole1 === 0) {document.getElementById('whole1Span').innerHTML = '';}
+    else {document.getElementById('whole1Span').innerHTML = whole1;}
+    
+    document.getElementById('num1Span').innerHTML = num1;
+    document.getElementById('den1Span').innerHTML = den1;
+    
+    document.getElementById('operationSpan').innerHTML = operation;
+    
+    if (whole2 === 0) {document.getElementById('whole2Span').innerHTML = '';}
+    else {document.getElementById('whole2Span').innerHTML = whole2;}
+    
+    document.getElementById('num2Span').innerHTML = num2;
+    document.getElementById('den2Span').innerHTML = den2;
+    
+    document.getElementById('equalsSpan').innerHTML = '=';
+    
+    if (wholeAnswer === 0) {document.getElementById('wholeAnswerSpan').innerHTML = '';}
+    else {document.getElementById('wholeAnswerSpan').innerHTML = wholeAnswer;}
+    
+    document.getElementById('numAnswerSpan').innerHTML = numAnswer;
+    document.getElementById('denAnswerSpan').innerHTML = denAnswer;
+} // end of displayProblem()
+
+</script>
+
+<style>
+    body {
+        background-color: black;
+        color: white;
+    }    
+</style>
+
+<head>
+    <link rel='stylesheet' type='text/css' href='../externalCSS/display fractions.css' />
+</head>
+
+<body>
+<h2>Operations with fractions</h2>
+
+Maximum denominator...
+<input type='number' id='maxDenNumber' value=12 min=3 max=12 />
+<br /><br />
+
+Choose your fraction type(s)...<br />
+<input type='checkbox' id='properCheck' checked />Proper fractions<br />
+<input type='checkbox' id='mixedCheck' checked />Mixed numbers and whole numbers<br />
+<input type='checkbox' id='improperCheck' checked />Improper fractions
+<br />
+<div id='typeErrorDiv' style='visibility:hidden; color:red;'>
+    Select at least one fraction type.
+</div>
+<br />
+
+Choose your operation(s)...
+<br />
+<input type='checkbox' id='addCheck' checked /> Addition<br />
+<input type='checkbox' id='subtractCheck' checked />Subtraction<br />
+<input type='checkbox' id='multiplyCheck' checked />Multiplication<br />
+<input type='checkbox' id='divideCheck' checked />Division
+<br />
+
+<div id='operationErrorDiv' style='visibility:hidden; color:red;'>
+    Select at least one operation.
+</div><br />
+
+<input type='button' value='Get a new problem' style='background-color:blue; color: white;' onclick='main();' />
+
+<br /><br />
+
+<div id='instructionsDiv' style='visibility:hidden;' >
+    Evaluate the following expression.
+    <br />Simplify completely.  
+</div>
+
+<table id='problemTable'>
+    <tr>
+        <td>
+            <span id='whole1Span'></span>
+        </td>
+        <td>
+            <span id='num1Span' class='top'></span>
+            <span id='den1Span' class='bottom' style='border-top: 1px solid #ffffff;'></span>
+        </td>
+        <td>
+            <span id='operationSpan'></span>
+        </td>
+        <td>
+            <span id='whole2Span'></span>
+        </td>
+        <td>            
+            <span id='num2Span' class='top'></span>
+            <span id='den2Span' class='bottom' style='border-top: 1px solid #ffffff;'></span>
+        </td>
+        <td>
+            <span id='equalsSpan'></span>
+        </td>
+        <td>
+            <input type='textBox' id='answerText' />
+            <input type='button' value='Check my answer' style='background-color:green; color:white;' />
+        </td>
+    </tr>
+</table>
+
+<input type='button' value='Show answer' style='background-color:orange; color:white;' onclick='showAnswer();' />
+
+
+<table id='answerTable'>
+    <td>
+        <span id='wholeAnswerSpan'></span>
+    </td>
+    <td>            
+        <span id='numAnswerSpan' class='top'></span>
+        <span id='denAnswerSpan' class='bottom' style='border-top: 1px solid #ffffff;'></span>
+    </td>
+</table>
+
+
+
+
+</body>

@@ -1,0 +1,114 @@
+<!-- title: Simplify square roots -->
+
+<script src='../externalJS/random number generator.js'>
+</script>
+
+<script>
+// global variables
+
+var temp1, temp2;
+var problemQty; // how many problems to do
+var prime1, prime2, prime3, prime4; // primes that we will multiply
+// create arrays to hold groups of primes
+var primeArray1 = [2, 3, 5];
+var primeArray2 = [2, 3, 5, 7, 11];
+var primeArray3 = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37];
+var radicand; // the number under the square root
+
+// the main function of the page
+function main() {
+  // reset the page
+  document.getElementById('problemDiv').innerHTML = '';
+
+  // use 2, 3, or 4 prime numbers to build a new number
+  temp1 = getRandom(0, 2);
+  switch (temp1) {
+    case 0: use2Primes(); break;
+    case 1: use3Primes(); break;
+    case 2: use4Primes(); break;
+    default: alert('error - main()');
+  }
+
+  radicand = prime1*prime2*prime3*prime4;
+
+  displayRadical();
+
+  // display the problem
+  document.getElementById('problemDiv').innerHTML = radicand;
+
+} // end of main()
+
+// put the radicand into a radical
+function displayRadical() {
+  radicand = '&radic;' + '<span style=text-decoration:overline>' + radicand + '</span>';
+} // end of displayRadical()
+
+// use 2 primes
+function use2Primes() {
+  // 1 from primeArray2, 1 from primeArray3
+  temp2 = primeArray2.length-1;
+  temp1 = getRandom(0, temp2);
+  prime1 = primeArray2[temp1];
+
+  temp2 = primeArray3.length-1;
+  temp1 = getRandom(0, temp2);
+  prime2 = primeArray3[temp1];
+
+  prime3 = 1;
+  prime4 = 1;
+
+} // end of use2Primes()
+
+// use 3 primes
+function use3Primes() {
+  // 2 from primeArray1, 1 from primeArray3
+  temp2 = primeArray1.length-1;
+  temp1 = getRandom(0, temp2);
+  prime1 = primeArray1[temp1];
+
+  temp1 = getRandom(0, temp2);
+  prime2 = primeArray1[temp1];
+
+  temp2 = primeArray3.length-1;
+  temp1 = getRandom(0, temp2);
+  prime3 = primeArray3[temp1];
+
+  prime4 = 1;
+
+} // end of use3Primes
+
+// use 4 primes
+function use4Primes() {
+  // 3 from primeArray1, 1 from primeArray3
+  temp2 = primeArray1.length-1;
+  temp1 = getRandom(0, temp2);
+  prime1 = primeArray1[temp1];
+
+  temp1 = getRandom(0, temp2);
+  prime2 = primeArray1[temp1];
+
+  temp1 = getRandom(0, temp2);
+  prime3 = primeArray1[temp1];
+
+  temp2 = primeArray3.length-1;
+  temp1 = getRandom(0, temp2);
+  prime4 = primeArray3[temp1];
+
+} // end of use4Primes()
+
+</script>
+
+
+<body>
+<h2>Simplify square roots</h2>
+
+<br /><br />
+
+<input type='button' value='Click me' onclick='main();' />
+
+<br /><br />
+
+<div id='problemDiv'>This is where the problems go</div>
+
+
+</body>

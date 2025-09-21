@@ -1,0 +1,238 @@
+<!-- title: quiz - systems of equations word problems -->
+
+<script src='../externalJS/random number generator.js'>
+</script>
+
+<script src='../externalJS/shuffle.js'>
+</script>
+
+<script>
+// global variables
+
+var temp1, temp2;
+var pencilQty1, pencilQty2, calculatorQty1, calculatorQty2;
+var pencilPrice, calculatorPrice, totalPrice1, totalPrice2;
+var problemArray = []; // an array to hold the problems
+var index; // for the problemArray
+var onePencil; // Boolean
+var difference1, difference2;
+
+// the main function of the page
+function main() {
+
+    // reset
+    document.getElementById('displayDiv').innerHTML = '';
+    problemArray = [];
+    index = 0;
+
+    getType1();
+    getType2();    
+    getType3();
+    getType4();
+    getType5();
+    getType6();
+    
+    problemArray = shuffleArray(problemArray);
+    displayProblems();
+    
+} // end of main()
+
+// get the price of each item
+function getPrices() {
+    pencilPrice = getRandom(1, 99)/100;
+    calculatorPrice = getRandom(2, 99);
+} // end of getPrices()
+
+// get the total prices
+function getTotalPrices() {
+    temp1 = pencilQty1*pencilPrice + calculatorQty1*calculatorPrice;
+    temp2 = pencilQty2*pencilPrice + calculatorQty2*calculatorPrice;
+    
+    // put dollars signs
+    totalPrice1 = '$' + temp1;
+    totalPrice2 = '$' + temp2;
+} // end of getTotalPrices()
+
+// get a problem where three coefficients are 1
+function getType1() {
+    pencilQty1 = 1;
+    calculatorQty1 = 1;
+
+    temp1 = getRandom(0, 1);
+    if (temp1===0) {
+        pencilQty2 = 1;
+        calculatorQty2 = getRandom(2, 9);
+        
+        getPrices();
+        getTotalPrices();
+        sentence1 = 'A pencil and a calculator cost ' + totalPrice1 + '.';
+        sentence2 = 'A pencil and ' + calculatorQty2 + ' calculators cost ' + totalPrice2 +'.';
+    }
+    else {
+        pencilQty2 = getRandom(2, 9);
+        calculatorQty2 = 1;
+        
+        getPrices();
+        getTotalPrices();
+        sentence1 = 'A pencil and a calculator cost ' + totalPrice1 + '.';
+        sentence2 = pencilQty2 + ' pencils and a calculator cost ' + totalPrice2 + '.';
+    }
+    
+    randomizeInfo();
+    addToArray();    
+} // end of getType1()
+
+// get a problem where 2 coefficients in the same eqn are 1
+function getType2() {
+    pencilQty1 = 1;
+    calculatorQty1 = 1;
+    pencilQty2 = getRandom(2, 9);
+    calculatorQty2 = getRandom(2, 9);
+    // NOTE: The above code allows 4 infinitely many and no solutions
+    
+    getPrices();
+    getTotalPrices();
+    
+    sentence1 = 'A pencil and a calculator cost ' + totalPrice1 + '.';
+    sentence2 = pencilQty2 + ' pencils and ' + calculatorQty2 + ' calculators cost ' + totalPrice2 + '.';
+    
+    randomizeInfo();
+    addToArray();  
+} // end of getType2()
+
+// get a problem where 1 coefficient is 1
+function getType3() {
+    temp1 = getRandom(0, 1);
+    if (temp1===0) { // one pencil
+        onePencil = true;
+        pencilQty1 = 1;
+        calculatorQty1 = getRandom(2, 9);
+    }
+    else { // one calculator
+        onePencil = false;
+        calculatorQty1 = 1;
+        pencilQty1 = getRandom(2, 9);
+    }
+    pencilQty2 = getRandom(2, 9);
+    calculatorQty2 = getRandom(2, 9);
+    
+    getPrices();
+    getTotalPrices();
+    
+    if (onePencil===true) {
+        sentence1 = 'A pencil and ' + calculatorQty1 + ' calculators cost ' + totalPrice1 + '.';
+    }
+    else {
+        sentence1 = pencilQty1 + ' pencils and a calculator cost ' + totalPrice1 + '.';
+    }
+    sentence2 = pencilQty2 + ' pencils and ' + calculatorQty2 + ' calculators cost ' + totalPrice2 + '.';
+    
+    randomizeInfo();
+    addToArray();
+    
+} // end of getType3()
+
+// get a problem where no coefficients are 1
+function getType4() {
+    pencilQty1 = getRandom(2, 9);
+    calculatorQty1 = getRandom(2, 9);
+    pencilQty2 = getRandom(2, 9);
+    calculatorQty2 = getRandom(2, 9);
+    
+    getPrices();
+    getTotalPrices();
+    
+    sentence1 = pencilQty1 + ' pencils and ' + calculatorQty1 + ' calculators cost ' + totalPrice1 + '.';
+    sentence2 = pencilQty2 + ' pencils and ' + calculatorQty2 + ' calculators cost ' + totalPrice2 + '.';
+    
+    randomizeInfo();
+    addToArray();
+} // end of getType4()
+
+// get a problem set up 4 substitution with one equation
+function getType5() {
+    calculatorQty1 = 1;
+    pencilQty1 = getRandom(2, 9);
+    calculatorQty2 = getRandom(2, 9);
+    pencilQty2 = getRandom(2, 9);
+    
+    getPrices();
+    getTotalPrices();
+    
+    difference1 = calculatorPrice - pencilQty1*pencilPrice;
+    difference1 = '$' + difference1;
+    
+    sentence1 = 'A calculator costs ' + difference1 + ' more than ' + pencilQty1 + ' pencils.';
+    sentence2 = pencilQty2 + ' pencils and ' + calculatorQty2 + ' calculators cost ' + totalPrice2 + '.';
+    
+    randomizeInfo();
+    addToArray();    
+} // end of getType5()
+
+// get a problem set up 4 substitution with two equations
+function getType6() {
+    calculatorQty1 = 1;
+    pencilQty1 = getRandom(2, 9);
+    calculatorQty2 = 1;
+    pencilQty2 = getRandom(2, 9);
+    
+    getPrices();
+    getTotalPrices();
+    
+    difference1 = calculatorPrice - pencilQty1*pencilPrice;
+    difference1 = '$' + difference1;
+    difference2 = calculatorPrice - pencilQty2*pencilPrice;
+    difference2 = '$' + difference2;
+    
+    sentence1 = ' costs ' + difference1 + ' more than ' + pencilQty1 + ' pencils.';
+    sentence2 = ' costs ' + difference2 + ' more than ' + pencilQty2 + ' pencils.';
+    
+    randomizeInfo();
+    
+    sentence1 = 'A calculator' + sentence1;
+    sentence2 = 'The same calculator' + sentence2;
+    
+    addToArray();
+} // end of getType6()
+
+
+// randomize which sentence/equation is first
+function randomizeInfo() {
+    temp1 = getRandom(0, 1);
+    if (temp1===0) { // switch sentences
+        temp1 = sentence1;
+        sentence1 = sentence2;
+        sentence2 = temp1;
+    }
+} // end of randomizeInfo()
+
+// add the sentences/equations to the array
+function addToArray() {
+    problemArray[index] = sentence1 + '  ' + sentence2;
+    problemArray[index] += '<br />What is the cost of each item?';
+    index++;    
+} // end of addToArray()
+
+// display the question
+function displayProblems() {
+    for (i=0; i<index; i++) {
+        document.getElementById('displayDiv').innerHTML += problemArray[i] + '<br /><br />';
+    }
+} // end of displayQuestion()
+
+</script>
+
+
+<body>
+<h2>Systems of Equations - Word problems</h2>
+
+<br /><br />
+
+<input type='button' value='Click me' onclick='main();' />
+
+<br /><br />
+
+<div id='displayDiv'></div>
+
+
+</body>

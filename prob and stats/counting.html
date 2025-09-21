@@ -1,0 +1,128 @@
+<!-- title:  FCP, permutations, combinations-->
+
+<script src='../externalJS/random number generator.js'>
+</script>
+
+<script>
+// global variables
+
+var temp1, temp2, temp3;
+var typeArray = []; // hold the different types of questions
+var index;
+var maxQty, chosenQty;
+var question;
+
+// the main function of the page
+function main() {
+
+	// reset the page
+	document.getElementById('problemDiv').innerHTML = '';
+	document.getElementById('errorDiv').style.visibility = 'hidden';
+	index = 0;
+	question = '';
+
+	if (verifyForm()) {
+		getQuestionTypes();
+		getNumbers();
+		getQuestion();
+		document.getElementById('problemDiv').innerHTML = question;
+	}
+
+} // end of main()
+
+// get a question based on user's selected preferences
+function getQuestion() {
+	temp1 = getRandom(0, index-1);
+	switch (typeArray[temp1]) {
+		case 'fcp': getFCP(); break;
+		case 'perm': getPermutation(); break;
+		case 'comb': getCombination(); break;
+		default: alert('error - getQuestion()');
+	}
+} // end of getQuestion()
+
+// get numbers to use in the problem
+function getNumbers() {
+	maxQty = getRandom(3, 15);
+	chosenQty = getRandom(2, maxQty-1);
+} // end of getNumbers()
+
+// get a fundamental counting principle problem
+function getFCP() {
+	question = 'How many ways can ' + maxQty + ' people be picked ';
+	question += 'from a group of ' + maxQty + ' people ';
+	question += 'if you cannot repeat the same person and ';
+	question += 'order matters?';
+} // end of getFCP()
+
+// get a permutation problem
+function getPermutation() {
+	question = 'How many ways can ' + chosenQty + ' people be picked ';
+	question += 'from a group of ' + maxQty + ' people ';
+	question += 'if you cannot repeat the same person and ';
+	question += 'order matters?';
+} // end of getPermutation()
+
+// get a combination problem
+function getCombination() {
+	question = 'How many ways can ' + chosenQty + ' people be picked ';
+	question += 'from a group of ' + maxQty + ' people ';
+	question += 'if you cannot repeat the same person and ';
+	question += 'order does not matter?';
+} // end of getCombination()
+
+// what type of questions were selected?
+function getQuestionTypes() {
+	if (document.getElementById('fcpBox').checked) {
+		typeArray[index] = 'fcp';
+		index++;
+	}
+	if (document.getElementById('permBox').checked) {
+		typeArray[index] = 'perm';
+		index++;
+	}
+	if (document.getElementById('combBox').checked) {
+		typeArray[index] = 'comb';
+		index++;
+	}
+} // end of getQuestionTypes()
+
+// verify that at least one option has been selected
+function verifyForm() {
+	temp1 = document.getElementById('fcpBox').checked;
+	temp2 = document.getElementById('permBox').checked;
+	temp3 = document.getElementById('combBox').checked;
+
+	if (temp1===false && temp2===false && temp3==false) {
+		document.getElementById('errorDiv').style.visibility = 'visible';
+		return false;
+	}
+	else {return true;}
+} // end of verifyForm()
+
+</script>
+
+
+<body>
+<h2>Counting</h2>
+
+<br />
+
+Select which types of problems to practice:<br />
+<input type='checkbox' id='fcpBox' /> Fundamental counting principle<br />
+<input type='checkbox' id='permBox' /> Permutations<br />
+<input type='checkbox' id='combBox' /> Combintations<br />
+
+<div id='errorDiv' style='visibility:hidden; color:red;'>
+	Select at least one option above.
+</div>
+
+<br />
+
+<input type='button' value='Click me' onclick='main();' />
+
+<br /><br />
+
+<div id='problemDiv'>This is where the problems go</div>
+
+</body>

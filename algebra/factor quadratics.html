@@ -1,0 +1,344 @@
+<!-- title: Factor Quadratics -->
+
+<script src='../externalJS/random number generator.js'>
+</script>
+
+<script src='../externalJS/gcf.js'>
+</script>
+
+<script>
+// global variables
+
+var temp1, temp2;
+var questionTypeArray = [];
+var index;
+var a, a1, a2, b, c, m, n;
+var firstTerm, secondTerm, thirdTerm;
+var commonFactor;
+var prime; // Boolean... if true, poly. is prime; if false, poly. is composite
+var firstBinomial, secondBinomial;
+var type; // which form of expression
+var primePolynomial;
+
+// the main function of the page
+function main() {
+// reset the page
+index = 0;
+document.getElementById('errorSpan').style.visibility = 'hidden';
+document.getElementById('problemDiv').innerHTML = '';
+document.getElementById('answerDiv').style.visibility = 'hidden';
+
+// verify the form
+if (verifyForm()) {
+    // show more buttons
+    document.getElementById('instructionsDiv').style.visibility = 'visible';
+    document.getElementById('showAnswerBtn').style.visibility = 'visible';
+    document.getElementById('newProblemBtn').style.visibility = 'visible';
+
+    getQuestionTypes();
+    getQuestion();
+    getCoefficients();
+    getAnswer();
+    displayQuestion();
+}
+
+else {
+    document.getElementById('errorSpan').style.visibility = 'visible';
+    document.getElementById('showAnswerBtn').style.visibility = 'hidden';
+    document.getElementById('newProblemBtn').style.visibility = 'hidden';
+}
+
+} // end of main()
+
+// determine which types of questions to pull from
+function getQuestionTypes() {
+    questionTypeArray = [];
+    if (document.getElementById('aEqualsOneBox').checked) {
+        questionTypeArray[index] = 'aEqualsOne';
+        index++;
+    }
+    if (document.getElementById('aNotOneBox').checked) {
+        questionTypeArray[index] = 'aNotOne';
+        index++;
+    }
+    if (document.getElementById('differenceOfSquaresBox').checked) {
+        questionTypeArray[index] = 'differenceOfSquares';
+        index++;
+    }
+} // end of getQuestionTypes()
+
+// pick a question from the array
+function getQuestion() {
+    temp1 = getRandom(0, questionTypeArray.length-1);
+
+    switch (questionTypeArray[temp1]) {
+        case 'aEqualsOne': getAEqualsOne(); break;
+        case 'aNotOne': getANotOne(); break;
+        case 'differenceOfSquares': getDifferenceOfSquares(); break;
+        default: alert('error - getQuestion()');
+    }
+
+    // check for a common factor
+    if (document.getElementById('commonFactorBox').checked) {
+        commonFactor = getRandom(2, 10);
+    }
+    else {commonFactor = 1;}
+
+    // check for a prime polynomial
+    if (document.getElementById('primeBox').checked) {prime = true;}
+    else {prime = false;}
+} // end of getQuestion()
+
+// get the coefficients a, b, and c based on question type and prime / composite
+function getCoefficients() {
+  if (prime===true) {
+    // randomly select whether polynomial is prime or composite
+    temp1 = getRandom(0, 2);
+    if (temp1===0) {
+      switch (type) {
+        case 'aEqualsOne': getAEqualsOnePrime(); break;
+        case 'aNotOne': getANotOnePrime(); break;
+        case 'differenceOfSquares': getDifferenceOfSquaresPrime(); break;
+        default: alert('error - getCoefficients()');
+      }
+    }
+    else {prime = false;}
+  }
+  if (prime===false){
+    a = commonFactor*a1*a2;
+    b = commonFactor*(a2*m + a1*n);
+    c = commonFactor*m*n;
+  }
+} // end of getCoefficients
+
+// create a polynomial with a = 1 that is prime
+function getAEqualsOnePrime() {
+  temp1 = false;
+  while (temp1===false) {
+    a = 1;
+    b = getRandom(-60, 59); if (b===0) {b = 60;}
+    c = getRandom(-900, 899); if (c===0) {c = 900;}
+    // check that b^2 - 4ac is not a perfect square
+    for (i=0; i<85; i++) {
+        if (b*b-4*a*c!==i*i) {temp1 = true;}
+        else {
+          temp1 = false;
+          i = 85;
+        }
+    }
+  }
+  getPrimePolynomial();
+
+  a *= commonFactor;
+  b *= commonFactor;
+  c *= commonFactor;
+} // end of getAEqualsOnePrime()
+
+// get a polynomial with a > 1 that is prime
+function getANotOnePrime() {
+
+} // end of getANotOnePrime()
+
+// get a polynomial with b = 0 that is prime
+function getDifferenceOfSquaresPrime() {
+
+} // end of getDifferenceOfSquaresPrime()
+
+// create the prime polynomial without a common factor
+function getPrimePolynomial() {
+  primePolynomial = '(';
+  if (a!==1) {primePolynomial += a;}
+  primePolynomial += 'x<sup>2</sup> ';
+  if (b<0) {primePolynomial += '&ndash; ';}
+  else if (b===0) {} // nothing to do
+  else {primePolynomial += '+ ';}
+  if (b!==0) {primePolynomial += Math.abs(b) + 'x ';}
+  if (c<0) {primePolynomial += '&ndash; ';}
+  else {primePolynomial += '+ ';}
+  primePolynomial += Math.abs(c) + ')';
+} // end of getPrimePolynomial()
+
+// create the answer
+function getAnswer() {
+  if (prime===false) { // polynomial can be factored
+    // get the first binomial
+    if (a1===1) {firstBinomial = '(x ';} else {firstBinomial = '(' + a1 + 'x ';}
+    if (m > 0) {firstBinomial += '+ ' + m + ')';}
+    else {firstBinomial += '&ndash; ' + Math.abs(m) + ')';}
+
+    // get the second firstBinomial
+    if (a2===1) {secondBinomial = '(x ';} else {secondBinomial = '(' + a2 + 'x ';}
+    if (n > 0) {secondBinomial += '+ ' + n + ')';}
+    else {secondBinomial += '&ndash; ' + Math.abs(n) + ')';}
+
+    // account for common factor
+    if (commonFactor===1) {answer = firstBinomial + secondBinomial;}
+    else {answer = commonFactor + firstBinomial + secondBinomial;}
+  }
+  else { // prime polynomial, except for possible common factor
+      if (commonFactor===1) {answer = 'Cannot be factored with integral coefficients';}
+      else {
+        answer = commonFactor + primePolynomial;
+      }
+  }
+} // end of getAnswer()
+
+// display the answer
+function showAnswer() {
+  document.getElementById('answerDiv').innerHTML = answer;
+  document.getElementById('answerDiv').style.visibility = 'visible';
+} // end of showAnswer()
+
+// display the question on the page
+function displayQuestion() {
+  // first term
+  if (a===1) {firstTerm = 'x<sup>2</sup>';}
+  else {firstTerm = a + 'x<sup>2</sup>';}
+
+  // second term
+  if (b===1) {secondTerm = ' + x';}
+  else if (b===-1) {secondTerm = ' &ndash; x';}
+  else if (b>1) {secondTerm = ' + ' + b + 'x';}
+  else if (b<-1) {secondTerm = ' &ndash; ' + Math.abs(b) + 'x';}
+  else if (b===0) {secondTerm = '';}
+
+  // third term
+  if (c > 0) {thirdTerm = ' + ' + c;}
+  else {thirdTerm = ' &ndash; ' + Math.abs(c);}
+
+  document.getElementById('problemDiv').innerHTML = firstTerm + secondTerm + thirdTerm;
+
+} // end of displayQuestion()
+
+// create a trinomial with a=1
+function getAEqualsOne() {
+    type = 'aEqualsOne';
+    a1 = 1;
+    a2 = 1;
+    m = getRandom(-30, 29); if (m===0) {m = 30;}
+    // avoid a difference of squares
+    n = -1*m;
+    while (n===-1*m) {n = getRandom(-30, 29); if (n===0) {n = 30;}}
+} // end of getEqualsOne()
+
+// create a trinomial with a > 1
+function getANotOne() {
+  type = 'aNotOne';
+  // prevent a difference of squares
+  a1 = 1; a2 = 1; m = 5; n = -5;
+  while (a1===a2 && m===-1*n) {
+    a1 = 1; a2 = 1;
+    while (a1===1 && a2===1) {
+      a1 = getRandom(1, 6);
+      a2 = getRandom(1, 6);
+    }
+    // make sure a1 and m are relatively prime
+    temp1 = 2;
+    while (temp1 !== 1) {
+      m = getRandom(-20, 19); if (m===0) {m = 20;}
+      temp1 = getGCF(a1, m);
+    }
+    // make sure a2 and n are relatively prime
+    temp1 = 2;
+    while (temp1 !== 1) {
+      n = getRandom(-20, 19); if (n===0) {n = 20;}
+      temp1 = getGCF(a2, n);
+    }
+  }
+} // end of getANotOne()
+
+// create a binomail that is a difference of squares
+function getDifferenceOfSquares() {
+  type = 'differenceOfSquares';
+  temp1 = 2;
+  while (temp1!==1) {
+    a1 = getRandom(1, 10);
+    m = getRandom(-10, 9); if (m===0) {m = 10;}
+    temp1 = getGCF(a1, m);
+  }
+a2 = a1;
+n = -1*m;
+} // end of getDifferenceOfSquares()
+
+// verify that at least one form of expression has been selected
+function verifyForm() {
+    if (document.getElementById('aEqualsOneBox').checked ||
+        document.getElementById('aNotOneBox').checked ||
+        document.getElementById('differenceOfSquaresBox').checked) {
+            return true;
+    }
+    else {return false;}
+} // end of verifyForm()
+
+// select all forms of expressions
+function selectAllForms() {
+    document.getElementById('aEqualsOneBox').checked = true;
+    document.getElementById('aNotOneBox').checked = true;
+    document.getElementById('differenceOfSquaresBox').checked = true;
+
+} // end of selectAllForms()
+
+// clear all form selections
+function clearAllForms() {
+    document.getElementById('aEqualsOneBox').checked = false;
+    document.getElementById('aNotOneBox').checked = false;
+    document.getElementById('differenceOfSquaresBox').checked = false;
+
+} // end of clearAllForms()
+
+</script>
+
+
+<body>
+<h2>Factoring Quadratics (ax<sup>2</sup> + bx + c)</h2>
+
+<br /><br />
+
+<span style='text-decoration: underline;'>Forms of expressions</span>
+<input type='button' onclick='selectAllForms();' value='Select all' />
+<input type='button' onclick='clearAllForms();' value='Clear all' />
+<br />
+<input type='checkbox' id='aEqualsOneBox' />Trinomial, a = 1<br />
+<input type='checkbox' id='aNotOneBox' />Trinomial, a > 1<br />
+<input type='checkbox' id='differenceOfSquaresBox' />Difference of squares<br />
+
+<span id='errorSpan' style='color: red;'>Select at least one option above</span>
+
+<br /><br />
+
+<input type='button' value='New problem' onclick='main();' />
+<br /><br />
+
+<span style='text-decoration:underline;'>Optional:</span><br />
+<input type='checkbox' id='commonFactorBox' />Include a common factor for all terms<br />
+<input type='checkbox' id='primeBox' />Include prime polynomials
+
+<br /><br />
+
+<input type='button' value='New problem' onclick='main();' />
+
+<br /><br />
+
+<div id='instructionsDiv' style='font-weight:bold; visibility:hidden;'>
+  Instructions:<br />
+  Factor the following expression completely.
+</div>
+
+<br />
+
+<div id='problemDiv'></div>
+
+<br /><br />
+
+<input type='button' id='showAnswerBtn' value='Show answer' onclick='showAnswer();' style='visibility:hidden;' />
+
+<br /><br />
+
+<div id='answerDiv' style='visibility:hidden;'>This is the answerDiv</div>
+
+<br /><br />
+
+<input type='button' id='newProblemBtn' value='New problem' onclick='main();' style='visibility:hidden;' />
+
+
+</body>

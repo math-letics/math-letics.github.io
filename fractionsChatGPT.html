@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fraction Addition</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 50px; }
+        .fraction { display: inline-block; text-align: center; }
+        .fraction span { display: block; }
+        .line { border-top: 2px solid black; width: 30px; margin: auto; }
+    </style>
+</head>
+<body>
+    <h2>Fraction Addition</h2>
+    <p>Solve the following:</p>
+    <div class="fraction">
+        <span>1</span>
+        <span class="line"></span>
+        <span>2</span>
+    </div>
+    +
+    <div class="fraction">
+        <span>1</span>
+        <span class="line"></span>
+        <span>4</span>
+    </div>
+    =
+    <input type="text" id="answer" placeholder="Enter answer">
+    <button onclick="checkAnswer()">Check</button>
+    <p id="result"></p>
+
+    <script>
+        function checkAnswer() {
+            let userAnswer = document.getElementById("answer").value.trim();
+            let correctAnswer = "3/4";
+            
+            if (userAnswer === correctAnswer) {
+                document.getElementById("result").innerText = "Correct!";
+                document.getElementById("result").style.color = "green";
+            } else {
+                document.getElementById("result").innerText = "Try again.";
+                document.getElementById("result").style.color = "red";
+            }
+        }
+    </script>
+</body>
+</html>

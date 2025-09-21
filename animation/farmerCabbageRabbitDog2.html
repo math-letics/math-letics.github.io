@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html>
+<style>
+#container {
+  width: 940px;
+  height: 600px;
+  position: relative;
+  background: lightBlue;
+}
+#cabbageLeft {
+  width: 60px;
+  height: 60px;
+  position: absolute;
+  bottom: 40px;
+  left: 10px;
+  background-color: lightGreen;
+  text-align: center;
+}
+#cabbageRight {
+  width: 60px;
+  height: 60px;
+  position: absolute;
+  bottom: 40px;
+  left: 730px;
+  background-color: lightGreen;
+  text-align: center;
+  visibility: hidden;
+}
+#rabbitLeft {
+  width: 60px;
+  height: 60px;
+  position: absolute;
+  bottom: 40px;
+  left: 80px;
+  background-color: white;
+  text-align: center;
+}
+#rabbitRight {
+  width: 60px;
+  height: 60px;
+  position: absolute;
+  bottom: 40px;
+  left: 800px;
+  background-color: white;
+  text-align: center;
+  visibility : hidden;
+}
+#dogLeft {
+  width: 60px;
+  height: 60px;
+  position: absolute;
+  bottom: 40px;
+  left: 150px;
+  background-color: black;
+  color: white;
+  text-align: center;
+}
+#dogRight {
+  width: 60px;
+  height: 60px;
+  position: absolute;
+  bottom: 40px;
+  left: 870px;
+  background-color: black;
+  color: white;
+  text-align: center;
+  visibility : hidden;
+}
+#raft {
+  width: 150px;
+  height: 40px;
+  position: absolute;
+  bottom: 40px;
+  left: 220px;
+  background-color: brown; 
+}
+#farmer {
+  width: 60px;
+  height: 60px;
+  position: absolute;
+  bottom: 60px;
+  left: 300px;
+  background-color: grey;  
+  text-align: center;
+}
+#landLeft {
+    width: 220px;
+    height: 60px;
+    position: absolute;
+    background: green;
+    bottom: 0px;
+    left: 0px;
+}
+#water {
+    width: 500px;
+    height: 45px;
+    position: absolute;
+    background: blue;
+    bottom: 0px;
+    left: 220px;
+}
+#landRight {
+    width: 220px;
+    height: 60px;
+    position: absolute;
+    background: green;
+    bottom: 0px;
+    left: 720px;
+}
+#onTheRaft {
+  width: 60px;
+  height: 60px;
+  position: absolute;
+  bottom: 60px;
+  left: 230px;  
+  outline-width: 1px;
+  text-align: center;
+}
+</style>
+
+<script>
+
+var temp1, temp2;
+
+// positions... 0 is on left, 1 is on raft, 2 is on right
+let cabbagePosition = 0;
+let rabbitPosition = 0;
+let dogPosition = 0;
+let raftIsOnLeft = true; // Track raft side (starts on the left)
+
+var cargo, previousCargo;
+
+function move(id, from, to, onComplete) {
+  const elem = document.getElementById(id);   
+  let pos = from;
+  const step = from < to ? 1 : -1;
+
+  clearInterval(elem._intervalId);
+  elem._intervalId = setInterval(() => {
+    if (pos === to) {
+      clearInterval(elem._intervalId);
+      if (onComplete) onComplete();
+    } else {
+      pos += step;
+      elem.style.left = pos + 'px';
+    }
+  }, 5);
+} // end of move();
+
+function crossTheRiver() {
+  // check to make sure rules are not broken, e.g. cabbage not left with rabbit
+  var verified = verifyForm();
+  if (verified) { 
+    
+    let completed = 0;
+    const checkAllDone = () => {
+      completed++;
+      if (completed === 3) { // code to execute after the raft has crossed
+        
+        unloadTheRaft();
+
+        if (cabbagePosition===2 && rabbitPosition===2 && dogPosition===2) {
+          alert('You did it!  Nice work!');
+          location.reload();
+        }
+      }
+    };
+  
+    if (raftIsOnLeft) {
+      move('onTheRaft', 230, 580, checkAllDone);
+      move('farmer', 300, 650, checkAllDone);
+      move('raft', 220, 570, checkAllDone);
+    } else {
+      move('onTheRaft', 580, 230, checkAllDone);
+      move('farmer', 650, 300, checkAllDone);
+      move('raft', 570, 220, checkAllDone);
+    }
+  
+    raftIsOnLeft = !raftIsOnLeft; // Toggle side
+  }  
+  else { // rules are being broken, do not allow crossing
+    unloadTheRaft();
+  }
+} // end of crossTheRiver()
+
+// make sure rules are followed
+function verifyForm() {
+    // return true if. rules are followed
+    // return false if. rules are not followed
+    if (cabbagePosition===rabbitPosition) {
+      alert('You cannot leave the rabbit alone with the cabbage.');
+      return false;
+    }
+    else if (rabbitPosition===dogPosition) {
+      alert('You cannot leave the dog alone with the rabbit.');
+      return false;  
+    }
+    else {return true;}
+} // end of verifyForm();
+
+function loadTheRaft() { // when the select menu is changed
+    cargo = document.getElementById('itemSelect').value;
+  
+    // recognize which item has been selected
+    temp1 =document.getElementById('itemSelect').value;
+
+    if (temp1==='defaultOption') {loadDefault();}
+    else if (temp1==='cabbageOption') {loadCabbage();}
+    else if (temp1==='rabbitOption') {loadRabbit();}
+    else if (temp1==='dogOption') {loadDog();}
+    else {alert('error - loadTheRaft()');}
+    previousCargo = cargo;
+} // end of loadTheRaft()
+
+function loadDefault() {
+      document.getElementById('onTheRaft').innerHTML = ''; 
+      document.getElementById('onTheRaft').style.backgroundColor = 'transparent';
+      document.getElementById('onTheRaft').style.outlineColor = 'transparent';
+      
+      // whatever the previous cargo was, put it back on the appropriate side
+      if (previousCargo==='cabbageOption') {
+        if (raftIsOnLeft) {
+          document.getElementById('cabbageLeft').style.visibility = 'visible';
+          cabbagePosition = 0;
+        }
+        else if (!raftIsOnLeft) {
+          document.getElementById('cabbageRight').style.visibility = 'visible';
+          cabbagePosition = 2;
+        }
+      }
+      else if (previousCargo==='rabbitOption') {
+        if (raftIsOnLeft) {
+          document.getElementById('rabbitLeft').style.visibility = 'visible';
+          rabbitPosition = 0;
+        }
+        else if (!raftIsOnLeft) {
+          document.getElementById('rabbitRight').style.visibility = 'visible';
+          rabbitPosition = 2;
+        }
+      }
+      else if (previousCargo==='dogOption') {
+        if (raftIsOnLeft) {
+          document.getElementById('dogLeft').style.visibility = 'visible';
+          dogPosition = 0;
+        }
+        else if (!raftIsOnLeft) {
+          document.getElementById('dogRight').style.visibility = 'visible';
+          dogPosition = 2;
+        }
+      }      
+} // end of loadDefault()
+
+function loadCabbage() {
+      document.getElementById('onTheRaft').innerHTML = 'Cabbage';
+      document.getElementById('onTheRaft').style.backgroundColor = 'lightGreen';
+      document.getElementById('onTheRaft').style.color = 'black';
+      cabbagePosition = 1;
+      
+      // make sure the item is hidden on both sides
+      document.getElementById('cabbageLeft').style.visibility = 'hidden';
+      document.getElementById('cabbageRight').style.visibility = 'hidden';
+      
+      if (previousCargo==='rabbitOption') {
+        if (raftIsOnLeft) {
+          document.getElementById('rabbitLeft').style.visibility = 'visible';
+          rabbitPosition = 0;
+        }
+        else if (!raftIsOnLeft) {
+          document.getElementById('rabbitRight').style.visibility = 'visible';
+          rabbitPosition = 2;
+        }
+      }
+      else if (previousCargo==='dogOption') {
+        if (raftIsOnLeft) {
+          document.getElementById('dogLeft').style.visibility = 'visible';
+          dogPosition = 0;
+        }
+        else if (!raftIsOnLeft) {
+          document.getElementById('dogRight').style.visibility = 'visible';
+          dogPosition = 2;
+        }
+      }  
+} // end of loadCabbage()
+
+function loadRabbit() {
+      document.getElementById('onTheRaft').innerHTML = 'Rabbit'; 
+      document.getElementById('onTheRaft').style.backgroundColor = 'white';
+      document.getElementById('onTheRaft').style.color = 'black';
+      rabbitPosition = 1;
+      
+      // make sure the item is hidden on both sides
+      document.getElementById('rabbitLeft').style.visibility = 'hidden';
+      document.getElementById('rabbitRight').style.visibility = 'hidden';
+      
+      if (previousCargo==='cabbageOption') {
+        if (raftIsOnLeft) {
+          document.getElementById('cabbageLeft').style.visibility = 'visible';
+          cabbagePosition = 0;
+        }
+        else if (!raftIsOnLeft) {
+          document.getElementById('cabbageRight').style.visibility = 'visible';
+          cabbagePosition = 2;
+        }
+      }
+      else if (previousCargo==='dogOption') {
+        if (raftIsOnLeft) {
+          document.getElementById('dogLeft').style.visibility = 'visible';
+          dogPosition = 0;
+        }
+        else if (!raftIsOnLeft) {
+          document.getElementById('dogRight').style.visibility = 'visible';
+          dogPosition = 2;
+        }
+      }
+} // end of loadRabbit()
+
+function loadDog() {
+      document.getElementById('onTheRaft').innerHTML = 'Dog'; 
+      document.getElementById('onTheRaft').style.backgroundColor = 'black';
+      document.getElementById('onTheRaft').style.color = 'white';
+      dogPosition = 1;
+      
+      // make sure the item is hidden on both sides
+      document.getElementById('dogLeft').style.visibility = 'hidden';
+      document.getElementById('dogRight').style.visibility = 'hidden';
+     
+      if (previousCargo==='cabbageOption') {
+        if (raftIsOnLeft) {
+          document.getElementById('cabbageLeft').style.visibility = 'visible';
+          cabbagePosition = 0;
+        }
+        else if (!raftIsOnLeft) {
+          document.getElementById('cabbageRight').style.visibility = 'visible';
+          cabbagePosition = 2;
+        }
+      }
+      else if (previousCargo==='rabbitOption') {
+        if (raftIsOnLeft) {
+          document.getElementById('rabbitLeft').style.visibility = 'visible';
+          rabbitPosition = 0;
+        }
+        else if (!raftIsOnLeft) {
+          document.getElementById('rabbitRight').style.visibility = 'visible';
+          rabbitPosition = 2;
+        }
+      }
+} // end of loadDog()
+
+function unloadTheRaft() {  
+    document.getElementById('onTheRaft').innerHTML = '';
+    document.getElementById('onTheRaft').style.backgroundColor = 'transparent';
+  
+    // temp1 variable continues into each unload function
+    temp1 = '<option value="defaultOption">Select an item</option>';
+
+    if (cargo==='defaultOption') {unloadDefault();}
+    else if (cargo==='cabbageOption') {unloadCabbage();}
+    else if (cargo==='rabbitOption') {unloadRabbit();}
+    else if (cargo==='dogOption') {unloadDog();}
+    document.getElementById('itemSelect').innerHTML = temp1;
+    cargo = 'defaultOption';
+    previousCargo = 'defaultOption';
+} // end of unloadTheRaft()
+
+function unloadDefault() { // nothing came across the river
+    //what items are on the current side need to be selectable 
+    if (raftIsOnLeft) {
+        if (cabbagePosition===0) {temp1 += '<option value="cabbageOption">Cabbage</option>';}
+        if (rabbitPosition===0) {temp1 += '<option value="rabbitOption">Rabbit</option>';}
+        if (dogPosition===0) {temp1 += '<option value="dogOption">Dog</option>';}
+    }
+    else if (!raftIsOnLeft) {
+        if (cabbagePosition===2) {temp1 += '<option value="cabbageOption">Cabbage</option>';}
+        if (rabbitPosition===2) {temp1 += '<option value="rabbitOption">Rabbit</option>';}
+        if (dogPosition===2) {temp1 += '<option value="dogOption">Dog</option>';}
+    }
+} // end of unloadDefault()
+
+function unloadCabbage() {
+      temp1 += '<option value="cabbageOption">Cabbage</option>';
+      if (!raftIsOnLeft) {
+        document.getElementById('cabbageRight').style.visibility = 'visible';
+        cabbagePosition = 2;
+        if (rabbitPosition===2) {temp1 += '<option value="rabbitOption">Rabbit</option>';}
+        if (dogPosition===2) {temp1 += '<option value="dogOption">Dog</option>';}
+      }
+      else if (raftIsOnLeft) {
+        document.getElementById('cabbageLeft').style.visibility = 'visible';
+        cabbagePosition = 0;
+        if (rabbitPosition===0) {temp1 += '<option value="rabbitOption">Rabbit</option>';}
+        if (dogPosition===0) {temp1 += '<option value="dogOption">Dog</option>';}
+      }    
+} // end of unloadCabbage()
+
+function unloadRabbit() {
+      if (!raftIsOnLeft) {
+        document.getElementById('rabbitRight').style.visibility = 'visible';
+        rabbitPosition = 2;
+        if (cabbagePosition===2) {temp1 += '<option value="cabbageOption">Cabbage</option>';}
+        temp1 += '<option value="rabbitOption">Rabbit</option>';
+        if (dogPosition===2) {temp1 += '<option value="dogOption">Dog</option>';}
+      }
+      else if (raftIsOnLeft) {
+        if (cabbagePosition===0) {temp1 += '<option value="cabbageOption">Cabbage</option>';}
+        document.getElementById('rabbitLeft').style.visibility = 'visible';
+        rabbitPosition = 0;
+        temp1 += '<option value="rabbitOption">Rabbit</option>';
+        if (dogPosition===0) {temp1 += '<option value="dogOption">Dog</option>';}
+      }
+} // end of unloadRabbit()
+
+function unloadDog() {
+      if (!raftIsOnLeft) {
+        document.getElementById('dogRight').style.visibility = 'visible';
+        dogPosition = 2;
+        if (cabbagePosition===2) {temp1 += '<option value="cabbageOption">Cabbage</option>';}
+        if (rabbitPosition===2) {temp1 += '<option value="rabbitOption">Rabbit</option>';}
+        temp1 += '<option value="dogOption">Dog</option>';
+      }
+      else if (raftIsOnLeft) {
+        if (cabbagePosition===0) {temp1 += '<option value="cabbageOption">Cabbage</option>';}
+        document.getElementById('dogLeft').style.visibility = 'visible';
+        dogPosition = 0;
+        if (rabbitPosition===0) {temp1 += '<option value="rabbitOption">Rabbit</option>';}
+        temp1 += '<option value="dogOption">Dog</option';
+      }     
+} // end of unloadCabbage()
+
+</script>
+
+
+<body>
+  <div id ="container">
+    A farmer needs to get some cabbage, a rabbit, and a dog across the river.  <br />
+    The farmer has a boat in which he can only bring one item at a time. <br /><br />
+    If the rabbit is left alone with the cabbage, the rabbit will eat the cabbage. <br /><br />
+    If the dog is left alone with the rabbit, the dog will eat the rabbit.  <br /><br />
+    Can you help the farmer get all three items to the other side?  
+    <br /><br />&nbsp;&nbsp;
+    <button onclick='location.reload();'>Restart</button>
+    <br /><br />&nbsp;&nbsp;
+    <select id='itemSelect' onchange='loadTheRaft();'>
+      <option value='defaultOption'>Select an item</option>
+      <option value='cabbageOption'>Cabbage</option>
+      <option value='rabbitOption'>Rabbit</option>
+      <option value='dogOption'>Dog</option>
+    </select>
+    <div style='text-align: center;' >
+      <button  onclick='crossTheRiver()'>Cross the river</button>
+    </div>
+    <span id='landLeft'></span>
+    <span id='water'></span>
+    <span id='landRight'></span>
+    <span id ='cabbageLeft'>Cabbage</span>
+    <span id='rabbitLeft'>Rabbit</span>
+    <span id='dogLeft'>Dog</span>
+    <span id='raft'></span>
+    <span id='farmer'>Farmer</span>
+    <span id='onTheRaft'></span>
+    <span id='cabbageRight'>Cabbage</span>
+    <span id='rabbitRight'>Rabbit</span>
+    <span id='dogRight'>Dog</span>
+  </div>
+
+</body>
+</html>

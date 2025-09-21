@@ -1,0 +1,88 @@
+<!-- title:  -->
+
+<script src='../externalJS/random number generator.js'></script>
+
+<script src='../externalJS/shuffle.js'></script>
+
+<script>
+// global variables
+
+var vocabArray = [];
+var definitionArray = [];
+
+// the main function of the page
+function main() {
+
+    // reset the page
+    document.getElementById('column1').innerHTML = '';
+    document.getElementById('column2').innerHTML = '';
+    getTerms();
+    var x = shuffleArray(vocabArray);
+    for (i=0; i<vocabArray.length; i++) {
+        document.getElementById('column1').innerHTML += '<br />' + x[i];
+    }
+    x = shuffleArray(definitionArray);
+    for (i=0; i<definitionArray.length; i++) {
+        var number = i + 1;
+        document.getElementById('column2').innerHTML += '<br />' + number + ')&nbsp;&nbsp;' + x[i];
+    }
+    
+} // end of main()
+
+// get vocab terms and definitions
+function getTerms() {
+    vocabArray[0] = 'vertex';
+    definitionArray[0] = 'Where the two sides of an angle meet';
+    
+    vocabArray[1] = 'complementary';
+    definitionArray[1] = 'Angles that sum to 90 degrees';
+    
+    vocabArray[2] = 'supplementary';
+    definitionArray[2] = 'Angles that sum to 180 degrees';
+    
+    vocabArray[3] = 'right angle';
+    definitionArray[3] = 'An angle that measures exactly 90 degrees';
+    
+    vocabArray[4] = 'straight angle';
+    definitionArray[4] = 'An angle that measures exactly 180 degrees';
+    
+    vocabArray[5] = 'acute angle';
+    definitionArray[5] = 'An angle that measures less than 90 degrees';
+    
+    vocabArray[6] = 'obtuse angle';
+    definitionArray[6] = 'An angle that measures between 90 and 180 degrees';
+    
+    vocabArray[7] = 'vertical angles';
+    definitionArray[7] = 'When two lines cross, a pair of angles that only share a vertex';
+    
+    // distractors
+    vocabArray[8] = 'reflex';
+    vocabArray[9] = 'rotation';
+    vocabArray[10] = 'linear pair';
+    vocabArray[11] = 'congruent';
+    vocabArray[12] = 'equation';
+    vocabArray[13] = 'angle';
+} // end of getTerms()
+
+</script>
+
+
+<body>
+<h2>Vocab quiz - Geometry A - Topic 1</h2>
+
+
+<input type='button' value='Click me' onclick='main();' />
+
+<br /><br />
+
+<div id='displayDiv'></div>
+
+<table>
+    <tr>
+        <td id='column1'></td>
+        <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+        <td id='column2'></td>
+    </tr>
+</table>
+
+</body>

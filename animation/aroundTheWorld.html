@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dot Center on Circle</title>
+  <style>
+    #circleContainer {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      border: 2px solid black;
+      border-radius: 50%;
+      margin: 50px auto;
+    }
+
+    #dot {
+      width: 20px;
+      height: 20px;
+      background-color: red;
+      border-radius: 50%;
+      position: absolute;
+      transition: top 0.5s ease, left 0.5s ease;
+    }
+
+    #moveButton {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="circleContainer">
+  <div id="dot"></div>
+</div>
+<button id="moveButton">Move 90° Clockwise</button>
+
+<script>
+  const dot = document.getElementById('dot');
+  const container = document.getElementById('circleContainer');
+  const dotSize = 20;
+  const centerX = container.offsetWidth / 2;
+  const centerY = container.offsetHeight / 2;
+  const radius = container.offsetWidth / 2; // no subtraction!
+
+  let angle = -90; // Start at top (12:00)
+
+  function updateDotPosition(deg) {
+    const rad = deg * (Math.PI / 180);
+    const x = centerX + radius * Math.cos(rad);
+    const y = centerY + radius * Math.sin(rad);
+
+    // Move the top-left corner so the center of the dot is at (x, y)
+    dot.style.left = `${x - dotSize / 2}px`;
+    dot.style.top = `${y - dotSize / 2}px`;
+  }
+
+  // Initial position at 12:00
+  updateDotPosition(angle);
+
+  document.getElementById('moveButton').addEventListener('click', () => {
+    angle += 90;
+    updateDotPosition(angle);
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!-- title:  -->
+
+<script src='../externalJS/random number generator.js'></script>
+
+<script src='../externalJS/shuffle.js'></script>
+
+<script>
+// global variables
+
+var vocabArray = [];
+var definitionArray = [];
+
+// the main function of the page
+function main() {
+
+    // reset the page
+    document.getElementById('column1').innerHTML = '';
+    document.getElementById('column2').innerHTML = '';
+    getTerms();
+    var x = shuffleArray(vocabArray);
+    for (i=0; i<vocabArray.length; i++) {
+        document.getElementById('column1').innerHTML += '<br />' + x[i];
+    }
+    x = shuffleArray(definitionArray);
+    for (i=0; i<definitionArray.length; i++) {
+        var number = i + 1;
+        document.getElementById('column2').innerHTML += '<br />' + number + ')&nbsp;&nbsp;' + x[i];
+    }
+
+} // end of main()
+
+// get vocab terms and definitions
+function getTerms() {
+    vocabArray[0] = 'rate/ratio';
+    definitionArray[0] = 'A comparison of two (or more) numbers';
+
+    vocabArray[1] = 'proportion';
+    definitionArray[1] = 'When two fractions are equal';
+
+    vocabArray[2] = 'cross multiply and divide';
+    definitionArray[2] = 'A way to solve simple proportions';
+
+    vocabArray[3] = 'units/label';
+    definitionArray[3] = 'What we are counting or calculating';
+
+    vocabArray[4] = 'sum';
+    definitionArray[4] = 'The result of adding';
+
+    vocabArray[5] = 'difference';
+    definitionArray[5] = 'The result of subtracting';
+
+    vocabArray[6] = 'slope';
+    definitionArray[6] = 'The rate of change; also called "rise over run"';
+
+    vocabArray[7] = 'origin';
+    definitionArray[7] = 'The point (0, 0) on a graph';
+
+    vocabArray[8] = 'x-intercept';
+    definitionArray[8] = 'Where a line/graph crosses the x-axis';
+
+    vocabArray[9] = 'y-intercept';
+    definitionArray[9] = 'Where a line/graph crosses the y-axis';
+
+    // distractors
+    vocabArray[10] = 'table';
+    vocabArray[11] = 'product';
+    vocabArray[12] = 'quotient';
+    vocabArray[13] = 'linear';
+    vocabArray[14] = 'fraction';
+    vocabArray[15] = 'graph';
+
+} // end of getTerms()
+
+</script>
+
+
+<body>
+<h2>Vocab quiz - Algebra 1B - Topic 1</h2>
+
+
+<input type='button' value='Click me' onclick='main();' />
+
+<br /><br />
+
+<div id='displayDiv'></div>
+
+<table>
+    <tr>
+        <td id='column1'></td>
+        <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+        <td id='column2'></td>
+    </tr>
+</table>
+
+</body>

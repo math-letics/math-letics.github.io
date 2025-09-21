@@ -1,0 +1,47 @@
+<!-- re-create the external javascript that will round numbers correctly -->
+
+<script>
+
+// generate a random number
+function getRandom(min, max) {
+
+    var x = Math.floor(Math.random()*(max - min + 1)) + min;
+    // NOTE: using 0.1 and 0.9 as min and max return values of 0.1 or 1.1 every time
+    // This code probably only works for whole numbers
+    
+    return x;
+
+} // end of getRandom(min, max)
+
+// get a random number less than 1000
+function main() {
+    
+    // for terminating decimals ending in 5, it seems to round down
+    
+    var number = 0.15550;
+    
+    var tenths = number.toFixed(1);
+    
+    var hundredths = number.toFixed(2);
+    
+    var thousandths = number.toFixed(3);
+    
+    var thousandthsAdjust = Math.round(number*1000)/1000;
+    
+    document.getElementById('displaySpace').innerHTML = number + '<br />' + tenths +
+        '<br />' + hundredths + '<br />' + thousandths + '<br />' + thousandthsAdjust;
+    
+} // end of function main()
+
+
+</script>
+
+
+<body>
+
+<input type='button' value='Click me' onclick='main();' />
+
+<div id='displaySpace'>This is where the numbers will be displayed</div>
+
+
+</body>

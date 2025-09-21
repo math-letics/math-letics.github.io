@@ -1,0 +1,78 @@
+<!-- title:  -->
+
+<script src='../externalJS/random number generator.js'></script>
+
+<script src='../externalJS/shuffle.js'></script>
+
+<script>
+// global variables
+
+var vocabArray = [];
+var definitionArray = [];
+
+// the main function of the page
+function main() {
+
+    // reset the page
+    document.getElementById('column1').innerHTML = '';
+    document.getElementById('column2').innerHTML = '';
+    getTerms();
+    var x = shuffleArray(vocabArray);
+    for (i=0; i<vocabArray.length; i++) {
+        document.getElementById('column1').innerHTML += '<br />' + x[i];
+    }
+    x = shuffleArray(definitionArray);
+    for (i=0; i<definitionArray.length; i++) {
+        var number = i + 1;
+        document.getElementById('column2').innerHTML += '<br />' + number + ')&nbsp;&nbsp;' + x[i];
+    }
+    
+} // end of main()
+
+// get vocab terms and definitions
+function getTerms() {
+    vocabArray[0] = 'factors';
+    definitionArray[0] = 'Whole numbers or polynomials that we multiply with';
+
+    vocabArray[1] = 'to factor';
+    definitionArray[1] = 'When we write a number or expression as multiplication';
+    
+    vocabArray[2] = 'factor T chart';
+    definitionArray[2] = 'Kevin&apos;s preferred method for finding whole number factors';
+    
+    vocabArray[3] = 'prime number';
+    definitionArray[3] = 'A whole number whose only factors are 1 and itself';
+    
+    vocabArray[4] = 'factor tree';
+    definitionArray[4] = 'A strategy for finding the prime factorization of a whole number';
+    
+    //distractors
+    vocabArray[5] = 'product';
+    vocabArray[6] = 'round out';
+    vocabArray[7] = 'prime factorization';
+    vocabArray[8] = 'quadratic';
+
+} // end of getTerms()
+
+</script>
+
+
+<body>
+<h2>Vocab quiz - Algebra 1B - Topic 4</h2>
+
+
+<input type='button' value='Click me' onclick='main();' />
+
+<br /><br />
+
+<div id='displayDiv'></div>
+
+<table>
+    <tr>
+        <td id='column1'></td>
+        <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+        <td id='column2'></td>
+    </tr>
+</table>
+
+</body>

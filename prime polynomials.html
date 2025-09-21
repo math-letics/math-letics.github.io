@@ -1,0 +1,48 @@
+<!-- title:  -->
+
+<script src='externalJS/random number generator.js'>
+</script>
+
+<script>
+// global variables
+
+var temp1, temp2;
+
+// the main function of the page
+function main() {
+    var h, k, d, b, c;
+    var problem = '';
+    
+    
+    
+    for (i=0; i<100; i++) {       
+        c = 101;
+        while (Math.abs(c)>100) {
+            h = getRandom(-5, 5);
+            k = getRandom(-5, 4); if (k===0) {k=5;}
+            d = getRandom(1, 7); if (d===1) {d=9;} if (d===4) {d=10;}
+            b = -2*h;
+            c = h*h - k*k*d;
+        }
+    
+        problem += 'x<sup>2</sup> + ' + b + 'x + ' + c;
+        problem += '&nbsp...&nbsp;' + h + ', ' + k + ', ' + d + '<br /><br />';  
+    } 
+    
+    document.getElementById('problemDiv').innerHTML = problem;
+
+} // end of main()
+
+</script>
+
+
+<body>
+<h2>Webpage title</h2>
+
+<br /><br />
+
+<input type='button' value='Click me' onclick='main();' />
+
+<div id='problemDiv'></div>
+
+</body>

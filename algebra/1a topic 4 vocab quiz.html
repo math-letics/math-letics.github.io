@@ -1,0 +1,83 @@
+<!-- title:  -->
+
+<script src='../externalJS/random number generator.js'></script>
+
+<script src='../externalJS/shuffle.js'></script>
+
+<script>
+// global variables
+
+var vocabArray = [];
+var definitionArray = [];
+
+// the main function of the page
+function main() {
+
+    // reset the page
+    document.getElementById('column1').innerHTML = '';
+    document.getElementById('column2').innerHTML = '';
+    getTerms();
+    var x = shuffleArray(vocabArray);
+    for (i=0; i<vocabArray.length; i++) {
+        document.getElementById('column1').innerHTML += '<br />' + x[i];
+    }
+    x = shuffleArray(definitionArray);
+    for (i=0; i<definitionArray.length; i++) {
+        var number = i + 1;
+        document.getElementById('column2').innerHTML += '<br />' + number + ')&nbsp;&nbsp;' + x[i];
+    }
+    
+} // end of main()
+
+// get vocab terms and definitions
+function getTerms() {
+    vocabArray[0] = 'expression';
+    definitionArray[0] = 'A "math sentence" that is NOT an equation or inequality';
+    
+    vocabArray[1] = 'equation';
+    definitionArray[1] = 'When an expression is equal to another expression';
+    
+    vocabArray[2] = 'inequality';
+    definitionArray[2] = 'When an expression is NOT equal to another expression';
+    
+    vocabArray[3] = 'solution';
+    definitionArray[3] = 'A variable value that makes an equation true';
+    
+    vocabArray[4] = 'inverse operations';
+    definitionArray[4] = 'When two operations cancel each other';
+    
+    vocabArray[5] = 'balancing';
+    definitionArray[5] = 'When we do the same thing on both sides of an equation';
+
+    // distractors...
+    vocabArray[6] = 'coefficient';
+    vocabArray[7] = 'exponent';
+    vocabArray[8] = 'variable';
+    vocabArray[9] = 'substitute';
+    vocabArray[10] = 'evaluate';
+    vocabArray[11] = 'simplify';
+    
+} // end of getTerms()
+
+</script>
+
+
+<body>
+<h2>Vocab quiz - Algebra 1A - Topic 4</h2>
+
+
+<input type='button' value='Click me' onclick='main();' />
+
+<br /><br />
+
+<div id='displayDiv'></div>
+
+<table>
+    <tr>
+        <td id='column1'></td>
+        <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+        <td id='column2'></td>
+    </tr>
+</table>
+
+</body>

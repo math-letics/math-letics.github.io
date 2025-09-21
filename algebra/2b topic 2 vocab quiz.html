@@ -1,0 +1,87 @@
+<!-- title:  -->
+
+<script src='../externalJS/random number generator.js'></script>
+
+<script src='../externalJS/shuffle.js'></script>
+
+<script>
+// global variables
+
+var vocabArray = [];
+var definitionArray = [];
+
+// the main function of the page
+function main() {
+
+    // reset the page
+    document.getElementById('column1').innerHTML = '';
+    document.getElementById('column2').innerHTML = '';
+    getTerms();
+    var x = shuffleArray(vocabArray);
+    for (i=0; i<vocabArray.length; i++) {
+        document.getElementById('column1').innerHTML += '<br />' + x[i];
+    }
+    x = shuffleArray(definitionArray);
+    for (i=0; i<definitionArray.length; i++) {
+        var number = i + 1;
+        document.getElementById('column2').innerHTML += '<br />' + number + ')&nbsp;&nbsp;' + x[i];
+    }
+    
+} // end of main()
+
+// get vocab terms and definitions
+function getTerms() {
+    vocabArray[0] = 'square root';
+    definitionArray[0] = 'Can be used to cancel a "square" (exponent of 2)';
+    
+    vocabArray[1] = 'plus or minus';
+    definitionArray[1] = 'An indication that a number can be positive or negative';
+    
+    vocabArray[2] = 'domain';
+    definitionArray[2] = 'Possible input values for a function';
+    
+    vocabArray[3] = 'zeros of a function';
+    definitionArray[3] = 'x-values for which y = 0';
+    
+    vocabArray[4] = 'Zero Product Property';
+    definitionArray[4] = 'If <i>ab</i> = 0, then either <i>a</i> = 0 or <i>b</i> = 0';
+    
+    vocabArray[5] = 'discriminant';
+    definitionArray[5] = '<i>b</i><sup>2</sup> - 4<i>ac</i>; tells us how many real solutions a quadratic equation has';
+    
+    vocabArray[6] = 'quadratic formula';
+    definitionArray[6] = 'Can be used to solve any quadratic equation';
+    
+    // distractors
+    vocabArray[7] = 'initial height';
+    vocabArray[8] = 'real number';
+    vocabArray[9] = 'imaginary number';
+    vocabArray[10] = 'parabola';
+    vocabArray[11] = 'vertex';
+    
+    
+
+} // end of getTerms()
+
+</script>
+
+
+<body>
+<h2>Vocab quiz - Algebra 2B - Topic 2</h2>
+
+
+<input type='button' value='Click me' onclick='main();' />
+
+<br /><br />
+
+<div id='displayDiv'></div>
+
+<table>
+    <tr>
+        <td id='column1'></td>
+        <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+        <td id='column2'></td>
+    </tr>
+</table>
+
+</body>

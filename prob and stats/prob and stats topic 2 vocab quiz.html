@@ -1,0 +1,96 @@
+<!-- title:  -->
+
+<script src='../externalJS/random number generator.js'></script>
+
+<script src='../externalJS/shuffle.js'></script>
+
+<script>
+// global variables
+
+var vocabArray = [];
+var definitionArray = [];
+
+// the main function of the page
+function main() {
+
+    // reset the page
+    document.getElementById('column1').innerHTML = '';
+    document.getElementById('column2').innerHTML = '';
+    getTerms();
+    var x = shuffleArray(vocabArray);
+    for (i=0; i<vocabArray.length; i++) {
+        document.getElementById('column1').innerHTML += '<br />' + x[i];
+    }
+    x = shuffleArray(definitionArray);
+    for (i=0; i<definitionArray.length; i++) {
+        var number = i + 1;
+        document.getElementById('column2').innerHTML += '<br />' + number + ')&nbsp;&nbsp;' + x[i];
+    }
+    
+} // end of main()
+
+// get vocab terms and definitions
+function getTerms() {
+    vocabArray[0] = 'mean';
+    definitionArray[0] = 'The average value of a data set';
+    
+    vocabArray[1] = 'median';
+    definitionArray[1] = 'The middle value of a data set';
+    
+    vocabArray[2] = 'mode';
+    definitionArray[2] = 'The value of a data set that occurs the most';
+    
+    vocabArray[3] = 'quartile 1 (Q1)';
+    definitionArray[3] = 'The median value of the lower half of a data set';
+    
+    vocabArray[4] = 'quartile 3 (Q3)';
+    definitionArray[4] = 'The median value of the upper half of a data set';
+    
+    vocabArray[5] = 'five-number summary';
+    definitionArray[5] = 'The minimum, maximum, and quartiles of a data set';
+    
+    vocabArray[6] = 'interquartile range (IQR)';
+    definitionArray[6] = 'The spread of the middle 50% of a data set';
+    
+    vocabArray[7] = 'outlier';
+    definitionArray[7] = 'A value of a data set that is much higher or lower than most other values';
+    
+    // distractors
+    vocabArray[8] = 'quantitative';
+    vocabArray[9] = 'maximum';
+    vocabArray[10] = 'frequency';
+    vocabArray[11] = 'box plot';
+    vocabArray[12] = 'minimum';
+
+
+
+} // end of getTerms()
+
+</script>
+
+<style>
+body {
+    background-color: black;
+    color: white;
+}
+</style>
+
+<body>
+<h2>Vocab quiz - Prob and Stats - Topic 2</h2>
+
+
+<input type='button' value='Click me' onclick='main();' />
+
+<br /><br />
+
+<div id='displayDiv'></div>
+
+<table>
+    <tr>
+        <td id='column1'></td>
+        <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+        <td id='column2'></td>
+    </tr>
+</table>
+
+</body>

@@ -1,0 +1,38 @@
+<!-- title:  -->
+
+<script src='../externalJS/random number generator.js'>
+</script>
+
+<script>
+// global variables
+
+var temp1, temp2;
+
+// the main function of the page
+function main() {
+    temp1 = getRandom(0, 1);
+    alert(temp1);
+} // end of main()
+
+// check the input answer
+function checkAnswer() {
+    temp1 = document.getElementById('userText').value;
+    alert(temp1);
+} // end of checkAnswer()
+
+</script>
+
+
+<body>
+<h2>Webpage title</h2>
+
+<br /><br />
+
+<form>
+<input type='text' id='userText' />
+<input type='submit' onclick='checkAnswer()'; />
+</form>
+
+<input type='button' value='New problem' id='newBtn' onclick='main()'; />
+
+</body>

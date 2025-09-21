@@ -1,0 +1,82 @@
+<!-- title:  -->
+
+<script src='../externalJS/random number generator.js'></script>
+
+<script src='../externalJS/shuffle.js'></script>
+
+<script>
+// global variables
+
+var vocabArray = [];
+var definitionArray = [];
+
+// the main function of the page
+function main() {
+
+    // reset the page
+    document.getElementById('column1').innerHTML = '';
+    document.getElementById('column2').innerHTML = '';
+    getTerms();
+    var x = shuffleArray(vocabArray);
+    for (i=0; i<vocabArray.length; i++) {
+        document.getElementById('column1').innerHTML += '<br />' + x[i];
+    }
+    x = shuffleArray(definitionArray);
+    for (i=0; i<definitionArray.length; i++) {
+        var number = i + 1;
+        document.getElementById('column2').innerHTML += '<br />' + number + ')&nbsp;&nbsp;' + x[i];
+    }
+    
+} // end of main()
+
+// get vocab terms and definitions
+function getTerms() {
+    vocabArray[0] = 'solution';
+    definitionArray[0] = 'A variable value that makes an inequality true';
+
+    vocabArray[1] = 'reference number';
+    definitionArray[1] = 'A phrase Kevin made up meaning a variable value that makes the left side equal to the right';
+    
+    vocabArray[2] = 'inverse operations';
+    definitionArray[2] = 'When two operations cancel each other';
+    
+    vocabArray[3] = 'coefficient';
+    definitionArray[3] = 'A number multiplied by a variable';
+    
+    vocabArray[4] = 'variable';
+    definitionArray[4] = 'A letter that represents a number';
+
+    vocabArray[5] = 'expression';    
+    definitionArray[5] = 'A "math sentence" that is NOT an equation or inequality';
+    
+    // distractors
+    vocabArray[6] = 'flip';
+    vocabArray[7] = 'inequality';
+    vocabArray[8] = 'equation';
+
+    
+
+} // end of getTerms()
+
+</script>
+
+
+<body>
+<h2>Vocab quiz - Algebra 2A - Topic 1</h2>
+
+
+<input type='button' value='Click me' onclick='main();' />
+
+<br /><br />
+
+<div id='displayDiv'></div>
+
+<table>
+    <tr>
+        <td id='column1'></td>
+        <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+        <td id='column2'></td>
+    </tr>
+</table>
+
+</body>

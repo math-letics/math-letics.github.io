@@ -1,0 +1,253 @@
+<!-- finding the axis of symmetry and vertex from a quadratic equation -->
+
+<script src='../externalJS/random number generator.js'></script>
+<script src='../externalJS/round_numbers.js'></script>
+
+<script>
+// global variables
+var a, b, c; // for standard form; d is a scalar when we solve for y
+var equation;
+var xVertex, yVertex, vertex;
+var temp1, temp2, temp3, temp4;
+var h, k; // for vertex form
+var root1, root2; // for factored form
+var form;
+var discriminant;
+
+// create a new problem
+function getNewProblem() {
+    // reset the page
+    document.getElementById('answerSpace').innerHTML = '';
+    document.getElementById('problemSpace').innerHTML = '';
+    document.getElementById('answerBtn').style.visibility = 'hidden';
+    
+    var verified = verifySelections();
+    if (verified) {
+        document.getElementById('answerBtn').style.visibility = 'visible';
+        document.getElementById('errorMsgDiv').style.visibility = 'hidden';
+        getA();
+        getEquationForm();
+        if (form==='standard') {getStandard();}
+        else if (form==='vertex') {getVertexForm();}
+        else if (form==='factored') {getFactoredForm();}
+        else {alert('error - getNewProblem() - unknown form');}
+        getRoots();
+        getVertex();
+        displayProblem();        
+    }
+    else {document.getElementById('errorMsgDiv').style.visibility = 'visible';}    
+
+} // end of getNewProblem()
+
+// verify that at least one type of equation has been selected
+function verifySelections() {
+    temp1 = document.getElementById('standardFormBox').checked;
+    temp3 = document.getElementById('vertexFormBox').checked;
+    temp4 = document.getElementById('factoredFormBox').checked;
+    
+    if (temp1===false && temp3===false && temp4===false) {
+        return false;
+    }
+    else {return true;}
+} // end of verified()
+
+// get the value of a, that is used in all equation forms
+function getA() {
+    a = getRandom(-10, 9); if (a===0) {a=10;}
+} // end of getA()
+
+// which form of equation should be used?
+function getEquationForm() {
+    var equationArray = [];
+    temp1 = 0;
+    if (document.getElementById('standardFormBox').checked) {
+        equationArray[temp1] = 'standard';
+        temp1++;
+    }
+    if (document.getElementById('vertexFormBox').checked) {
+        equationArray[temp1] = 'vertex';
+        temp1++;
+    }
+    if (document.getElementById('factoredFormBox').checked) {
+        equationArray[temp1] = 'factored';
+        temp1++;
+    }
+    temp2 = getRandom(0, temp1-1);
+    form = equationArray[temp2];
+} // end of getEquationForm()
+
+// get a quadratic equation
+function getStandard() {    
+    getCoefficients(); // also calculates axis of symmetry
+    var firstTerm = a;
+    if (a===1) {firstTerm = '';}
+    else if (a===-1) {firstTerm = '-';}
+    firstTerm += 'x<sup>2</sup>';
+    
+    var secondTerm = b;
+    if (b===1) {secondTerm = ' + x';}
+    else if (b===-1) {secondTerm = ' &ndash; x';}
+    else if (b===0) {secondTerm = '';}
+    else if (b<0) {secondTerm = ' &ndash; ' + Math.abs(b) + 'x';}
+    else {secondTerm = ' + ' + b + 'x';}
+    
+    var thirdTerm = c;
+    if (c===0) {thirdTerm = '';}
+    else if (c>0) {thirdTerm = ' + ' + c;}
+    else {thirdTerm = ' &ndash; ' + Math.abs(c);}
+    equation = 'y = ' + firstTerm + secondTerm + thirdTerm;
+} // end of getEquation()
+
+// get the coefficients, as well as the axis of symmetry
+function getCoefficients() {
+    temp1 = getRandom(0, 1);
+    if (temp1===0) {xVertex = getNumber(-10, 10);}
+    else {xVertex = getNumber(-20, 20)/2;}
+    b = -2*a*xVertex;
+    c = getRandom(-10, 10);    
+} // end of getCoefficients()
+
+// create an equation that is in vertex form
+function getVertexForm() {
+    h = getRandom(-10, 10);
+    k = getRandom(-10, 10);
+    
+    equation = 'y = ';
+    if (a===1) {} // do nothing
+    else if (a===-1) {equation += '-';}
+    else {equation += a;}
+    
+    equation += '(x';
+    
+    if (h===0) {} // do nothing
+    else if (h<0) {equation += ' + ' + Math.abs(h);}
+    else {equation += ' &ndash; ' + h;}
+    
+    equation += ')<sup>2</sup>';
+    
+    if (k===0) {} // do nothing
+    else if (k<0) {equation += ' &ndash; ' + Math.abs(k);}
+    else {equation += ' + ' + k;}
+    
+    a = a;
+    b = -2*a*h;
+    c = a*h*h + k;
+} // end of getVertexForm()
+
+// create an equation in factored form
+function getFactoredForm() {
+    root1 = getRandom(-10, 10);
+    root2 = getRandom(-10, 10);
+    
+    equation = 'y = ';
+    if (a===1) {} // do nothing
+    else if (a===-1) {equation += '-';}
+    else {equation += a;}
+    
+    equation += '(x';
+    if (root1===0) {} // do nothing
+    else if (root1<0) {equation += ' + ' + Math.abs(root1);}
+    else {equation += ' &ndash; ' + root1;}
+    
+    equation += ')(x';
+    if (root2===0) {} // do nothing
+    else if (root2<0) {equation += ' + ' + Math.abs(root2);}
+    else {equation += ' &ndash; ' + root2;}
+    
+    equation += ')';
+} // end of getFactoredForm()
+
+// get the roots/zeros/x-intercepts of the parabola
+function getRoots() {
+    if (form==='standard' || form==='vertex') {
+        // first check to make sure that there are real roots
+        discriminant = b*b-4*a*c;
+        
+        root1 = (-1*b + Math.sqrt(b*b - 4*a*c)) / (2*a);
+        root1 = roundDecimalNumber(root1, 2);
+        root2 = (-1*b - Math.sqrt(b*b - 4*a*c)) / (2*a);
+        root2 = roundDecimalNumber(root2, 2);
+    }
+    else if (form==='factored') {
+        discriminant = 1; // just so we display the roots
+        root1 = root1;
+        root2 = root2;
+    }
+} // end of getRoots()
+
+// get the vertex of the parabola
+function getVertex() {
+    if (form==='standard') {
+        yVertex = a*xVertex*xVertex + b*xVertex + c;
+    }
+    else if (form==='vertex') {
+        xVertex = h;
+        yVertex = k;
+    }
+    else if (form==='factored') {
+        xVertex = (root1 + root2)/2;
+        yVertex = a*(xVertex - root1)*(xVertex - root2);
+    }
+    else {alert('error - getVertex() - unknown form');}
+    
+    vertex = '(' + xVertex + ', ' + yVertex + ')';
+} // end of getVertex()
+// display the problem
+function displayProblem() {
+    temp1 = 'The equation of a parabola is given.  <br />';
+    temp1 += 'Find the axis of symmetry, vertex, and x-intercepts.<br /><br />';
+    document.getElementById('problemSpace').innerHTML = temp1 + equation;
+} // end of displayProblem
+
+// show the answer when user clicks on the button
+function showAnswer() {
+    var answer = 'Axis of symmetry: x = ' + xVertex + '<br /> Vertex: ' + vertex;
+    
+    answer += '<br />x-intercepts: ';
+    if (discriminant<0) {answer += 'No real roots';}
+    else if (discriminant===0) {answer += '(' + root1 + ', 0)';}
+    else {answer += '(' + root1 + ', 0), (' + root2 + ', 0)';}
+    
+    document.getElementById('answerSpace').innerHTML = answer;
+} // end of showAnswer()
+
+</script>
+
+<style>
+
+</style>
+
+<body>
+
+Minnesota Department of Education<br />
+Mathematics K-12 Academic Standards<br />
+(2007 version)
+<br /><br />
+Standard 9.2.1.5:<br />
+Identify the vertex, line of symmetry and intercepts
+of the parabola corresponding to a quadratic function,
+using symbolic and graphical methods, when the function is expressed in the form
+f(x) = ax<sup>2</sup> + bx + c, in the form f(x) = a(x – h)<sup>2</sup> + k , or in factored form.
+<br /><br /><br />
+Select at least one form of equation to use:<br />
+<input type='checkbox' id='standardFormBox' />
+Standard form (y = ax<sup>2</sup> + bx + c)
+<br />
+<input type='checkbox' id='vertexFormBox' />
+Vertex form (y = a(x - h)<sup>2</sup> + k)
+<br />
+<input type='checkbox' id='factoredFormBox' />
+Factored form (y = a(x - m)(x - n))
+<br />
+<div id='errorMsgDiv' style='visibility:hidden; color:red;'>Select at least one option above</div>
+<br /><br />
+<input type='button' value='Get a new problem' onclick='getNewProblem();' />
+<br /><br />
+<div id='problemSpace'></div>
+<br /><br />
+<input type='button' id='answerBtn' value='Show answer' onclick='showAnswer();' style='visibility:hidden;' />
+<br /><br />
+<div id='answerSpace'></div>
+
+
+</body>

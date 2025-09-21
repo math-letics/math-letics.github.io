@@ -1,0 +1,84 @@
+<!-- title:  -->
+
+<script src='../externalJS/random number generator.js'></script>
+
+<script src='../externalJS/shuffle.js'></script>
+
+<script>
+// global variables
+
+var vocabArray = [];
+var definitionArray = [];
+
+// the main function of the page
+function main() {
+
+    // reset the page
+    document.getElementById('column1').innerHTML = '';
+    document.getElementById('column2').innerHTML = '';
+    getTerms();
+    var x = shuffleArray(vocabArray);
+    for (i=0; i<vocabArray.length; i++) {
+        document.getElementById('column1').innerHTML += '<br />' + x[i];
+    }
+    x = shuffleArray(definitionArray);
+    for (i=0; i<definitionArray.length; i++) {
+        var number = i + 1;
+        document.getElementById('column2').innerHTML += '<br />' + number + ')&nbsp;&nbsp;' + x[i];
+    }
+    
+} // end of main()
+
+// get vocab terms and definitions
+function getTerms() {
+    vocabArray[0] = 'area model';
+    definitionArray[0] = 'A process that uses rectangles to help us multiply';
+    
+    vocabArray[1] = 'FOIL method';
+    definitionArray[1] = 'A way to remember how to multiply binomials';
+    
+    vocabArray[2] = 'binomial';
+    definitionArray[2] = 'An expession often in the form <i>a</i>x + <i>b</i>';
+
+    vocabArray[3] = 'complete the square';
+    definitionArray[3] = 'A process to change from standard form to vertex form';
+    
+    vocabArray[4] = 'perfect square trinomial';
+    definitionArray[4] = 'Can be expressed as (<i>a</i>x + <i>b</i>)<sup>2</sup>';
+    
+    vocabArray[5] = 'constant term';
+    definitionArray[5] = '<i>c</i> in the expression <i>a</i>x<sup>2</sup> + <i>b</i>x + <i>c</i>';
+    
+    // distractors
+    vocabArray[6] = 'expand';
+    vocabArray[7] = 'distribute';
+    vocabArray[8] = 'order of operations';
+    vocabArray[9] = 'axis of symmetry';
+    vocabArray[10] = 'vertex';
+    
+    
+
+} // end of getTerms()
+
+</script>
+
+
+<body>
+<h2>Vocab quiz - Algebra 2B - Topic 3</h2>
+
+
+<input type='button' value='Click me' onclick='main();' />
+
+<br /><br />
+
+<div id='displayDiv'></div>
+
+<table>
+    <tr>
+        <td id='column1'></td>
+        <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+        <td id='column2'></td>
+    </tr>
+</table>
+
+</body>

@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html>
+<style>
+#container {
+  width: 500px;
+  height: 300px;
+  position: relative;
+  background: lightBlue;
+}
+#animate {
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  bottom: 20px;
+  left: 10px;
+  background-color: grey;
+}
+#floor1 {
+    width: 45px;
+    height: 30px;
+    position: absolute;
+    background: green;
+    bottom: 0px;
+    left: 0px;
+}
+#water1 {
+    width: 110px;
+    height: 10px;
+    position: absolute;
+    background: blue;
+    bottom: 0px;
+    left: 45px;
+}
+#floor2 {
+    width: 40px;
+    height: 30px;
+    position: absolute;
+    background: green;
+    bottom: 0px;
+    left: 155px;
+}
+#water2 {
+    width: 110px;
+    height: 10px;
+    position: absolute;
+    background: blue;
+    bottom: 0px;
+    left: 195px; 
+}
+#floor3 {
+    width: 40px;
+    height: 30px;
+    position: absolute;
+    background: green;
+    bottom: 0px;
+    left: 305px;
+}
+#water3 {
+    width: 110px;
+    height: 10px;
+    position: absolute;
+    background: blue;
+    bottom: 0px;
+    left: 345px; 
+}
+#floor4 {
+    width: 45px;
+    height: 30px;
+    position: absolute;
+    background: green;
+    bottom: 0px;
+    left: 455px; 
+}
+#statsDiv {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+}
+</style>
+
+<script>
+  
+// global variables
+var firstAttempt; // so that the user cannot jump more than once per question
+var reset = false; // tells whether or not to reset the position
+var numCorrect = 0; // after 3 consecutive correct answers, reset position, maybe increase the level
+var level = 1;
+var numberAttempted = 0; 
+var numberCorrect = 0; 
+var percentCorrect;
+var temp1, temp2, temp3;
+var problem;
+var validForm;
+
+/* See if- this is causing the reset problem
+// when the enter key is pressed, call the checkanswer feature
+document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+            checkAnswer();
+        }
+    });
+});
+*/
+
+// variables used in this specific webpage
+var a, b, c, x, inequality;
+  
+
+// get values to be used in the problem
+function getValues() {
+  a = getRandom(-10, 8); if (a===0) {a=9;} if (a===1) {a=10;}
+  b = getRandom(-99, 98); if (b===0) {b=99;}
+  x = getRandom(-99, 99);
+  
+  c = a*x + b;
+  
+  // randomly pick an inequality
+  temp1 = getRandom(0, 3);
+  switch (temp1) {
+    case 0: inequality = '&lt;'; break;
+    case 1: inequality = '&le;'; break;
+    case 2: inequality = '&gt;'; break;
+    case 3: inequality = '&ge;'; break;
+    default: alert('error - getValues()');
+  }
+  
+} // end of getValues()
+
+// create the answer
+function getAnswer() {
+
+} // end of getAnswer()
+
+
+// get a new question
+function getQuestion() {
+  problem = 'Solve for x.<br /><br />&nbsp;&nbsp;';
+  
+  // leading coefficient of -1
+  if (a===-1) {problem += '&ndash;';}
+  else {problem += a;}
+  problem += 'x ';
+  
+  // if. constant term is negative
+  if (b<0) {problem += '&ndash; ';}
+  else {problem += '+ ';}
+  problem += Math.abs(b) + ' ' + inequality + ' ' + c;
+  
+  problem += '<br />'; // give space
+  
+} // end of getQuestion()
+
+// answer the question correctly, jump safely
+function jumpSafe() {
+  var animate = document.getElementById("animate");
+  var posLeft = parseInt(animate.style.left) || 10;
+  var posBottom = parseInt(animate.style.bottom) || 20;
+  var counter = 0;
+
+  var id = setInterval(frame, 5);
+  function frame() {
+    if (counter < 75) {
+      posBottom += 2/3;
+    } else if (counter < 150) {
+      posBottom -= 2/3;
+    }
+    posLeft++;
+    animate.style.left = posLeft + "px";
+    animate.style.bottom = posBottom + "px";
+
+    counter++;
+    if (counter >= 150) {
+      clearInterval(id);
+      giveFeedback();
+    }
+  }
+} // end of jumpSafe()
+
+
+// incorrect answer, jump fails
+function jumpFail() {
+  var animate = document.getElementById("animate");
+  var posLeft = parseInt(animate.style.left) || 10;
+  var posBottom = parseInt(animate.style.bottom) || 20;
+  var counter = 0;
+
+  var id = setInterval(frame, 5);
+  function frame() {
+    if (counter < 55) {
+      posBottom += 10/11;
+    } else if (counter < 110) {
+      posBottom -= 14/11;
+    }
+    posLeft++;
+    animate.style.left = posLeft + "px";
+    animate.style.bottom = posBottom + "px";
+
+    counter++;
+    if (counter >= 110) {
+      clearInterval(id);
+      giveFeedback();
+    }
+  }
+} // end of jumpFail()
+
+// reset the position of the animate object
+function resetPosition() {
+  var animate = document.getElementById("animate");
+  animate.style.left = '10px';
+  animate.style.bottom = '20px';
+} // end of resetPosition()
+
+// get a whole number fact problem
+function newProblem() {
+    // reset
+    document.getElementById('answerInput1').value = '';
+    document.getElementById('feedbackDiv').innerHTML = '&nbsp;';
+    document.getElementById('checkButton').style.display = 'inline';
+    document.getElementById('answerInput1').style.display = 'inline';
+    document.getElementById('xSpan').style.display = 'inline';
+    document.getElementById('inequalitySelect').style.display = 'inline';
+    document.getElementById('inequalitySelect').value = '';
+    firstAttempt = true;
+    if (reset) {resetPosition();}
+    if (numCorrect > 2) {
+        resetPosition(); 
+        numCorrect = 0;
+        level++;
+        document.getElementById('statsDiv').innerHTML = 'Level: ' + level;
+    }
+    // display the level;
+    document.getElementById('statsDiv').innerHTML = 'Level: ' + level;
+    
+    getValues();
+    getAnswer();
+    getQuestion();
+
+    // display the problem
+    document.getElementById('problemDiv').innerHTML = problem;
+
+    // hide the new problem button so user cannot get an easier problem
+    document.getElementById('newButton').style.visibility = 'hidden';
+    
+    // set focus on the textbox
+    document.getElementById('inequalitySelect').focus();
+} // end of newProblem()
+
+
+
+// NORMALLY EXTERNAL JS
+// generate a random number
+function getRandom(min, max) {
+
+    var x = Math.floor(Math.random()*(max - min + 1)) + min;
+    // NOTE: using 0.1 and 0.9 as min and max return values of 0.1 or 1.1 every time
+    // This code probably only works for whole numbers
+    
+    return x; 
+
+} // end of getRandom(min, max)
+
+// validate the form
+function validateForm() {
+    temp1 = document.getElementById('inequalitySelect').value;
+    temp2 = document.getElementById('answerInput1').value;
+    if (temp1==='' || temp2==='') {
+      validForm = false;
+      document.getElementById('errorDiv').style.display = 'inline';
+      document.getElementById('inequalitySelect').focus();
+      }
+    else {
+      validForm = true;
+      document.getElementById('checkButton').style.display = 'none';
+      document.getElementById('errorDiv').style.display = 'none';
+      document.getElementById('newButton').style.visibility = 'visible';  
+    }
+} // end of validateForm()
+
+// check the user's answer
+function checkAnswer() {
+   // validate the form
+    validateForm();
+    // form is valid, check input
+    if (validForm && firstAttempt) {
+        temp1 = document.getElementById('inequalitySelect').value;
+        switch (temp1) {
+            case 'greater': temp1 = '&gt;'; break;
+            case 'greaterOrEqual': temp1 = '&ge;'; break;
+            case 'less': temp1 = '&lt;'; break;
+            case 'lessOrEqual': temp1 = '&le;'; break;
+            default: alert('error - checkAnswer()');
+        }
+        temp2 = document.getElementById('answerInput1').value;
+        temp2 = parseInt(temp2);
+        // if. answer is correct
+        temp3 = (c-b)/a;
+        
+        // flip the inequality if. a is negative
+        if (a<0) {
+            if (inequality==='&lt;') {inequality='&gt;';}
+            else if (inequality==='&le;') {inequality='&ge;';}
+            else if (inequality==='&gt;') {inequality='&lt;';}
+            else if (inequality==='&ge;') {inequality='&le;';}
+            else {alert('error - checkAnswer()');}
+        }
+        
+        if (temp1===inequality && temp2===temp3) {
+            result = 'correct';        
+            document.getElementById('newButton').focus();
+            jumpSafe();
+            reset = false;
+            numCorrect++;     
+        }        
+        // if. answer is incorrect
+        else {
+            result = 'incorrect';        
+            jumpFail();
+            reset = true;
+            numCorrect = 0;  
+        }
+        
+        // mark any future attempts as no longer the first attempt
+        firstAttempt = false;
+    }
+    
+    
+    
+} // end of checkAnswer()
+
+// give feedback ... set this in the animation function to run after clear(id)
+function giveFeedback() {
+    if (result === 'correct') {
+        document.getElementById('feedbackDiv').innerHTML = 'Correct!';
+    }
+    else if (result === 'incorrect') {
+        temp1 = 'x ' + inequality + ' ' + (c-b)/a;
+        document.getElementById('feedbackDiv').innerHTML = 'Correct answer: ' + temp1;
+        document.getElementById('feedbackDiv').innerHTML += '<br />Try again!';
+    }
+    else {alert('error - giveFeedback()');}
+} // end of giveFeedback()
+
+// load the page
+function loadPage() {
+    document.getElementById('errorDiv').style.display = 'none';
+    document.getElementById('newButton').focus();
+    document.getElementById('answerInput1').style.display = 'none';
+    document.getElementById('checkButton').style.display = 'none';
+    document.getElementById('xSpan').style.display = 'none';
+    document.getElementById('inequalitySelect').style.display = 'none';
+    getStats();
+} // end of loadPage()
+
+// get the stats 
+function getStats() {
+    if (numberAttempted === 0) {percentCorrect = '';}
+    else {
+        percentCorrect = 100 * numberCorrect / numberAttempted;
+        percentCorrect = roundDecimalNumber(percentCorrect, 1);        
+    }
+
+    temp1 = 'Level: ' + level;
+
+    document.getElementById('statsDiv').innerHTML = temp1;
+} // end of getStats()
+
+// NORMALLY EXTERNAL JS
+// round numbers
+function roundDecimalNumber(number, places) {
+
+    number = number * Math.pow(10, places);
+
+    number = number.toFixed(0);
+
+    number = number / Math.pow(10, places);
+
+    return number;
+
+} // end of roundDecimalNumber(number, places)
+
+</script>
+
+<body onload='loadPage()'>
+
+  <div id ="container">
+  
+  <button id='newButton' onclick='newProblem()'>New problem</button>
+  
+  <br /><br />
+  <span id='problemDiv'>Click the button above to get a new problem</span>
+  
+  <br />
+  
+
+  <span id='xSpan'>&nbsp;&nbsp;&nbsp;x </span>
+  <select id="inequalitySelect">
+    <option value=""></option>
+    <option value="greater">&gt;</option>
+    <option value='greaterOrEqual'>&ge;</option>
+    <option value="less">&lt;</option>
+    <option value='lessOrEqual'>&le;</option>
+  </select>
+  <input type='text' id='answerInput1' style='width: 20px;' />
+  <button id='checkButton' onclick='checkAnswer();'>Check answer</button>
+  <span id='statsDiv'>Stats</span>
+  <br />
+  <span id='errorDiv' style='color: red;'>Enter an answer in all of the boxes</span>
+  <span id='feedbackDiv'>&nbsp;</span>
+  <span id='floor1'></span>
+  <span id='water1'></span>
+  <span id='floor2'></span>
+  <span id='water2'></span>
+  <span id='floor3'></span>
+  <span id='water3'></span>
+  <span id='floor4'></span>
+  <span id ="animate">The wolf</span>
+</div>
+
+</body>
+</html>

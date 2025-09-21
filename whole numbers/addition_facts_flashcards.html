@@ -1,0 +1,152 @@
+<!-- title: Addition facts flashcards  -->
+
+<script src='../externalJS/random number generator.js'>
+</script>
+
+<script>
+
+
+
+// global variables
+var temp1, temp2;
+var term1, term2, sum;
+var problem;
+var numAttempted, numCorrect, pctCorrect;
+var min, max;
+
+// the main function of the page
+function main() {
+
+    // reset the display
+    document.getElementById('problemDiv').innerHTML = '';
+    document.getElementById('videoSpan').innerHTML = '';
+    document.getElementById('feedbackDiv').innerHTML = '';
+    document.getElementById('userText').value = '';
+    
+    document.getElementById('userText').focus();
+    
+    getRange();
+    getProblem();
+
+    document.getElementById('problemDiv').innerHTML = problem;
+
+} // end of main()
+
+// set the value of min and max
+function getRange() {
+    if (document.getElementById('10').checked) {max=10;}
+    else if (document.getElementById('11').checked) {max=11;}
+    else if (document.getElementById('12').checked) {max=12;}
+    
+    if (document.getElementById('negativeCheck').checked) {min=-1*max;}
+    else {min = 0;}
+} // end of getRange()
+
+// create the problem to display
+function getProblem() {
+    term1 = getRandom(min, max);
+    term2 = getRandom(min, max);
+    
+    sum = term1 + term2;
+    
+    problem = term1 + ' + ' + term2 + ' = ?';
+} // end of getProblem()
+
+function checkAnswer() {
+    var userAnswer = document.getElementById('userText').value;
+    
+    var feedback;
+    
+    if (userAnswer === '') {
+        feedback = 'Type an answer in the box above';
+    }
+    else {
+        userAnswer = parseInt(userAnswer);    
+        feedback = 'Your answer: ' + userAnswer;
+        feedback += '<br />Correct answer: ' + sum;
+    
+        if (userAnswer===sum) {feedback += '<br />Correct!';}
+        else {feedback += '<br />Not quite';} 
+    }
+    
+    document.getElementById('feedbackDiv').innerHTML = feedback;
+   
+    // change the focus to the "New problem" button
+    document.getElementById('newBtn').focus();
+} // end of checkAnswer()
+
+</script>
+
+
+<body>
+<h2>Addition facts flashcards</h2>
+
+Choose your range of numbers:<br />
+<input type='radio' name='rangeRadio' id='10' checked /> 0-10<br />
+<input type='radio' name='rangeRadio' id='11' /> 0-11<br />
+<input type='radio' name='rangeRadio' id='12' /> 0-12<br />
+
+<br />
+
+<input type='checkbox' id='negativeCheck' /> Include negative integers
+
+<br /><br />
+
+<input type='checkbox' id='videoCheck' /> Play video feedback
+
+<br /><br />
+
+<input type='button' value='New problem' onclick='main();' />
+
+<br /><br />
+
+<u>Stats</u><br />
+Problems attempted: <span id='numAttemptedSpan'></span><br />
+Problems correct: <span id='numCorrectSpan'></span><br />
+Percent correct: <span id='percentSpan'></span>
+
+<br /><br />
+
+<table>
+    <tr>
+        <td>
+            <div id='problemDiv' style='font-size:150%;'>This is the problemDiv</div>
+            <br />
+            <div style='font-size:150%;'>
+                Answer:<input type='textbox' id='userText' size='1' />
+            </div>
+        </td>
+        <td>
+            <span id='videoSpan'>This is the videoSpan</span>
+        </td>
+    </tr>
+</table>
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<input type='button' id='checkBtn' value='Check' onclick='checkAnswer();' style='color:white; background-color:green;' />
+
+<script>
+var input = document.getElementById("userText");
+
+// Execute a function when the user releases a key on the keyboard
+input.addEventListener("keyup", function(event) {
+  // Number 13 is the "Enter" key on the keyboard
+  if (event.keyCode === 13) {
+    // Cancel the default action, if needed
+    event.preventDefault();
+    // Trigger the button element with a click
+    document.getElementById("checkBtn").click();
+  }
+});
+</script>
+
+<input type='button' value='Show answer' onclick='showAnswer();' style='color:white; background-color:orange;' />
+<br /><br />
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<input type='button' id='newBtn' value='New problem' onclick='main();' />
+<br />
+<div id='feedbackDiv'>This is the feedbackDiv</div>
+
+</body>

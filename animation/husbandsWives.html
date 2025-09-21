@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html>
+<style>
+#container {
+  width: 1120px;
+  height: 600px;
+  position: relative;
+  background: lightBlue;
+}
+#husband1LeftSpan {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  bottom: 40px;
+  left: 10px;
+  background-color: gray;
+  text-align: center;
+  visibility: visible;
+}
+#husband1RightSpan {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  bottom: 40px;
+  left: 820px;
+  background-color: gray;
+  text-align: center;
+  visibility: hidden;
+}
+#wife1LeftSpan {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  bottom: 40px;
+  left: 60px;
+  background-color: gray;
+  text-align: center;
+  visibility: visible;
+}
+#wife1RightSpan {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  bottom: 40px;
+  left: 870px;
+  background-color: gray;
+  text-align: center;
+  visibility: hidden;
+}
+#husband2LeftSpan {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  bottom: 40px;
+  left: 110px;
+  background-color: white;
+  text-align: center;
+  visibility: visible;
+}
+#husband2RightSpan {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  bottom: 40px;
+  left: 920px;
+  background-color: white;
+  text-align: center;
+  visibility: hidden;
+}
+#wife2LeftSpan {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  bottom: 40px;
+  left: 160px;
+  background-color: white;
+  text-align: center;
+  visibility: visible;
+}
+#wife2RightSpan {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  bottom: 40px;
+  left: 970px;
+  background-color: white;
+  text-align: center;
+  visibility: hidden;
+}
+#husband3LeftSpan {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  bottom: 40px;
+  left: 210px;
+  background-color: yellow;
+  text-align: center;
+  visibility: visible;
+}
+#husband3RightSpan {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  bottom: 40px;
+  left: 1020px;
+  background-color: yellow;
+  text-align: center;
+  visibility: hidden;
+}
+#wife3LeftSpan {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  bottom: 40px;
+  left: 260px;
+  background-color: yellow;
+  text-align: center;
+  visibility: visible;
+}
+#wife3RightSpan {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  bottom: 40px;
+  left: 1070px;
+  background-color: yellow;
+  text-align: center;
+  visibility: hidden;
+}
+#raftSpan {
+  width: 110px;
+  height: 40px;
+  position: absolute;
+  bottom: 40px;
+  left: 310px;
+  background-color: brown; 
+}
+#landLeftSpan {
+    width: 310px;
+    height: 60px;
+    position: absolute;
+    background: green;
+    bottom: 0px;
+    left: 0px;
+}
+#waterSpan {
+    width: 500px;
+    height: 45px;
+    position: absolute;
+    background: blue;
+    bottom: 0px;
+    left: 310px;
+}
+#landRightSpan {
+    width: 310px;
+    height: 60px;
+    position: absolute;
+    background: green;
+    bottom: 0px;
+    left: 810px;
+}
+#cargo1Span {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  bottom: 60px;
+  left: 320px;  
+  outline-width: 1px;
+  text-align: center;
+}
+#cargo2Span {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  bottom: 60px;
+  left: 370px;  
+  outline-width: 1px;
+  text-align: center;
+}
+</style>
+
+<script>
+
+var temp1, temp2;
+
+// positions... 0 is on left, 1 is on raft, 2 is on right
+let husband1Position = 0;
+let wife1Position = 0;
+let husband2Position = 0;
+let wife2Position = 0;
+let husband3Position = 0;
+let wife3Position = 0;
+let raftIsOnLeft = true; // Track raft side (starts on the left)
+
+
+function move(id, from, to, onComplete) {
+  const elem = document.getElementById(id);   
+  let pos = from;
+  const step = from < to ? 1 : -1;
+
+  clearInterval(elem._intervalId);
+  elem._intervalId = setInterval(() => {
+    if (pos === to) {
+      clearInterval(elem._intervalId);
+      if (onComplete) onComplete();
+    } else {
+      pos += step;
+      elem.style.left = pos + 'px';
+    }
+  }, 5);
+} // end of move();
+
+function crossTheRiver() {
+  // assign positions to the people who are on the raft
+  changePosition();
+  
+  // check to make sure rules are not broken, e.g. cabbage not left with rabbit
+  var verified = verifyForm();
+  if (verified) { 
+    
+    let completed = 0;
+    const checkAllDone = () => {
+      completed++;
+      if (completed === 3) {
+        // code to execute after the raft has crossed  
+      }
+    };
+  
+    if (raftIsOnLeft) {
+      move('cargo1Span', 320, 710, checkAllDone);
+      move('cargo2Span', 370, 760, checkAllDone);
+      move('raftSpan', 310, 700, checkAllDone);
+    } else {
+      move('cargo1Span', 710, 320, checkAllDone);
+      move('cargo2Span', 760, 370, checkAllDone);
+      move('raftSpan', 700, 310, checkAllDone);
+    }
+  
+    raftIsOnLeft = !raftIsOnLeft; // Toggle side
+  }  
+  else { // rules are being broken, do not allow crossing
+  }
+  /*
+  alert('husband1Position ' + husband1Position);
+  alert('wife1Position ' + wife1Position);
+  alert('husband2Position ' + husband2Position);
+  alert('wife2Position ' + wife2Position);
+  alert('husband3Position ' + husband3Position);
+  alert('wife3Position ' + wife3Position);
+  */
+} // end of crossTheRiver()
+
+// make sure rules are followed
+function verifyForm() {
+    // make sure someone is in the boat
+    if (document.getElementById('cargo1Span').innerHTML==='' &&
+        document.getElementById('cargo2Span').innerHTML==='') {
+        alert('Someone needs to row the boat.');
+        return false;
+    }
+    // return true if. rules are followed
+    // return false if. rules are not followed    
+    if (husband1Position!==wife1Position) {
+      if (wife1Position===husband2Position || wife1Position===husband3Position) {
+        alert('Husband 1 will be jealous');
+        return false;
+      }
+      else {return true;}
+    }
+    else if (husband2Position!==wife2Position) {
+      if (wife2Position===husband1Position || wife2Position===husband3Position) {
+        alert('Husband 2 will be jealous');
+        return false;
+      }
+      else {return true;}
+    }
+    else if (husband3Position!==wife3Position) {
+      if (wife3Position===husband1Position || wife3Position===husband2Position) {
+        alert('Husband 3 will be jealous');
+        return false;
+      }
+      else {return true;}
+    }
+    else {return true;}
+    
+} // end of verifyForm();
+
+// argument is husband1, wife1, etc
+// abbrev is H1, W1, etc
+// side is left or right
+// color is gray, white, or yellow
+function load(argument, abbrev, side, color) {
+    var argumentSpan;
+    if (raftIsOnLeft && side==='left') {
+        argumentSpan = argument + 'LeftSpan';
+        
+        if (document.getElementById('cargo1Span').innerHTML==='') {  
+            document.getElementById('cargo1Span').innerHTML = abbrev;
+            document.getElementById('cargo1Span').style.backgroundColor = color;
+            document.getElementById(argumentSpan).style.visibility = 'hidden';
+        }
+        else if (document.getElementById('cargo2Span').innerHTML==='') {  
+            document.getElementById('cargo2Span').innerHTML = abbrev;
+            document.getElementById('cargo2Span').style.backgroundColor = color;
+            document.getElementById(argumentSpan).style.visibility = 'hidden';         
+        }
+        else {alert('The boat is full.  Remove someone from the boat or cross the river.');}
+    }
+    else if (!raftIsOnLeft && side==='right') {
+        argumentSpan = argument + 'RightSpan';
+        if (document.getElementById('cargo1Span').innerHTML==='') {  
+            document.getElementById('cargo1Span').innerHTML = abbrev;
+            document.getElementById('cargo1Span').style.backgroundColor = color;
+            document.getElementById(argumentSpan).style.visibility = 'hidden';
+        }
+        else if (document.getElementById('cargo2Span').innerHTML==='') {  
+            document.getElementById('cargo2Span').innerHTML = abbrev;
+            document.getElementById('cargo2Span').style.backgroundColor = color;
+            document.getElementById(argumentSpan).style.visibility = 'hidden';    
+        }
+        else {alert('The boat is full.  Remove someone from the boat or cross the river.');}
+    }
+
+} // end of load(argument)
+
+
+// assign position 1 to whichever person is clicked
+function changePosition() {
+  temp1 = document.getElementById('cargo1Span').innerHTML;
+  temp2 = document.getElementById('cargo2Span').innerHTML;
+  if (temp1==='H1' || temp2==='H1') {
+    if (raftIsOnLeft) {husband1Position = 2;}
+    else {husband1Position = 0;}
+  }  
+  if (temp1==='W1' || temp2==='W1') {
+    if (raftIsOnLeft) {wife1Position = 2;}
+    else {wife1Position = 0;}
+  }  
+  if (temp1==='H2' || temp2==='H2') {
+    if (raftIsOnLeft) {husband2Position = 2;}
+    else {husband2Position = 0;}
+  }  
+  if (temp1==='W2' || temp2==='W2') {
+    if (raftIsOnLeft) {wife2Position = 2;}
+    else {wife2Position = 0;}
+  }  
+  if (temp1==='H3' || temp2==='H3') {
+    if (raftIsOnLeft) {husband3Position = 2;}
+    else {husband3Position = 0;}
+  }  
+  if (temp1==='W3' || temp2==='W3') {
+    if (raftIsOnLeft) {wife3Position = 2;}
+    else {wife3Position = 0;}
+  }
+} // end of changePosition(argument)
+
+// cargoSpan is either cargo1Span or cargo2Span
+function unload(cargoSpan) {
+    switch (document.getElementById(cargoSpan).innerHTML) {
+        case 'H1':
+          if (raftIsOnLeft) {
+            document.getElementById('husband1LeftSpan').style.visibility = 'visible';
+            husband1Position = 0;  
+          }
+          else if (!raftIsOnLeft) {
+            document.getElementById('husband1RightSpan').style.visibility = 'visible';
+            husband1Position = 2;
+          }
+          break;
+        case 'W1':
+          if (raftIsOnLeft) {
+            document.getElementById('wife1LeftSpan').style.visibility = 'visible';
+            wife1Position = 0;              
+          }
+          else if (!raftIsOnLeft) {
+            document.getElementById('wife1RightSpan').style.visibility = 'visible';
+            wife1Position = 2;
+          }
+          break;
+        case 'H2':
+          if (raftIsOnLeft) {
+            document.getElementById('husband2LeftSpan').style.visibility = 'visible';
+            husband2Position = 0;
+          }
+          else if (!raftIsOnLeft) {
+            document.getElementById('husband2RightSpan').style.visibility = 'visible';
+            husband2Position = 2;
+          }
+          break;
+        case 'W2':
+          if (raftIsOnLeft) {
+            document.getElementById('wife2LeftSpan').style.visibility = 'visible';
+            wife2Position = 0;
+          }
+          else if (!raftIsOnLeft) {
+            document.getElementById('wife2RightSpan').style.visibility = 'visible';            
+            wife2Position = 2;
+          }
+          break;
+        case 'H3':
+          if (raftIsOnLeft) {
+            document.getElementById('husband3LeftSpan').style.visibility = 'visible';
+            husband3Position = 0;
+          }
+          else if (!raftIsOnLeft) {
+            document.getElementById('husband3RightSpan').style.visibility = 'visible';
+            husband3Position = 2;
+          }
+          break;
+        case 'W3':
+          if (raftIsOnLeft) {
+            document.getElementById('wife3LeftSpan').style.visibility = 'visible';
+            wife3Position = 0;
+          }
+          else if (!raftIsOnLeft) {
+            document.getElementById('wife3RightSpan').style.visibility = 'visible';
+            wife3Position = 2;
+          }
+          break;
+    }
+    document.getElementById(cargoSpan).innerHTML = '';
+    document.getElementById(cargoSpan).style.backgroundColor = 'transparent';
+    checkForCompletion();
+} // end of unload(cargoSpan)
+
+function checkForCompletion() {
+  if (husband1Position===2 && wife1Position===2 && husband2Position===2 &&
+  wife2Position===2 && husband3Position===2 && wife3Position===2) {
+        alert('You did it!  Nice work!');
+        location.reload();
+  }
+} // end of checkForCompletion()
+
+</script>
+
+
+<body>
+  <div id ="container">
+    Three jealous husbands and their wives all need to get across a river.  <br />
+    Husband 1 (H1) is married to Wife 1 (W1), etc.<br /><br />
+    Rules:<br />
+    &nbsp;&nbsp; - A maximum of two people can fit in the boat<br />
+    &nbsp;&nbsp; - Any person can row the boat<br />
+    &nbsp;&nbsp; - If a wife is not with her jealous husband, she cannot be with any other husbands<br /><br />
+    Can you get everyone across the river?<br /><br />
+    Click on a person to move them on or off of the boat.
+    <br /><br />&nbsp;&nbsp;
+    <button onclick='location.reload();'>Restart</button>
+    <br /><br />&nbsp;&nbsp;
+
+    <div style='text-align: center;' >
+      <button  onclick='crossTheRiver()'>Cross the river</button>
+    </div>
+    <span id='landLeftSpan'></span>
+    <span id='waterSpan'></span>
+    <span id='landRightSpan'></span>
+    <span id ='husband1LeftSpan' style='visibility:visible;' onclick='load("husband1", "H1", "left", "gray");'>H1</span>
+    <span id='wife1LeftSpan' style='visibility:visible;' onclick='load("wife1", "W1", "left", "gray");'>W1</span>
+    <span id='husband2LeftSpan' style='visibility:visible;' onclick='load("husband2", "H2", "left", "white");'>H2</span>
+    <span id ='wife2LeftSpan' style='visibility:visible;' onclick='load("wife2", "W2", "left", "white");'>W2</span>
+    <span id='husband3LeftSpan' style='visibility:visible;' onclick='load("husband3", "H3", "left", "yellow");'>H3</span>
+    <span id='wife3LeftSpan' style='visibility:visible;' onclick='load("wife3", "W3", "left", "yellow");'>W3</span>
+    <span id ='husband1RightSpan'onclick='load("husband1", "H1", "right", "gray");'>H1</span>
+    <span id='wife1RightSpan' onclick='load("wife1", "W1", "right", "gray");'>W1</span>
+    <span id='husband2RightSpan' onclick='load("husband2", "H2", "right", "white");'>H2</span>
+    <span id ='wife2RightSpan' onclick='load("wife2", "W2", "right", "white");'>W2</span>
+    <span id='husband3RightSpan' onclick='load("husband3", "H3", "right", "yellow");'>H3</span>
+    <span id='wife3RightSpan' onclick='load("wife3", "W3", "right", "yellow");'>W3</span>
+    <span id='raftSpan'></span>
+    <span id='cargo1Span' onclick='unload("cargo1Span");'></span>
+    <span id='cargo2Span' onclick='unload("cargo2Span");'></span>
+  </div>
+
+</body>
+</html>

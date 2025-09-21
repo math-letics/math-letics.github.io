@@ -1,0 +1,93 @@
+<!-- title:  -->
+
+<script src='../externalJS/random number generator.js'></script>
+
+<script src='../externalJS/shuffle.js'></script>
+
+<script>
+// global variables
+
+var vocabArray = [];
+var definitionArray = [];
+
+// the main function of the page
+function main() {
+
+    // reset the page
+    document.getElementById('column1').innerHTML = '';
+    document.getElementById('column2').innerHTML = '';
+    getTerms();
+    var x = shuffleArray(vocabArray);
+    for (i=0; i<vocabArray.length; i++) {
+        document.getElementById('column1').innerHTML += '<br />' + x[i];
+    }
+    x = shuffleArray(definitionArray);
+    for (i=0; i<definitionArray.length; i++) {
+        var number = i + 1;
+        document.getElementById('column2').innerHTML += '<br />' + number + ')&nbsp;&nbsp;' + x[i];
+    }
+    
+} // end of main()
+
+// get vocab terms and definitions
+function getTerms() {
+    vocabArray[0] = 'polynomial';
+    definitionArray[0] = 'An algebraic expression with rational coefficients and whole number exponents';
+    
+    vocabArray[1] = 'monomial';
+    definitionArray[1] = 'A polynomial with one term';
+    
+    vocabArray[2] = 'binomial';
+    definitionArray[2] = 'A polynomial with two terms';
+    
+    vocabArray[3] = 'trinomial';
+    definitionArray[3] = 'A polynomial with three terms';
+    
+    vocabArray[4] = 'combine like terms';
+    definitionArray[4] = 'Put "apples with apples, oranges with oranges, apple pies with apple pies, etc."';
+    
+    vocabArray[5] = 'opposite';
+    definitionArray[5] = 'The result of changing the signs of all terms of a polynomial';
+    
+    vocabArray[6] = 'box method';
+    definitionArray[6] = 'A strategy for multiplying polynomials that uses an area model';
+    
+    vocabArray[7] = 'terms';
+    definitionArray[7] = 'Things that we are adding';
+    
+    vocabArray[8] = 'product';
+    definitionArray[8] = 'The result of multiplying';
+    
+    // distractors
+    vocabArray[9] = 'exponent';
+    vocabArray[10] = 'coefficient';
+    vocabArray[11] = 'sum';
+    vocabArray[12] = 'difference';
+    vocabArray[13] = 'perimeter';
+    vocabArray[14] = 'area';
+    vocabArray[15] = 'factors';
+
+} // end of getTerms()
+
+</script>
+
+
+<body>
+<h2>Vocab quiz - Algebra 1B - Topic 3</h2>
+
+
+<input type='button' value='Click me' onclick='main();' />
+
+<br /><br />
+
+<div id='displayDiv'></div>
+
+<table>
+    <tr>
+        <td id='column1'></td>
+        <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+        <td id='column2'></td>
+    </tr>
+</table>
+
+</body>

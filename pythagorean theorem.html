@@ -1,0 +1,469 @@
+<!-- pythagorean theorem and converse -->
+
+<script src='externalJS/random number generator.js'></script>
+
+<script src='externalJS/round_decimal_numbers.js'></script>
+
+<script src='externalJS/STATS.JS'></script>
+
+<script src='externalJS/video_feedback.js'></script>
+
+<script>
+// global variables
+var temp1, temp2, temp3; // temporary variables
+var question = []; // an array to hold the types of possible questions
+var problem; // a string to hold the information and question for the problem
+var leg1Name, leg1Length, leg2Name, leg2Length, hypName, hypLength, triangleName, rightAngle;
+var scalar; // scale factor for Pythagorean triples
+var answer;
+var questionType; // for checking the answer -- text vs select
+var submissions; // for external JS
+
+// get a new problem
+function getNewProblem() {
+    resetPage();
+
+    if (verifySelections()) {
+        // display hidden things
+        document.getElementById('checkBtn').style.display = 'inline';
+        // create a new problem
+        getTriangleName();
+        getQuestionTypes(); // populate an array with the type of possible question
+        getQuestion(); // generate a problem
+        document.getElementById('problemSpace').innerHTML = problem;
+        document.getElementById('answerBtn').style.visibility = 'visible';
+
+        if (questionType==='leg' || questionType==='hyp') {focusOnText();}
+        else {focusOnSelect();}
+    }
+    else {document.getElementById('errorDiv').style.visibility = 'visible';}
+} // end of getNewProblem()
+
+// reset the page
+function resetPage() {
+    submissions = 0;
+    document.getElementById('errorDiv').style.visibility = 'hidden';
+    document.getElementById('answerSpace').innerHTML = '';
+    document.getElementById('userText').style.display = 'none';
+    document.getElementById('userText').value = '';
+    document.getElementById('select').style.display = 'none';
+    document.getElementById('select').value = 'default';
+    document.getElementById('checkBtn').style.display = 'none';
+    document.getElementById('problemSpace').innerHTML = '';
+    document.getElementById('answerBtn').style.visibility = 'hidden';
+    document.getElementById('feedbackSpace').innerHTML = '&nbsp;<br />&nbsp;';
+} // end of resetPage()
+
+// get the name of the triangle
+function getTriangleName() {
+    // eventually replace with an array of possible names
+    triangleName = 'ABC';
+
+    var side1 = triangleName.slice(0, 2);
+    var angle1 = triangleName.slice(2, 3);
+    var side2 = triangleName.slice(1, 3);
+    var angle2 = triangleName.slice(0, 1);
+    var side3 = triangleName.slice(0, 1) + triangleName.slice(2, 3);
+    var angle3 = triangleName.slice(1, 2);
+
+
+    // randomly select two letters
+    temp1 = getRandom(0, 2);
+    if (temp1===0) {
+        hypName=side1;
+        leg1Name=side2;
+        leg2Name=side3;
+        rightAngle = angle1;
+    }
+    else if (temp1===1) {
+        hypName=side2;
+        leg1Name = side1;
+        leg2Name=side3;
+        rightAngle = angle2;
+    }
+    else {
+        hypName=side3;
+        leg1Name=side1;
+        leg2Name=side2;
+        rightAngle = angle3;
+    }
+} // end of getTriangleName()
+
+// populate an array based on user's selected options
+function getQuestionTypes() {
+    question = [];
+    temp1 = 0;
+    if (document.getElementById('legBox').checked) {
+        question[temp1] = 'leg';
+        temp1++;
+    }
+    if (document.getElementById('hypBox').checked) {
+        question[temp1] = 'hyp';
+        temp1++;
+    }
+    if (document.getElementById('converseBox').checked) {
+        question[temp1] = 'converse';
+        temp1++;
+    }
+} // end of getQuestionTypes()
+
+// randomly select a question from the array
+function getQuestion() {
+    temp1 = getRandom(0, question.length-1);
+    questionType = question[temp1];
+    // hide and display textbox and select menu
+    if (questionType==='leg' || questionType==='hyp') {
+        document.getElementById('userText').style.display = 'inline';
+        document.getElementById('select').style.display = 'none';
+    }
+    else {
+        document.getElementById('userText').style.display = 'none';
+        document.getElementById('select').style.display = 'inline';
+    }
+    switch (questionType) {
+        case 'leg': solveForLeg(); roundAnswer(); break;
+        case 'hyp': solveForHyp(); roundAnswer(); break;
+        case 'converse': solveConverse(); break;
+        default: alert('error - getQuestion()');
+    }
+} // end of getQuestion()
+
+// create a problem to solve for the leg
+function solveForHyp() {
+    // either use Pythagorean triples, or random numbers
+    temp1 = getRandom(0, 1);
+    if (temp1===0) {getTriple();}
+    else {
+        leg1Length = getRandom(1, 706);
+        leg2Length = getRandom(1, 706);
+    }
+    problem = 'In &Delta; ' + triangleName + ', &ang;' + rightAngle;
+    problem += ' is a right angle, ' + leg1Name + ' is ' + leg1Length;
+    problem += ' units long, and ' + leg2Name + ' is ' + leg2Length;
+    problem += ' units long.<br /><br />';
+    problem += 'What is the length of ' + hypName + '?';
+
+    answer = Math.sqrt(leg1Length*leg1Length + leg2Length*leg2Length);
+} // end of solveForHyp()
+
+// create a problem to solve for the hypotenuse
+function solveForLeg() {
+    // either use Pythagorean triples or random numbers
+    temp1 = getRandom(0, 1);
+    if (temp1===0) {getTriple();}
+    else {
+        leg1Length = getRandom(1, 706);
+        hypLength = getRandom(leg1Length+1, 999);
+    }
+    problem = 'A right triangle has ';
+    temp1 = getRandom(0, 1);
+    if (temp1===0) {
+        problem += 'a leg of length ' + leg1Length + ' units and ';
+        problem += 'a hypotenuse of length ' + hypLength + ' units.';
+    }
+    else {
+        problem += 'a hypotenuse of length ' + hypLength + ' units and ';
+        problem += 'a leg of length ' + leg1Length + ' units.';
+    }
+    problem += '<br /><br />What is the length of the third side?';
+    answer = Math.sqrt(hypLength*hypLength - leg1Length*leg1Length);
+} // end of solveForLeg()
+
+// create a problem using the converse of the Pythagorean Theorem
+function solveConverse() {
+    getTriple();
+    // randomly decide to alter the triple or not
+    temp1 = getRandom(0, 1);
+    if (temp1===0) {
+        temp2 = getRandom(-9, 8); if (temp2===0) {temp2=9;}
+        temp3 = getRandom(0, 2);
+        if (temp3===0) {leg1Length += temp2;}
+        else if (temp3===1) {leg2Length += temp2;}
+        else {hypLength += temp2;}
+        answer = 'No';
+    }
+    else {answer = 'Yes';}
+    problem = 'Will the following side lengths make a right triangle?';
+    problem += '<br /><br />';
+    temp1 = getRandom(0, 2);
+    if (temp1===0) {problem += leg1Length + ', ' + leg2Length + ', ' + hypLength;}
+    else if (temp1===1) {problem += leg1Length + ', ' + hypLength + ', ' + leg2Length;}
+    else {problem += hypLength + ', ' + leg1Length + ', ' + leg2Length;}
+} // end of solveConverse()
+
+// get a Pythagorean triple and a scalar
+function getTriple() {
+    temp1 = getRandom(0, 15);
+    switch (temp1) {
+        case 0: leg1Length=3; leg2Length=4; hypLength=5; scalar=199; break;
+        case 1: leg1Length=5; leg2Length=12; hypLength=13; scalar=76; break;
+        case 2: leg1Length=8; leg2Length=15; hypLength=17; scalar=58; break;
+        case 3: leg1Length=7; leg2Length=24; hypLength=25; scalar=39; break;
+        case 4: leg1Length=20; leg2Length=21; hypLength=29; scalar=34; break;
+        case 5: leg1Length=12; leg2Length=35; hypLength=37; scalar=27; break;
+        case 6: leg1Length=9; leg2Length=40; hypLength=41; scalar=24; break;
+        case 7: leg1Length=28; leg2Length=45; hypLength=53; scalar=18; break;
+        case 8: leg1Length=11; leg2Length=60; hypLength=61; scalar=16; break;
+        case 9: leg1Length=16; leg2Length=63; hypLength=65; scalar=15; break;
+        case 10: leg1Length=33; leg2Length=56; hypLength=65; scalar=15; break;
+        case 11: leg1Length=48; leg2Length=55; hypLength=73; scalar=13; break;
+        case 12: leg1Length=13; leg2Length=84; hypLength=85; scalar=11; break;
+        case 13: leg1Length=36; leg2Length=77; hypLength=85; scalar=11; break;
+        case 14: leg1Length=39; leg2Length=80; hypLength=89; scalar=11; break;
+        case 15: leg1Length=65; leg2Length=72; hypLength=97; scalar=10; break;
+        default: alert('error - getTriple()');
+    }
+    // randomly select leg1 and leg2 lengths
+    temp1 = getRandom(0, 1);
+    if (temp1===0) {temp2=leg1Length; leg1Length=leg2Length; leg2Length=temp2;}
+    // scale the lengths
+    temp1 = getRandom(1, scalar);
+    leg1Length *= scalar; leg2Length *= scalar; hypLength *= scalar;
+} // end of getTriple()
+
+// verify that at least one option has been selected
+function verifySelections() {
+    temp1 = document.getElementById('legBox').checked; // "Solve for a leg" is checked
+    temp2 = document.getElementById('hypBox').checked; // "Solve for the hypotenuse" is checked
+    temp3 = document.getElementById('converseBox').checked; // "Converse.... " is checked
+
+    // The || symbol is "or"
+    if (temp1 || temp2 || temp3) {return true;}  // At least one box is checked; the form is verified
+    else {return false;} // No options are selected
+} // end of verifySelections()
+
+// when solving for a leg or hyp, round the answer
+function roundAnswer() {
+    problem += '<br />(Round to the nearest ';
+    if (hypLength < 10) {
+        problem += 'thousandth, if needed)';
+        answer = roundDecimalNumber(answer, 3);
+    }
+    else if (hypLength < 100) {
+        temp1 = getRandom(0, 1); // randomly decide on how to round
+        if (temp1===0) {
+            problem += 'hundredth, if needed)';
+            answer = roundDecimalNumber(answer, 2);
+        }
+        else {
+            problem += 'thousandth, if needed)';
+            answer = roundDecimalNumber(answer, 3);
+        }
+    }
+    else {
+        temp1 = getRandom(0, 1);
+        if (temp1===0) {
+            problem += 'hundredth, if needed)';
+            answer = roundDecimalNumber(answer, 2);
+        }
+        else {
+            problem += 'tenth, if needed)';
+            answer = roundDecimalNumber(answer, 1);
+        }
+    }
+} // end of roundAnswer()
+
+// check the users answer and give feedback
+function checkAnswer() {
+    submissions++;
+    var userAnswer = 'Your answer: ';
+    if (questionType==='leg' || questionType==='hyp') {
+        if (document.getElementById('userText').value == '') {
+            temp1 = 'Type an answer in the box above<br />&nbsp;';
+            document.getElementById('feedbackSpace').innerHTML = temp1;
+            document.getElementById('feedbackSpace').style.color = 'red';
+            focusOnText();
+            return;
+        }
+        document.getElementById('feedbackSpace').style.color = 'white';
+        userAnswer += document.getElementById('userText').value;
+        document.getElementById('feedbackSpace').innerHTML = userAnswer;
+        if (document.getElementById('userText').value == answer) {
+           temp1 = '<br />Correct!';
+           document.getElementById('feedbackSpace').innerHTML += temp1;
+           document.getElementById('newProbBtn').focus();
+           countCorrect(submissions);
+           if (document.getElementById('videoBox').checked) {playCorrect();}
+        }
+        else {
+            temp1 = '<br />Not quite.  Try again.';
+            document.getElementById('feedbackSpace').innerHTML += temp1;
+            focusOnText();
+            countWrong(submissions);
+            if (document.getElementById('videoBox').checked) {playWrong();}
+        }
+    }
+    else { // converse question
+        if (document.getElementById('select').value == 'default') {
+            temp1 = 'Select an answer from the drop-down menu <br />&nbsp;';
+            document.getElementById('feedbackSpace').innerHTML = temp1;
+            document.getElementById('feedbackSpace').style.color = 'red';
+            focusOnSelect();
+            return;
+        }
+        document.getElementById('feedbackSpace').style.color = 'white';
+        userAnswer += document.getElementById('select').value;
+        document.getElementById('feedbackSpace').innerHTML = userAnswer;
+        if (document.getElementById('select').value == answer) {
+           temp1 = '<br />Correct!';
+           document.getElementById('feedbackSpace').innerHTML += temp1;
+           document.getElementById('newProbBtn').focus();
+           countCorrect(submissions);
+           if (document.getElementById('videoBox').checked) {playCorrect();}
+        }
+        else {
+            temp1 = '<br />Not quite.  Try again.';
+            document.getElementById('feedbackSpace').innerHTML += temp1;
+            focusOnSelect();
+            countWrong(submissions);
+            if (document.getElementById('videoBox').checked) {playWrong();}
+        }
+    }
+} // end of checkAnswer()
+
+// focus on the textbox
+function focusOnText() {
+    document.getElementById('userText').focus();
+} // end of focusOnText()
+
+// focus on the select menu
+function focusOnSelect() {
+    document.getElementById('select').focus();
+} // end of focusOnSelect()
+
+// show the answer to the current question
+function showAnswer() {
+    document.getElementById('answerSpace').innerHTML = answer;
+    submissions++;
+    countWrong(submissions);
+    if (document.getElementById('videoBox').checked) {playAnswer();}
+} // end of showAnswer()
+
+// change the background and font color
+function changeTheme() {
+    temp1 = document.body.style.backgroundColor;
+    if (temp1 === 'white') {
+        document.body.style.backgroundColor = 'black';
+        document.body.style.color = 'white';
+        document.getElementById('problemSpace').style.color = 'white';
+        document.getElementById('statsTD').style.color = 'white';
+    }
+    else {
+        document.body.style.backgroundColor = 'white';
+        document.body.style.color = 'black';
+        document.getElementById('problemSpace').style.color = 'black';
+        document.getElementById('statsTD').style.color = 'black';
+    }
+} // end of changeTheme()
+
+</script>
+
+<style>
+
+body {
+    background-color: black;
+    color: white;
+}
+
+#newProbBtn {
+    background-color: green;
+    color: white;
+}
+
+#checkBtn {
+    background-color: blue;
+    color: white;
+}
+
+#answerBtn {
+    background-color: orange;
+    color: white;
+}
+
+</style>
+
+<body onload='document.getElementById("newProbBtn").focus();'>
+<h3>The Pythagorean Theorem</h3>
+
+This webpage will generate problems involving the Pythagorean Theorem and its converse.
+<br /><br />
+
+What type of problem would you like?<br />
+&nbsp;<input type='checkbox' id='hypBox' checked />Solve for the hypotenuse<br />
+&nbsp;<input type='checkbox' id='legBox' checked />Solve for a leg<br />
+&nbsp;<input type='checkbox' id='converseBox' checked />Converse of the Pythagorean Theorem
+
+<br /><br />
+
+<input type='checkbox' id='videoBox' />Play video feedback
+
+<br />
+
+<div id='errorDiv' style='color:red; visibility:hidden;'>Select at least one option above</div>
+<br />
+<input type='button' id='newProbBtn' value='Get a new problem' onclick='getNewProblem();' />
+<input type='button' id='themeBtn' value='Change color theme' onclick='changeTheme();' />
+
+<br /><br />
+
+<table>
+<tr>
+    <td style='width:70%;'>
+        <div id='problemSpace'></div>
+    </td>
+    <td id='statsTD' style='width:25%;'>
+        <div style='text-align:left;' id='numCorrect'></div>
+        <div style='text-align:left;' id='numAttempts'></div>
+        <div style='text-align:left;' id='pctCorrect'></div>
+    </td>
+</tr>
+<tr>
+    <td>
+        <br /><br />
+        <input type='text' id='userText' style='display:none;' />
+        <select id='select' style='display:none;'>
+            <option value='default'>(select)</option>
+            <option value='Yes'>Yes</option>
+            <option value='No'>No</option>
+        </select>
+        <input type='submit' value='Check my answer' id='checkBtn' onclick='checkAnswer();' style='display:none;' />
+        <!-- javascript for triggering the checkBtn when Enter is pressed -->
+        <!-- DOES NOT APPEAR TO WORK FOR SELECT MENU -->
+        <script>
+            var inputSelect = document.getElementById('select');
+            inputSelect.addEventListener('keyup', function(event) {
+                if (event.keyCode===13) {
+                    event.preventDefault();
+                    document.getElementById('checkBtn').click();
+                }
+            });
+            var inputText = document.getElementById('userText');
+            inputText.addEventListener('keyup', function(event) {
+                var temp = document.getElementById('userText').value;
+                if (event.keyCode===13 && temp !== '') { // 13 is for Enter key
+                    event.preventDefault();
+                    document.getElementById('checkBtn').click();
+                }
+            });
+        </script>
+    </td>
+    <td>
+        <div id='videoSpace'></div>
+    </td>
+</tr>
+</table>
+
+
+
+
+
+<div id='feedbackSpace'></div>
+
+<br /><br /><br />
+
+<input type='button' value='Show answer' id='answerBtn' onclick='showAnswer();' style='visibility:hidden;' />
+
+<div id='answerSpace'></div>
+<div id='practiceSpace'></div>
+
+</body>

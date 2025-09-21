@@ -1,0 +1,89 @@
+<!-- title:  -->
+
+<script src='../externalJS/random number generator.js'></script>
+
+<script src='../externalJS/shuffle.js'></script>
+
+<script>
+// global variables
+
+var vocabArray = [];
+var definitionArray = [];
+
+// the main function of the page
+function main() {
+
+    // reset the page
+    document.getElementById('column1').innerHTML = '';
+    document.getElementById('column2').innerHTML = '';
+    getTerms();
+    var x = shuffleArray(vocabArray);
+    for (i=0; i<vocabArray.length; i++) {
+        document.getElementById('column1').innerHTML += '<br />' + x[i];
+    }
+    x = shuffleArray(definitionArray);
+    for (i=0; i<definitionArray.length; i++) {
+        var number = i + 1;
+        document.getElementById('column2').innerHTML += '<br />' + number + ')&nbsp;&nbsp;' + x[i];
+    }
+    
+} // end of main()
+
+// get vocab terms and definitions
+function getTerms() {
+   
+    vocabArray[0] = 'opposite leg';
+    definitionArray[0] = 'Across from a reference angle';
+    
+    vocabArray[1] = 'adjacent leg';
+    definitionArray[1] = 'Next to a reference angle';
+    
+    vocabArray[2] = 'proportion';
+    definitionArray[2] = 'When two fractions are equal';
+    
+    vocabArray[3] = 'sine (of an angle)';
+    definitionArray[3] = 'Opposite leg over hypotenuse';
+    
+    vocabArray[4] = 'cosine (of an angle)';
+    definitionArray[4] = 'Adjacent leg over hypotenuse';
+    
+    vocabArray[5] = 'tangent (of an angle)';
+    definitionArray[5] = 'Opposite leg over adjacent leg';
+    
+    vocabArray[6] = 'SOH CAH TOA';
+    definitionArray[6] = 'A way to remember definitions of trigonometric functions';
+    
+    vocabArray[7] = 'inverse';
+    definitionArray[7] = 'A way to cancel a given function';
+    
+    // distractors
+    vocabArray[8] = 'hypotenuse';
+    vocabArray[9] = 'cross multiply and divide';
+    vocabArray[10] = 'angle of elevation';
+    vocabArray[11] = 'angle of depression';
+    vocabArray[12] = 'similar triangles';
+
+} // end of getTerms()
+
+</script>
+
+
+<body>
+<h2>Vocab quiz - Geometry B - Topic 2</h2>
+
+
+<input type='button' value='Click me' onclick='main();' />
+
+<br /><br />
+
+<div id='displayDiv'></div>
+
+<table>
+    <tr>
+        <td id='column1'></td>
+        <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+        <td id='column2'></td>
+    </tr>
+</table>
+
+</body>

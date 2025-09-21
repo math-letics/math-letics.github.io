@@ -1,0 +1,226 @@
+<!-- title:  -->
+
+<script src='../externalJS/random number generator.js'>
+</script>
+
+<script src='../externalJS/shuffle.js'>
+// shuffleArray(inputArray)
+</script>
+
+<script>
+// global variables
+
+var temp1, temp2;
+var qty; // how many problems selected by the user for a given operation
+var factsArray = []; // array to hold problems that are generated
+var max, min;
+var index; // the array index of a given problem
+var term1, term2, sum;
+var factor1, factor2, product;
+var verified; // true/false
+
+
+
+// the main function of the page
+function main() {
+
+    // reset the page
+    document.getElementById('displayDiv').innerHTML = '';
+    index = 0;
+    factsArray = [];
+
+    verified = verifyForm();
+    if (verified) {
+        getMaxAndMin();
+        getAddition();
+        getSubtraction();
+        getMultiplication();
+        getDivision();
+        factsArray = shuffleArray(factsArray); // external js
+        displayProblems();
+    }
+    else {
+        // display error message
+    }
+
+
+} // end of main()
+
+// verify that no information is missing from the form
+function verifyForm() {
+    if (document.getElementById('addBox').checked===false &&
+        document.getElementById('subBox').checked===false &&
+        document.getElementById('multBox').checked===false &&
+        document.getElementById('divBox').checked===false)
+    {
+            document.getElementById('errorMsgDiv').style.visibility = 'visible';
+            return false;
+    }
+    else {
+        document.getElementById('errorMsgDiv').style.visibility = 'hidden';
+        return true;
+    }
+} // end of verifyForm()
+
+// get the maximum value to use when generating numbers
+function getMaxAndMin() {
+    max = document.getElementById('maxQty').value;
+    if (document.getElementById('noRadio').checked) {min = 0;}
+    else if (document.getElementById('yesRadio').checked) {min = -1*max;}
+    else {alert('error - getMaxAndMin()');}
+} // end of getMax()
+
+// generate addition problems, if requested
+function getAddition() {
+    if (document.getElementById('addBox').checked) {
+        qty = document.getElementById('addQty').value;
+        for (i=0; i<qty; i++) {
+            term1 = getRandom(min, max);
+            term2 = getRandom(min, max);
+            factsArray[index] = '(' + term1 + ') + (' + term2 + ') =';
+            index++;
+        }
+    }
+} // end of getAddition()
+
+// generate subtraction problems
+function getSubtraction() {
+    if (document.getElementById('subBox').checked) {
+        qty = document.getElementById('subQty').value;
+        for (i=0; i<qty; i++) {
+            term1 = getRandom(min, max);
+            term2 = getRandom(min, max);
+            sum = term1 + term2;
+            factsArray[index] = '(' + sum + ') &ndash; (' + term1 + ') =';
+            index++;
+        }
+    }
+} // end of getSubtraction()
+
+// generate multiplication problems
+function getMultiplication() {
+    if (document.getElementById('multBox').checked) {
+        qty = document.getElementById('multQty').value;
+        for (i=0; i<qty; i++) {
+            factor1 = getRandom(min, max);
+            factor2 = getRandom(min, max);
+            factsArray[index] = '(' + factor1 + ')(' + factor2 + ') =';
+            index++;
+        }
+    }
+} // end of getMultiplication()
+
+// get division problems
+function getDivision() {
+    if (document.getElementById('divBox').checked) {
+        qty = document.getElementById('divQty').value;
+        for (i=0; i<qty; i++) {
+            factor1 = getRandom(min, max);
+            factor2 = getRandom(min, max);
+            product = factor1*factor2;
+
+            // avoid 0 divided by 0
+            if (factor1===0) {factor1 = getRandom(1, max);}
+            if (document.getElementById('yesRadio').checked) {
+                temp1 = getRandom(0, 1);
+                if (temp1===0) {
+                  factor1*-1;
+                }
+            }
+
+            factsArray[index] = '(' + product + ') &divide; (' + factor1 + ') =';
+            index++;
+        }
+    }
+} // end of getDivision()
+
+// display the problems
+function displayProblems() {
+    var probNum;
+    temp1 = '';
+    for (i=0; i<index; i++) {
+        probNum = i+1;
+        temp1 += probNum + ') &nbsp;&nbsp;&nbsp;&nbsp;' + factsArray[i] + '<br />';
+    }
+    document.getElementById('displayDiv').innerHTML = temp1;
+} // end of displayProblems()
+
+
+function changeQtyVisibility(operation) {
+    var operationBox = operation + 'Box';
+    var operationSpan = operation + 'Span';
+    if (document.getElementById(operationBox).checked) {
+        document.getElementById(operationSpan).style.visibility = 'visible';
+    }
+    else {document.getElementById(operationSpan).style.visibility = 'hidden';}
+} // end of changeQtyVisibility(operation)
+
+
+</script>
+
+<style>
+    body {
+        background-color: black;
+        color: white;
+    }
+
+    #optionsDiv {
+        font-size: 150%
+    }
+
+</style>
+
+<body>
+<h2>Math facts worksheet generator</h2>
+
+<div id='optionsDiv'>
+Choose the maximum value for each fact<br />
+<input type='number' id='maxQty' min=9 max=12 value=10 />
+
+<br /><br />
+
+Select one or more operations:<br />
+<input type='checkbox' id='addBox' onclick='changeQtyVisibility("add");' /> Addition
+<span id='addSpan' style='visibility:hidden;'>
+    ... Qty:
+    <input type='number' id='addQty' min=1 max=100 value=25 />
+</span>
+<br />
+<input type='checkbox' id='subBox' onclick='changeQtyVisibility("sub");' /> Subtraction
+<span id='subSpan' style='visibility:hidden;'>
+    ... Qty:
+    <input type='number' id='subQty' min=1 max=100 value=25 />
+</span>
+<br />
+<input type='checkbox' id='multBox' onclick='changeQtyVisibility("mult");' /> Multiplication
+<span id='multSpan' style='visibility:hidden;'>
+    ... Qty:
+    <input type='number' id='multQty' min=1 max=100 value=25 />
+</span>
+<br />
+<input type='checkbox' id='divBox' onclick='changeQtyVisibility("div");' /> Division
+<span id='divSpan' style='visibility:hidden;'>
+    ... Qty:
+    <input type='number' id='divQty' min=1 max=100 value=25 />
+</span>
+<br />
+<span id='errorMsgDiv' style='color:red; visibility:hidden;'>
+    Select at least one operation above
+</span>
+<br /><br />
+
+Include negative numbers?<br />
+<input type='radio' name='negativeRadio' id='yesRadio' value='yes' /> Yes<br />
+<input type='radio' name='negativeRadio' id='noRadio' value='no' checked /> No
+
+<br /><br />
+
+<input type='button' value='Get math facts' onclick='main();' />
+
+</div>
+
+<br /><br />
+
+<div id='displayDiv'></div>
+
+</body>

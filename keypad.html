@@ -1,0 +1,54 @@
+<!-- create a keypad for users to input numeric values -->
+
+<script>
+
+// global variables
+var inputString = '';
+
+// allow numberpad to type in answer
+function updateString(value) {
+    inputString += value;
+    document.getElementById('inputText').value = inputString;
+} // end of updateString(value)
+
+// clear button to reset the form
+function clearAnswer() {
+    document.getElementById('inputText').value = "";
+    inputString = "";
+} // end of clearAnswer()
+
+</script>
+
+
+
+<body>
+
+
+<!-- input box for user's answer -->
+<input type='text' id='inputText' size='4' />
+<br /><br />
+
+<!-- keypad -->
+<input type='button' style='width:60px; height:30px;' value='7' onclick='updateString("7");' />
+<input type='button' style='width:60px; height:30px;' value='8' onclick='updateString("8");' />
+<input type='button' style='width:60px; height:30px;' value='9' onclick='updateString("9");' />
+<br />
+<input type='button' style='width:60px; height:30px;' value='4' onclick='updateString("4");' />
+<input type='button' style='width:60px; height:30px;' value='5' onclick='updateString("5");' />
+<input type='button' style='width:60px; height:30px;' value='6' onclick='updateString("6");' />
+<br />
+<input type='button' style='width:60px; height:30px;' value='1' onclick='updateString("1");' />
+<input type='button' style='width:60px; height:30px;' value='2' onclick='updateString("2");' />
+<input type='button' style='width:60px; height:30px;' value='3' onclick='updateString("3");' />
+<br />
+<input type='button' style='width:92px; height:30px;' value='0' onclick='updateString("0");' />
+<input type='button' style='width:92px; height:30px;' value='Clear' onclick='clearAnswer();' />
+
+<br /><br />
+
+<input type='button' value='click me' onclick='alert(document.getElementById("inputText").value);' />
+
+
+
+
+</body>

@@ -1,0 +1,93 @@
+<!-- title:  -->
+
+<script src='../externalJS/random number generator.js'></script>
+
+<script src='../externalJS/shuffle.js'></script>
+
+<script>
+// global variables
+
+var vocabArray = [];
+var definitionArray = [];
+
+// the main function of the page
+function main() {
+
+    // reset the page
+    document.getElementById('column1').innerHTML = '';
+    document.getElementById('column2').innerHTML = '';
+    getTerms();
+    var x = shuffleArray(vocabArray);
+    for (i=0; i<vocabArray.length; i++) {
+        document.getElementById('column1').innerHTML += '<br />' + x[i];
+    }
+    x = shuffleArray(definitionArray);
+    for (i=0; i<definitionArray.length; i++) {
+        var number = i + 1;
+        document.getElementById('column2').innerHTML += '<br />' + number + ')&nbsp;&nbsp;' + x[i];
+    }
+    
+} // end of main()
+
+// get vocab terms and definitions
+function getTerms() {
+    vocabArray[0] = 'polygon';
+    definitionArray[0] = 'A closed 2-d shape with only straight sides';
+    
+    vocabArray[1] = 'perimeter';
+    definitionArray[1] = 'The distance around a polygon';
+    
+    vocabArray[2] = 'area';
+    definitionArray[2] = 'The amount of space inside a closed 2-d shape';
+    
+    vocabArray[3] = 'perpendicular';
+    definitionArray[3] = 'Two lines that intersect at a 90-degree angle';
+    
+    vocabArray[4] = 'base';
+    definitionArray[4] = 'A side of a polygon perpendicular to the height';
+    
+    vocabArray[5] = 'height';
+    definitionArray[5] = 'The distance between the bases of a quadrilateral';
+    
+    vocabArray[6] = 'quadrilateral';
+    definitionArray[6] = 'A polygon with four sides';
+    
+    vocabArray[7] = 'parallelogram';
+    definitionArray[7] = 'A quadrilateral with two pairs of parallel sides';
+    
+    vocabArray[8] = 'trapezoid';
+    definitionArray[8] = 'A quadrilateral with only one pair of parallel sides';
+    
+    // distractors
+    vocabArray[9] = 'diagonal';
+    vocabArray[10] = 'pentagon';
+    vocabArray[11] = 'composite';
+    vocabArray[12] = 'angle';
+    vocabArray[13] = 'vertex';
+    vocabArray[14] = 'isosceles';
+    vocabArray[15] = 'expression';
+
+} // end of getTerms()
+
+</script>
+
+
+<body>
+<h2>Vocab quiz - Geometry A - Topic 3</h2>
+
+
+<input type='button' value='Click me' onclick='main();' />
+
+<br /><br />
+
+<div id='displayDiv'></div>
+
+<table>
+    <tr>
+        <td id='column1'></td>
+        <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+        <td id='column2'></td>
+    </tr>
+</table>
+
+</body>

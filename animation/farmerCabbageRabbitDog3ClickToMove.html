@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html>
+<style>
+#container {
+  width: 940px;
+  height: 600px;
+  position: relative;
+  background: lightBlue;
+}
+#cabbageLeft {
+  width: 60px;
+  height: 60px;
+  position: absolute;
+  bottom: 40px;
+  left: 10px;
+  background-color: lightGreen;
+  text-align: center;
+}
+#cabbageRight {
+  width: 60px;
+  height: 60px;
+  position: absolute;
+  bottom: 40px;
+  left: 730px;
+  background-color: lightGreen;
+  text-align: center;
+  visibility: hidden;
+}
+#rabbitLeft {
+  width: 60px;
+  height: 60px;
+  position: absolute;
+  bottom: 40px;
+  left: 80px;
+  background-color: white;
+  text-align: center;
+}
+#rabbitRight {
+  width: 60px;
+  height: 60px;
+  position: absolute;
+  bottom: 40px;
+  left: 800px;
+  background-color: white;
+  text-align: center;
+  visibility : hidden;
+}
+#dogLeft {
+  width: 60px;
+  height: 60px;
+  position: absolute;
+  bottom: 40px;
+  left: 150px;
+  background-color: black;
+  color: white;
+  text-align: center;
+}
+#dogRight {
+  width: 60px;
+  height: 60px;
+  position: absolute;
+  bottom: 40px;
+  left: 870px;
+  background-color: black;
+  color: white;
+  text-align: center;
+  visibility : hidden;
+}
+#raft {
+  width: 150px;
+  height: 40px;
+  position: absolute;
+  bottom: 40px;
+  left: 220px;
+  background-color: brown; 
+}
+#farmer {
+  width: 60px;
+  height: 60px;
+  position: absolute;
+  bottom: 60px;
+  left: 300px;
+  background-color: grey;  
+  text-align: center;
+}
+#landLeft {
+    width: 220px;
+    height: 60px;
+    position: absolute;
+    background: green;
+    bottom: 0px;
+    left: 0px;
+}
+#water {
+    width: 500px;
+    height: 45px;
+    position: absolute;
+    background: blue;
+    bottom: 0px;
+    left: 220px;
+}
+#landRight {
+    width: 220px;
+    height: 60px;
+    position: absolute;
+    background: green;
+    bottom: 0px;
+    left: 720px;
+}
+#onTheRaft {
+  width: 60px;
+  height: 60px;
+  position: absolute;
+  bottom: 60px;
+  left: 230px;  
+  outline-width: 1px;
+  text-align: center;
+}
+</style>
+
+<script>
+
+var temp1, temp2;
+var numberOfGuardsLeft, numberOfGuardsRight, numberOfGuardsRaft;
+var numberOfPrisonersLeft, numberOfPrisonersRight, numberOfPrisonersRaft;
+
+// positions... 0 is on left, 1 is on raft, 2 is on right
+let cabbagePosition = 0;
+let rabbitPosition = 0;
+let dogPosition = 0;
+let raftIsOnLeft = true; // Track raft side (starts on the left)
+
+
+function move(id, from, to, onComplete) {
+  const elem = document.getElementById(id);   
+  let pos = from;
+  const step = from < to ? 1 : -1;
+
+  clearInterval(elem._intervalId);
+  elem._intervalId = setInterval(() => {
+    if (pos === to) {
+      clearInterval(elem._intervalId);
+      if (onComplete) onComplete();
+    } else {
+      pos += step;
+      elem.style.left = pos + 'px';
+    }
+  }, 5);
+} // end of move();
+
+function crossTheRiver() {
+  // check to make sure rules are not broken, e.g. cabbage not left with rabbit
+  var verified = verifyForm();
+  if (verified) {     
+    let completed = 0;
+    const checkAllDone = () => {
+      completed++;
+      /* do we need this?
+      if (completed === 3) { // code to execute after the raft has crossed
+        
+        unloadTheRaft();
+
+        if (cabbagePosition===2 && rabbitPosition===2 && dogPosition===2) {
+          alert('You did it!  Nice work!');
+          location.reload();
+        }
+      }
+      */
+    };
+  
+    if (raftIsOnLeft) {
+      move('onTheRaft', 230, 580, checkAllDone);
+      move('farmer', 300, 650, checkAllDone);
+      move('raft', 220, 570, checkAllDone);
+    } else {
+      move('onTheRaft', 580, 230, checkAllDone);
+      move('farmer', 650, 300, checkAllDone);
+      move('raft', 570, 220, checkAllDone);
+    }    
+  
+    raftIsOnLeft = !raftIsOnLeft; // Toggle side
+  }  
+  else { // rules are being broken, do not allow crossing
+    
+  }
+} // end of crossTheRiver()
+
+// make sure rules are followed
+function verifyForm() {
+    // return true if. rules are followed
+    // return false if. rules are not followed
+    
+    if (raftIsOnLeft) {
+        if (document.getElementById('rabbitLeft').style.visibility==='visible') {
+          if (document.getElementById('cabbageLeft').style.visibility==='visible') {
+            alert('The farmer cannot leave the rabbit with the cabbage.');
+            return false;
+          }
+          else if (document.getElementById('dogLeft').style.visibility==='visible') {
+            alert('The farmer cannot leave the dog with the rabbit.');
+            return false;
+          }
+          else {return true;}
+        }
+        else {return true;}
+    }
+    else if (!raftIsOnLeft) {
+        if (document.getElementById('rabbitRight').style.visibility==='visible') {
+          if (document.getElementById('cabbageRight').style.visibility==='visible') {
+            alert('The farmer cannot leave the rabbit with the cabbage.');
+            return false;
+          }
+          else if (document.getElementById('dogRight').style.visibility==='visible') {
+            alert('The farmer cannot leave the dog with the rabbit.');
+            return false;
+          }
+          else {return true;}
+        }
+        else {return true;}
+    }    
+
+} // end of verifyForm();
+
+function load(item, side) {
+  var correctSide = verifySide(side);
+  if (correctSide) {
+    
+    // make sure space is open
+    if (document.getElementById('onTheRaft').innerHTML==='') {
+      var itemSpan = item + side;
+      document.getElementById(itemSpan).style.visibility = 'hidden';
+      document.getElementById('onTheRaft').style.visibility = 'visible';
+      
+      if (item==='cabbage') {loadCabbage();}
+      if (item==='rabbit') {loadRabbit();}
+      if (item==='dog') {loadDog();}         
+    }
+    else {alert('There is not enough space.  Click on the item on the boat to make room.');}
+
+  }  
+} // end of load(argument)
+
+// make sure the item being clicked is on the same side as the boat
+function verifySide(side) {
+    if ((raftIsOnLeft&&side==='Left') || (!raftIsOnLeft&&side==='Right')){
+        return true;
+    }
+    else {return false;}
+} // end of verifySide(side)
+
+function loadCabbage() {
+    document.getElementById('onTheRaft').style.backgroundColor = 'lightGreen';
+    document.getElementById('onTheRaft').innerHTML = 'Cabbage';
+    document.getElementById('onTheRaft').style.color = 'black';
+} // end of loadCabbage()
+
+function loadRabbit() {
+    document.getElementById('onTheRaft').style.backgroundColor = 'white';
+    document.getElementById('onTheRaft').innerHTML = 'Rabbit'; 
+    document.getElementById('onTheRaft').style.color = 'black';   
+} // end of loadRabbit()
+
+function loadDog() {
+    document.getElementById('onTheRaft').style.backgroundColor = 'black';
+    document.getElementById('onTheRaft').innerHTML = 'Dog';
+    document.getElementById('onTheRaft').style.color = 'white';
+} // end of loadDog()
+
+// clicking an object on the raft moves them off and to the appropriate side
+function unload() {
+    document.getElementById('onTheRaft').style.visibility = 'hidden';
+    
+    var item = document.getElementById('onTheRaft').innerHTML;
+    document.getElementById('onTheRaft').innerHTML = '';
+    
+    var itemSpan;
+    if (item==='Cabbage') {
+        if (raftIsOnLeft) {itemSpan = 'cabbageLeft';}
+        else if (!raftIsOnLeft) {itemSpan = 'cabbageRight';}
+    }
+    if (item==='Rabbit') {
+        if (raftIsOnLeft) {itemSpan = 'rabbitLeft';}
+        else if (!raftIsOnLeft) {itemSpan = 'rabbitRight';}
+    }
+    if (item==='Dog') {
+        if (raftIsOnLeft) {itemSpan = 'dogLeft';}
+        else if (!raftIsOnLeft) {itemSpan = 'dogRight';}
+    }
+    document.getElementById(itemSpan).style.visibility = 'visible';
+  
+    checkForCompletion();
+} // end of unload(cargoSpan)
+
+function checkForCompletion() {
+  if (document.getElementById('cabbageRight').style.visibility==='visible' &&
+      document.getElementById('dogRight').style.visibility==='visible' &&
+      document.getElementById('rabbitRight').style.visibility==='visible') {
+    
+    alert('You did it!  Nice work!');
+    location.reload();
+  }
+} // end of checkForCompletion()
+
+</script>
+
+
+<body>
+  <div id ="container">
+    A farmer needs to get some cabbage, a rabbit, and a dog across the river.  <br />
+    The farmer has a boat in which he can only bring one item at a time. <br /><br />
+    If the farmer leaves the dog with the rabbit, the dog will eat the rabbit.  <br /><br />
+    If the farmer leaves the rabbit with the cabbage, the rabbit will eat the cabbage. <br /><br />
+    Can you help the farmer get all three items to the other side?
+    <br /><br />Click on an item to move it on or off the boat.
+    <br /><br />&nbsp;&nbsp;
+    <button onclick='location.reload();'>Restart</button>
+    <br /><br />&nbsp;&nbsp;
+
+    <div style='text-align: center;' >
+      <button  onclick='crossTheRiver()'>Cross the river</button>
+    </div>
+    <span id='landLeft'></span>
+    <span id='water'></span>
+    <span id='landRight'></span>
+    <span id ='cabbageLeft' onclick='load("cabbage", "Left");' style='visibility:visible;'>Cabbage</span>
+    <span id='rabbitLeft' onclick='load("rabbit", "Left");' style='visibility:visible;'>Rabbit</span>
+    <span id='dogLeft' onclick='load("dog", "Left");' style='visibility:visible;'>Dog</span>
+    <span id='raft'></span>
+    <span id='farmer'>Farmer</span>
+    <span id='onTheRaft' onclick='unload();'></span>
+    <span id='cabbageRight' onclick='load("cabbage", "Right");' style='visibility:hidden;'>Cabbage</span>
+    <span id='rabbitRight' onclick='load("rabbit", "Right");' style='visibility:hidden;'>Rabbit</span>
+    <span id='dogRight' onclick='load("dog", "Right");' style='visibility:hidden;'>Dog</span>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!-- title: Scientific notation -->
+
+<script src='../externalJS/random number generator.js'>
+</script>
+
+<script src='../externalJS/round_decimal_numbers.js'>
+</script>
+
+<script>
+// global variables
+
+var temp1, temp2;
+var typeArray = []; // which types of problems are selected?
+var coefficient, power;
+var problem;
+var digits; // how many digits right of the decimal for coefficient?
+
+// the main function of the page
+function main() {
+
+// reset the page
+document.getElementById('displayDiv').innerHTML = '';
+document.getElementById('errorDiv').style.visibility = 'hidden';
+
+var verified = verify();
+
+if (verified) {
+    getProblemTypes();
+    getProblem();
+
+    document.getElementById('displayDiv').innerHTML = problem;
+}
+
+
+
+
+} // end of main()
+
+// verify that the form is correctly filled out
+function verify() {
+    temp1 = document.getElementById('standardBox').checked;
+    temp2 = document.getElementById('scientificBox').checked;
+
+    if (temp1===false && temp2===false) {
+        document.getElementById('errorDiv').style.visibility = 'visible';
+        return false;
+    }
+    else {return true;}
+}
+
+// get the type of problem to display
+function getProblemTypes() {
+
+temp1 = 0;
+if (document.getElementById('standardBox').checked) {
+    typeArray[temp1] = 'standard';
+    temp1++;
+}
+if (document.getElementById('scientificBox').checked) {
+    typeArray[temp1] = 'scientific';
+    temp1++;
+}
+
+} // end of getProblemTypes()
+
+// get a problem to display
+function getProblem() {
+    temp1 = getRandom(0, typeArray.length-1);
+
+    power = getRandom(-9, 9);
+
+    // coefficient is either 1, 2, or 3 digits
+    temp2 = getRandom(0, 2);
+    switch(temp2) {
+        case 0:
+            coefficient = getRandom(1, 9);
+            digits = 0;
+            break;
+        case 1:
+            coefficient = getRandom(11,99)/10;
+            digits = 1;
+            break;
+        case 2:
+            coefficient = getRandom(101,999)/100;
+            digits = 2;
+            break;
+        default: alert('error - getProblem()');
+    }
+
+    if (typeArray[temp1]==='standard') {
+        // change standard form to scientific notation
+        problem = coefficient * 10**power;
+    }
+    else if (typeArray[temp1]==='scientific') {
+        // change scientific notation to standard form
+        problem = coefficient + ' &times; 10<sup>' + power + '</sup>';
+
+    }
+    else {alert('error-getProblem()');}
+} // end of getProblem()
+
+
+
+
+
+</script>
+
+
+<body>
+<h2>Scientific notation</h2>
+
+<br />
+
+<input type='checkbox' id='standardBox' />Change standard form to scientific notation
+<br />
+<input type='checkbox' id='scientificBox' />Change scientific notation to stand form
+
+<br /><br />
+
+<div id='errorDiv' style='color:red; visibility:hidden;'>
+    Select at least one type of problem above
+</div>
+
+<input type='button' value='Get a new problem' onclick='main();' />
+
+<br /><br />
+
+<div id='displayDiv'></div>
+</body>

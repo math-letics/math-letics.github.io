@@ -1,0 +1,23 @@
+.answer {
+    /*make the answers appear in bold text */
+    font-weight: bold;
+    
+    /*hide the answers at first; they will be revealed when user clicks "Show answers" button */
+    display: none;
+}
+
+#showAnswersBtn { /*hide the "Show answers" button at first; it will be revealed when a new quiz is created */
+    display: none;
+}
+
+#hideTextBoxesBtn {
+    display: none;
+}
+    
+#showTextBoxesBtn {
+    display: none;
+}
+
+#hideAnswersBtn {
+    display: none;
+}

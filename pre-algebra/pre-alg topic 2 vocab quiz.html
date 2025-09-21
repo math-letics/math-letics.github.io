@@ -1,0 +1,73 @@
+<!-- title:  -->
+
+<script src='../externalJS/random number generator.js'></script>
+
+<script src='../externalJS/shuffle.js'></script>
+
+<script>
+// global variables
+
+var vocabArray = [];
+var definitionArray = [];
+
+// the main function of the page
+function main() {
+
+    // reset the page
+    document.getElementById('column1').innerHTML = '';
+    document.getElementById('column2').innerHTML = '';
+    getTerms();
+    var x = shuffleArray(vocabArray);
+    for (i=0; i<vocabArray.length; i++) {
+        document.getElementById('column1').innerHTML += '<br />' + x[i];
+    }
+    x = shuffleArray(definitionArray);
+    for (i=0; i<definitionArray.length; i++) {
+        var number = i + 1;
+        document.getElementById('column2').innerHTML += '<br />' + number + ')&nbsp;&nbsp;' + x[i];
+    }
+    
+} // end of main()
+
+// get vocab terms and definitions
+function getTerms() {
+    vocabArray[0] = 'simple interest';
+    definitionArray[0] = 'A percent collected based on the principal';
+    
+    vocabArray[1] = 'interest rate';
+    definitionArray[1] = 'A percentage of the principal or current balance';
+    
+    vocabArray[2] = 'principal';
+    definitionArray[2] = 'The starting value of an account';
+    
+    // distractors
+    vocabArray[3] = 'compound interest';
+    vocabArray[4] = 'discount';
+    vocabArray[5] = 'commission';
+    
+  
+
+} // end of getTerms()
+
+</script>
+
+
+<body>
+<h2>Vocab quiz - Pre-Algebra - Topic 2</h2>
+
+
+<input type='button' value='Click me' onclick='main();' />
+
+<br /><br />
+
+<div id='displayDiv'></div>
+
+<table>
+    <tr>
+        <td id='column1'></td>
+        <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+        <td id='column2'></td>
+    </tr>
+</table>
+
+</body>

@@ -1,0 +1,41 @@
+<!-- title:Absolute value-->
+
+<script src='externalJS/random number generator.js'>
+</script>
+
+<script>
+// global variables
+
+var temp1, temp2, temp3;
+
+// the main function of the page
+function main() {
+    document.getElementById('displayDiv').innerHTML = '';
+    temp3 = document.getElementById('number').value;
+    temp3 = parseInt(temp3)+1;
+    for (i=1; i<temp3; i++) {
+        temp1 = getRandom(-99, 99);
+        temp2 = i + ') |' + temp1 + '| =';
+        document.getElementById('displayDiv').innerHTML += temp2 + '<br />';        
+    }
+} // end of main()
+
+</script>
+
+
+<body>
+<h2>Absolute value problems</h2>
+
+<br /><br />
+
+<input type='number' id='number' value='40' />
+
+<br /><br />
+
+<input type='button' value='Click me' onclick='main();' />
+
+<br /><br />
+
+<div id='displayDiv'></div>
+
+</body>

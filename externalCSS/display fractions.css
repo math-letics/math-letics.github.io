@@ -1,0 +1,22 @@
+/* title: display fractions in html
+
+-- have a div with a class of 'fraction'
+-- within the 'fraction' div,
+    -- numerator is in a span of class 'top'
+    -- denominator is in a span of class 'bottom'
+    
+*/
+
+.fraction, .top, .bottom {
+    padding: 0 5px;    
+}
+
+.fraction {
+    display: inline-block;
+    text-align: center;    
+}
+
+.bottom{
+    border-top: 1px solid #000;
+    display: block;
+}

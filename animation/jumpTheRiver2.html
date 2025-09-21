@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<style>
+
+
+
+#container {
+  width: 500px;
+  height: 200px;
+  position: relative;
+  background: lightBlue;
+}
+#animate {
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  bottom: 20px;
+  left: 0px;
+  background-color: red;
+}
+#floor1 {
+    width: 300px;
+    height: 30px;
+    position: absolute;
+    background: green;
+    bottom: 0px;
+}
+#floor2 {
+    width: 100px;
+    height: 10px;
+    position: absolute;
+    background: blue;
+    bottom: 0px;
+    left: 300px;
+}
+#floor3 {
+    width: 100px;
+    height: 30px;
+    position: absolute;
+    background: green;
+    bottom: 0px;
+    left: 400px;
+}
+</style>
+
+<script>
+
+// for general use
+var userAnswer, result;
+var number1, number2;
+var temp1;
+var problem;
+var correctAnswer;
+
+// for the animation
+var jumpPoint, landPoint, peakPoint, fallDistance;
+var id, posLeft, posBottom;
+
+// animate the jump
+function animateJump() {
+  // code from W3schools
+  id = null;
+  const elem = document.getElementById("animate");   
+  posLeft = 0; elem.style.left = posLeft + 'px';
+  posBottom = 20; elem.style.bottom = posBottom + 'px';
+  clearInterval(id);   
+
+
+  // animation depends on answer
+  if (result === 'correct') {
+    jumpPoint = 250;
+    peakPoint = 325;
+    landPoint = 400;
+    fallDistance = 100;
+  }
+  else if (result === 'incorrect') {
+    jumpPoint = 215;
+    peakPoint = 275;
+    landPoint = 350;
+    fallDistance = 120;
+  }
+
+  // start the animation
+  id = setInterval(frame, 5);
+  function frame() {
+    if (posLeft < jumpPoint) {
+        posLeft++;
+        elem.style.left = posLeft + 'px';
+    }
+    else if (posLeft <= peakPoint) {
+        posLeft++;
+        posBottom += 100/(peakPoint-jumpPoint);
+        elem.style.left = posLeft + 'px';
+        elem.style.bottom = posBottom + 'px';
+    }
+    else if (posLeft <= landPoint) {
+        posLeft++;
+        posBottom -= fallDistance/(landPoint-peakPoint);
+        elem.style.left = posLeft + 'px';
+        elem.style.bottom = posBottom + 'px';
+    }
+    else {
+        clearInterval(id);
+        giveFeedback();
+    }
+  }
+} // end of animateJump()
+
+// get a whole number fact problem
+function newProblem() {
+    // reset the textbox and feedback
+    document.getElementById('answerText').value = '';
+    document.getElementById('feedbackDiv').innerHTML = '&nbsp;';
+
+    // numbers to operate with
+    number1 = getRandom(0, 10);
+    number2 = getRandom(0, 10);
+
+    // randomly select which operation
+    var temp1 = getRandom(0, 3);
+    switch (temp1) {
+        case 0: getAddition(); break;
+        case 1: getSubtraction(); break;
+        case 2: getMultiplication(); break;
+        case 3: getDivision(); break;
+        default: alert('error - newProblem()');
+    }
+
+    // display the problem
+    document.getElementById('problemDiv').innerHTML = problem;
+
+    // set focus on the textbox
+    document.getElementById('answerText').focus();
+} // end of newProblem()
+
+// get an addition problem
+function getAddition() {
+    problem = number1 + ' + ' + number2 + ' = ?';
+    correctAnswer = number1 + number2;
+} // end of getAddition()
+
+// get a subtraction problem
+function getSubtraction() {
+    correctAnswer = number1 + number2;
+
+    // switch things around
+    temp1 = correctAnswer;
+    correctAnswer = number2;
+    number2 = temp1;
+
+    problem = number2 + ' &ndash; ' + number1 + ' = ?';
+} // end of getSubtraction
+
+// get a multiplication problem
+function getMultiplication() {
+    problem = number1 + ' &times; ' + number2 + ' = ? ';
+    correctAnswer = number1*number2;
+} // end of getMultiplication()
+
+// get a division problem
+function getDivision() {
+    // be careful of 0 x 0 = 0 ... no way to rework that into division
+    if (number2===0) {number2 = getRandom(1, 10);}
+
+    correctAnswer = number1 * number2;
+    temp1 = correctAnswer;
+    correctAnswer = number1;
+    number1 = temp1;
+
+    problem = number1 + ' &divide; ' + number2 + ' = ?';
+} // end of getDivision()
+
+// NORMALLY EXTERNAL JS
+// generate a random number
+function getRandom(min, max) {
+
+    var x = Math.floor(Math.random()*(max - min + 1)) + min;
+    // NOTE: using 0.1 and 0.9 as min and max return values of 0.1 or 1.1 every time
+    // This code probably only works for whole numbers
+    
+    return x; 
+
+} // end of getRandom(min, max)
+
+// check the user's answer
+function checkAnswer() {
+    userAnswer = document.getElementById('answerText').value;
+    
+    if (userAnswer == correctAnswer) {
+        result = 'correct';        
+        document.getElementById('newButton').focus();
+    }
+    else if (userAnswer !== correctAnswer) {
+        result = 'incorrect';        
+        document.getElementById('answerText').focus();
+    }
+    else {alert('error - checkAnswer()');}
+
+    animateJump();
+} // end of checkAnswer()
+
+// give feedback ... set this in the animation function to run after clear(id)
+function giveFeedback() {
+    if (result === 'correct') {
+        document.getElementById('feedbackDiv').innerHTML = 'Correct!';
+    }
+    else if (result === 'incorrect') {
+        document.getElementById('feedbackDiv').innerHTML = 'Try again!';
+    }
+    else {alert('error - giveFeedback()');}
+} // end of giveFeedback()
+
+</script>
+
+<body onload='document.getElementById("newButton").focus()'>
+
+<button id='newButton' onclick='newProblem()'>New problem</button>
+
+<br /><br />
+<div id='problemDiv'>Click the button above to get a new problem</div>
+
+<br /><br />
+
+<input type='text' id='answerText' />
+<button onclick='checkAnswer()'>Check answer</button>
+<div id='feedbackDiv'>&nbsp;</div>
+
+<div id ="container">
+  <span id='floor1'></span>
+  <span id='floor2'></span>
+  <span id='floor3'></span>
+  <span id ="animate"></span>
+</div>
+
+
+
+
+
+
+</body>
+</html>

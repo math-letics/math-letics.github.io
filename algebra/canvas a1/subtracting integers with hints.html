@@ -1,0 +1,196 @@
+<!-- title:  Subtract integers with hints-->
+
+<style>
+
+body {
+    background-color: black;
+    color: white;
+}
+
+#newProblemBtn {
+	background-color: green;
+	color: white;
+}
+
+#hintBtn {
+	background-color: blue;
+	color: white;
+}
+
+#answerBtn {
+	background-color: orange;
+	color: white;
+}
+
+</style>
+
+<!-- what would otherwise be external javascript -->
+<script>
+	// generate a random number
+function getRandom(min, max) {
+
+    var x = Math.floor(Math.random()*(max - min + 1)) + min;
+    // NOTE: using 0.1 and 0.9 as min and max return values of 0.1 or 1.1 every time
+    // This code probably only works for whole numbers
+    
+    return x; 
+
+} // end of getRandom(min, max)
+</script>
+
+<script>
+// global variables
+
+var temp1, temp2;
+var addend1, addend2, sum, difference;
+var problem, answer; 
+var hint1, hint2;
+var hintsUsed;
+var max;
+
+// the main function of the page
+function main() {
+
+	// reset the page
+	document.getElementById('answerDiv').innerHTML = '&nbsp;';
+	document.getElementById('hintDiv').innerHTML = '&nbsp;<br />&nbsp;';
+	hintsUsed = 0;
+
+	document.getElementById('hintBtn').style.visibility = 'visible';
+	document.getElementById('answerBtn').style.visibility = 'visible';
+
+	getMax();
+
+	getAddends();
+	getSum();
+
+	displayProblem();
+
+} // end of main()
+
+// get the maximum number to add with
+function getMax() {
+
+	max = document.getElementById('maxNumber').value;
+
+} // end of getMax() 
+
+// get the first number we are adding
+function getAddends() {
+
+	addend1 = getRandom(-1*max, max);
+	addend2 = getRandom(-1*max, max);
+
+} // end of getAddend1()
+
+// get the sum
+function getSum() {
+
+	sum = addend1 + addend2;
+	difference = sum - addend2;
+
+} // end of getSum()
+
+// display the problem on the screen
+function displayProblem() {
+
+	problem = sum + ' &ndash; ' + addend2; 
+
+	document.getElementById('problemDiv').innerHTML = 'Find the difference... <br />';
+	document.getElementById('problemDiv').innerHTML += problem;
+
+} // end of displayProblem()
+
+// show the answer when the user clicks on the "Show answer" button
+function showAnswer() {
+
+	answer = problem + ' = ' + difference;
+
+	document.getElementById('answerDiv').innerHTML = answer;
+
+} // end of showAnswer()
+
+
+// give the user hints when they click the "Get a hint" button
+function getHint() {
+
+	// these will change if we are subtracting zero;
+	hint1 = '(Hint 1 of 2): ';
+	hint2 = '(Hint 2 of 2): ';
+
+
+	// hints will involve absolute values
+	var absolute = Math.abs(addend2);
+	
+	if (addend2 === 0) {
+		hint1 = 'Subtracting zero changes nothing';
+		hint1 = '(Hint 1 of 1): ' + hint1; 
+		hintsUsed += 2;
+		document.getElementById('hintDiv').innerHTML = hint1;
+	}
+
+	else {
+        if (addend2 > 0) {
+                hint1 += 'Subtract a positive ... "chop slash"';
+                hint2 += problem + ' is the same as ' + sum + ' + -' + absolute;
+            }
+        
+        else if (addend2 < 0) {
+            hint1 += 'Subtract a negative ... "chop chop"';
+            hint2 += problem + ' is the same as ' + sum + ' + ' + absolute;
+        }        
+        if (hintsUsed === 0) {
+			document.getElementById('hintDiv').innerHTML = hint1 + '<br />';
+			hintsUsed++;
+		}
+		else if (hintsUsed === 1) {
+            document.getElementById('hintDiv').innerHTML += hint2; hintsUsed++;
+        }		    
+    }
+    
+    
+
+
+} // end of getHint()
+
+</script>
+
+<body>
+<h2>Subtracting integers</h2>
+You can use this page to practice subtracting with integers.  
+<div style='color: red'>**It is recommended that you know how to add integers before practicing subtraction**</div>
+
+<br /><br />
+
+
+Choose the maximum number<br />
+<input type='number' value='1000' min='10' max='1000' id='maxNumber'; />
+
+
+<br /><br />
+
+<input type='button' value='New problem' id='newProblemBtn' onclick='main();' />
+
+<br /><br />
+
+<div id='problemDiv'>&nbsp;<br />&nbsp;</div>
+
+<br />
+
+<input type='button' value='Get a hint' id='hintBtn' style='visibility:hidden;' onclick='getHint();' />
+
+<br /><br />
+
+<div id='hintDiv'>&nbsp;<br />&nbsp;</div>
+
+<br /><br />
+
+
+<input type='button' value='Show answer' id='answerBtn' style='visibility:hidden;' onclick='showAnswer();' />
+
+<br /><br />
+
+<div id='answerDiv'></div>
+
+
+</body>

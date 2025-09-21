@@ -1,0 +1,79 @@
+<!-- title:  -->
+
+<script src='../externalJS/random number generator.js'></script>
+
+<script src='../externalJS/shuffle.js'></script>
+
+<script>
+// global variables
+
+var vocabArray = [];
+var definitionArray = [];
+
+// the main function of the page
+function main() {
+
+    // reset the page
+    document.getElementById('column1').innerHTML = '';
+    document.getElementById('column2').innerHTML = '';
+    getTerms();
+    var x = shuffleArray(vocabArray);
+    for (i=0; i<vocabArray.length; i++) {
+        document.getElementById('column1').innerHTML += '<br />' + x[i];
+    }
+    x = shuffleArray(definitionArray);
+    for (i=0; i<definitionArray.length; i++) {
+        var number = i + 1;
+        document.getElementById('column2').innerHTML += '<br />' + number + ')&nbsp;&nbsp;' + x[i];
+    }
+    
+} // end of main()
+
+// get vocab terms and definitions
+function getTerms() {
+    vocabArray[0] = 'included';
+    definitionArray[0] = 'An angle that is "between" two sides';
+    
+    vocabArray[1] = 'ambiguous case';
+    definitionArray[1] = 'When more than one triangle is possible with its given measurements';
+    
+    vocabArray[2] = 'supplementary';
+    definitionArray[2] = 'Angles that sum to 180 degrees';
+    
+    vocabArray[3] = 'acute';
+    definitionArray[3] = 'An angle that measures less than 90 degrees';
+    
+    vocabArray[4] = 'obtuse';
+    definitionArray[4] = 'An angle that measures more than 90 degrees';
+    
+    // distractors
+    vocabArray[5] = 'Law of Sines';
+    vocabArray[6] = 'Law of Cosines';
+    vocabArray[7] = 'right';
+    vocabArray[8] = 'straight';
+    vocabArray[9] = 'complementary';
+
+} // end of getTerms()
+
+</script>
+
+
+<body>
+<h2>Vocab quiz - Geometry B - Topic 3</h2>
+
+
+<input type='button' value='Click me' onclick='main();' />
+
+<br /><br />
+
+<div id='displayDiv'></div>
+
+<table>
+    <tr>
+        <td id='column1'></td>
+        <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+        <td id='column2'></td>
+    </tr>
+</table>
+
+</body>

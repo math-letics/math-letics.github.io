@@ -1,0 +1,44 @@
+<!-- Trying out HTML Canvas  -->
+
+<script src='externalJS/random number generator.js'>
+</script>
+
+<script>
+// global variables
+
+var temp1, temp2;
+
+// the main function of the page
+function main() {
+	temp1 = getRandom(0, 1);
+	alert(temp1);
+} // end of main()
+
+</script>
+
+
+<body>
+<h2>Trying HTML Canvas</h2>
+
+<br /><br />
+
+<input type='button' value='Click me' onclick='drawStuff();' />
+
+<br /><br />
+
+<canvas id='canvasID' width='200' height='100' style='border:1px solid;'></canvas>
+
+<script>
+
+function drawStuff() {
+	var canvas = document.getElementById('canvasID');
+	var ctx = canvas.getContext('2d');
+	ctx.beginPath();
+	ctx.arc(100, 50, 25, 0, 2*Math.PI);
+	ctx.stroke();	
+}
+
+
+</script>
+
+</body>

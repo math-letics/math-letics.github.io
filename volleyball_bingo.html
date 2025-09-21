@@ -1,0 +1,129 @@
+<!-- title:  -->
+
+<script src='externalJS/random number generator.js'>
+</script>
+
+<script src='externalJS/shuffle.js'>
+</script>
+
+<script>
+// global variables
+
+var temp1, temp2;
+var playerArray = ['Brian', 'C', 'Kevin', 'Kim', 'Megan', 'Mike'];
+var inArray = []; // an array with pairs of players
+
+// the main function of the page
+function main() {
+
+getArray();
+getCard();
+
+} // end of main()
+
+// build an array with all possible two-player permutations
+function getArray() {
+    
+    temp1 = 0;
+    
+    // set-spike combo's
+    for (i=0; i<playerArray.length; i++) {
+        for (j=0; j<playerArray.length; j++) {
+            if (j !== i) {
+                inArray[temp1] = playerArray[i] + '<br />' + playerArray[j];
+                temp1++;             
+            }
+        }
+    }
+    // aces
+    for (i=0; i<playerArray.length; i++) {
+        inArray[temp1] = playerArray[i] + '<br />Ace';        
+        temp1++;
+    }
+    // blocks
+    for (i=0; i<playerArray.length; i++) {
+        inArray[temp1] = playerArray[i] + '<br />Block';
+        temp1++;
+    }
+    // add pancakes in getCard
+    
+} // end of getArray()
+
+// fill the table / Bingo card with two-player permutations
+function getCard() {
+    
+    inArray = shuffleArray(inArray); 
+    // make sure 'pancake' is on the card ... randomly inserted, but not in the last position
+    temp1 = getRandom(0, 23); // only to 23... free space switches index 12 to 24
+    inArray[temp1] = 'Pan<br />' + 'cake';
+
+    // fill the bingo card
+    for (i=0; i<24; i++) {
+        document.getElementById(i).innerHTML = inArray[i];
+    }
+    
+    // free space
+    document.getElementById('24').innerHTML = document.getElementById('12').innerHTML;
+    document.getElementById('12').innerHTML = 'Free <br />Space';
+    
+} // end of getCard()
+
+</script>
+
+<style>
+    td {
+        border: 1px solid;
+        text-align: center;
+    }
+</style>
+
+<body>
+<h2>Volleyball Bingo</h2>
+
+<div id='testDiv'></div>
+
+<table>
+    <tr>
+        <td id='0'>00</td>
+        <td id='1'>01</td>
+        <td id='2'>02</td>
+        <td id='3'>03</td>
+        <td id='4'>04</td>
+    </tr>
+    <tr>
+        <td id='5'>00</td>
+        <td id='6'>01</td>
+        <td id='7'>02</td>
+        <td id='8'>03</td>
+        <td id='9'>04</td>
+    </tr>
+    <tr>
+        <td id='10'>00</td>
+        <td id='11'>01</td>
+        <td id='12'>Free space</td>
+        <td id='13'>03</td>
+        <td id='14'>04</td>    
+    </tr> <tr>
+        <td id='15'>00</td>
+        <td id='16'>01</td>
+        <td id='17'>02</td>
+        <td id='18'>03</td>
+        <td id='19'>04</td>    
+    </tr> <tr>
+        <td id='20'>00</td>
+        <td id='21'>01</td>
+        <td id='22'>02</td>
+        <td id='23'>03</td>
+        <td id='24'>04</td>    
+    </tr>
+</table>
+
+
+
+
+<br /><br />
+
+<input type='button' value='Click me' onclick='main();' />
+
+
+</body>
