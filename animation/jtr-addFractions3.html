@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+<style>
+.fraction, .top, .bottom {
+    padding: 0 5px;    
+}
+
+.fraction {
+    display: inline-block;
+    text-align: center;    
+}
+
+.bottom {
+    border-top: 1px solid #000;
+    display: block;
+}  
+
+#container {
+  width: 500px;
+  height: 300px;
+  position: relative;
+  background: lightBlue;
+  overflow: hidden;
+}
+
+#animate {
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  bottom: 30px;
+  left: 5px;
+  z-index: 4;  /* wolf normally above everything */
+}
+
+#floor1, #floor2, #floor3, #floor4 {
+    position: absolute;
+    background: green;
+    bottom: 0px;
+    z-index: 2; 
+}
+
+#water1, #water2, #water3 {
+    position: absolute;
+    background: blue;
+    bottom: 0px;
+    z-index: 3;  
+}
+
+#floor1 { width: 45px; height: 30px; left: 0px; }
+#water1 { width: 110px; height: 10px; left: 45px; }
+#floor2 { width: 40px; height: 30px; left: 155px; }
+#water2 { width: 110px; height: 10px; left: 195px; }
+#floor3 { width: 40px; height: 30px; left: 305px; }
+#water3 { width: 110px; height: 10px; left: 345px; }
+#floor4 { width: 45px; height: 30px; left: 455px; }
+
+#statsDiv {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+}
+</style>
+
+<script>
+// globals
+var firstAttempt;
+var reset = false;
+var numCorrect = 0;
+var level = 1;
+var problem;
+var correctAnswer, userAnswer;
+var result;
+
+// constants for start position
+const START_LEFT = 5;
+const START_BOTTOM = 30;
+
+// fraction vars
+var num1, num2, den1, den2, numAnswer, denAnswer;
+
+function getGCF(a, b) {
+  if (a < b) [a, b] = [b, a];
+  let r = a % b;
+  while (r !== 0) {
+    a = b;
+    b = r;
+    r = a % b;
+  }
+  return b;
+}
+
+function getRandom(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function getValues() {
+  do {
+    num1 = getRandom(1, 9);
+    den1 = getRandom(2, 10);
+  } while (num1 === den1);
+  let g = getGCF(num1, den1);
+  num1 /= g; den1 /= g;
+
+  do {
+    num2 = getRandom(1, 9);
+    den2 = getRandom(2, 10);
+  } while (num2 === den2);
+  g = getGCF(num2, den2);
+  num2 /= g; den2 /= g;
+}
+
+function getAnswer() {
+  numAnswer = num1 * den2 + num2 * den1;
+  denAnswer = den1 * den2;
+  let g = getGCF(numAnswer, denAnswer);
+  numAnswer /= g; denAnswer /= g;
+  correctAnswer = numAnswer + '/' + denAnswer;
+}
+
+function getQuestion() {
+  problem = '<table><tr><td>Evaluate </td>';
+  problem += '<td><span class="top">' + num1 + '</span><span class="bottom">' + den1 + '</span></td>';
+  problem += '<td>+</td>';
+  problem += '<td><span class="top">' + num2 + '</span><span class="bottom">' + den2 + '</span></td></tr></table>';
+  problem += '<br />Reduce.  Use a slash / to separate numerator and denominator.';
+  problem += '<br />Leave whole numbers as fractions over 1; example: 2 = 2/1';
+}
+
+function getArcY(progress, startY, endY, peak) {
+  let t = progress;
+  let oneMinusT = 1 - t;
+  return (oneMinusT * oneMinusT * startY) + (2 * oneMinusT * t * peak) + (t * t * endY);
+}
+
+function jumpSafe() {
+  let animate = document.getElementById("animate");
+  let startLeft = parseFloat(animate.style.left) || START_LEFT;
+  let startBottom = parseFloat(animate.style.bottom) || START_BOTTOM;
+
+  let totalSteps = 150;
+  let distance = 150;
+  let stepX = distance / totalSteps;
+  let targetBottom = START_BOTTOM;
+  let jumpHeight = 40;
+  let peak = Math.max(startBottom, targetBottom) + jumpHeight;
+
+  animate.style.zIndex = 4;
+
+  let counter = 0;
+  let id = setInterval(() => {
+    counter++;
+    let progress = counter / totalSteps;
+    let posLeft = startLeft + stepX * counter;
+    let posBottom = getArcY(progress, startBottom, targetBottom, peak);
+    animate.style.left = posLeft + "px";
+    animate.style.bottom = posBottom + "px";
+    if (counter >= totalSteps) {
+      clearInterval(id);
+      animate.style.left = (startLeft + distance) + "px";
+      animate.style.bottom = targetBottom + "px";
+      giveFeedback();
+    }
+  }, 5);
+}
+
+function jumpFail() {
+  let animate = document.getElementById("animate");
+  let startLeft = parseFloat(animate.style.left) || START_LEFT;
+  let startBottom = parseFloat(animate.style.bottom) || START_BOTTOM;
+
+  let totalSteps = 110;
+  let distance = 110;
+  let stepX = distance / totalSteps;
+  let targetBottom = 5;
+  let jumpHeight = 30;
+  let peak = Math.max(startBottom, targetBottom) + jumpHeight;
+
+  animate.style.zIndex = 1;
+
+  let counter = 0;
+  let id = setInterval(() => {
+    counter++;
+    let progress = counter / totalSteps;
+    let posLeft = startLeft + stepX * counter;
+    let posBottom = getArcY(progress, startBottom, targetBottom, peak);
+    animate.style.left = posLeft + "px";
+    animate.style.bottom = posBottom + "px";
+
+    if (counter >= totalSteps) {
+      clearInterval(id);
+      animate.style.left = (startLeft + distance) + "px";
+      animate.style.bottom = targetBottom + "px";
+      giveFeedback();
+      // ✅ reset to original position after the failed jump completes
+      setTimeout(() => {
+        resetPosition();
+      }, 400);
+    }
+  }, 5);
+}
+
+function resetPosition() {
+  let animate = document.getElementById("animate");
+  animate.style.left = START_LEFT + "px";
+  animate.style.bottom = START_BOTTOM + "px";
+  animate.style.zIndex = 4; // always on top when reset
+}
+
+function newProblem() {
+  document.getElementById('answerInput1').value = '';
+  document.getElementById('feedbackDiv').innerHTML = '&nbsp;';
+  document.getElementById('checkButton').style.display = 'inline';
+  document.getElementById('answerInput1').style.display = 'inline';
+  firstAttempt = true;
+  if (reset) { resetPosition(); reset = false; }
+  if (numCorrect > 2) {
+    resetPosition(); 
+    numCorrect = 0;
+    level++;
+    document.getElementById('statsDiv').innerHTML = 'Level: ' + level;
+  }
+  document.getElementById('statsDiv').innerHTML = 'Level: ' + level;
+  getValues();
+  getAnswer();
+  getQuestion();
+  document.getElementById('problemDiv').innerHTML = problem;
+  document.getElementById('newButton').style.visibility = 'hidden';
+  document.getElementById('answerInput1').focus();
+}
+
+function checkAnswer() {
+  userAnswer = document.getElementById('answerInput1').value;
+  if (userAnswer.trim() === '') {
+    document.getElementById('errorDiv').style.display = 'inline';
+    return;
+  }
+  document.getElementById('checkButton').style.display = 'none';
+  document.getElementById('errorDiv').style.display = 'none';
+  document.getElementById('newButton').style.visibility = 'visible';
+
+  if (firstAttempt && userAnswer === correctAnswer) {
+    result = 'correct';
+    jumpSafe();
+    reset = false;
+    numCorrect++;
+  } else {
+    result = 'incorrect';
+    jumpFail();
+    reset = true;
+    numCorrect = 0;
+  }
+  firstAttempt = false;
+  document.getElementById('newButton').focus();
+}
+
+function giveFeedback() {
+  if (result === 'correct') {
+    document.getElementById('feedbackDiv').innerHTML = 'Correct!';
+  } else if (result === 'incorrect') {
+    document.getElementById('feedbackDiv').innerHTML = 'Correct answer: ' + correctAnswer + '<br />Try again!';
+  }
+}
+
+function loadPage() {
+  document.getElementById('errorDiv').style.display = 'none';
+  document.getElementById('newButton').focus();
+  document.getElementById('answerInput1').style.display = 'none';
+  document.getElementById('checkButton').style.display = 'none';
+  resetPosition();
+}
+
+</script>
+
+<body onload='loadPage()'>
+  <div id="container">
+    <button id='newButton' onclick='newProblem()'>New problem</button>
+    <br /><br />
+    <span id='problemDiv'>Click the button above to get a new problem</span>
+    <br /><br />
+    <input type='textbox' id='answerInput1' style='width: 50px;' />
+    <button id='checkButton' onclick='checkAnswer()'>Check answer</button>
+    <span id='statsDiv'>Stats</span>
+    <br />
+    <span id='errorDiv' style='color: red;'>Enter an answer above</span>
+    <span id='feedbackDiv'>&nbsp;</span>
+    <span id='floor1'></span>
+    <span id='water1'></span>
+    <span id='floor2'></span>
+    <span id='water2'></span>
+    <span id='floor3'></span>
+    <span id='water3'></span>
+    <span id='floor4'></span>
+    <span id="animate">
+      <img src='../images/wolf transparent.png' style='width:150%; height:150%'>
+    </span>
+  </div>
+</body>
+</html>
