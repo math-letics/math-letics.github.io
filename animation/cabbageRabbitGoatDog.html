@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body { font-family: sans-serif; }
+#container { width: 1160px; height: 600px; position: relative; background: lightBlue; margin: 20px auto; }
+
+/* Items */
+.item { width: 60px; height: 60px; position: absolute; bottom: 40px; text-align: center; line-height: 60px; font-weight: bold; cursor: pointer; }
+#cabbageLeft,#cabbageRight{background-color: lightGreen;color:black;}
+#rabbitLeft,#rabbitRight{background-color:white;color:black;}
+#dogLeft,#dogRight{background-color:black;color:white;}
+#goatLeft,#goatRight{background-color:saddlebrown;color:white;}
+
+/* Raft */
+#raft { width: 230px; height: 40px; position:absolute; bottom:40px; left:290px; background-color:brown; border-radius:10px; display:flex; align-items:flex-end; justify-content:center; gap:15px; padding-bottom:20px; z-index:1; }
+.raftSlot,#farmer { width:60px; height:60px; text-align:center; line-height:60px; font-weight:bold; }
+.raftSlot { visibility:hidden; cursor:pointer; }
+#farmer { background-color:grey; color:black; z-index:2; }
+
+/* Landscape */
+#landLeft{width:290px;height:60px;position:absolute;background:green;bottom:0;left:0;}
+#water{width:580px;height:45px;position:absolute;background:blue;bottom:0;left:290px;}
+#landRight{width:290px;height:60px;position:absolute;background:green;bottom:0;left:870px;}
+
+/* Left items positions */
+#cabbageLeft{left:10px;}#rabbitLeft{left:80px;}#goatLeft{left:150px;}#dogLeft{left:220px;}
+#cabbageRight{left:880px;visibility:hidden;}#rabbitRight{left:950px;visibility:hidden;}#goatRight{left:1020px;visibility:hidden;}#dogRight{left:1090px;visibility:hidden;}
+</style>
+</head>
+<body>
+<div id="container">
+<p>
+A farmer needs to get some cabbage, a rabbit, a dog, and a goat across the river.<br>
+The farmer can bring <b>two items</b> at a time.<br><br>
+Rules:<br>
+- Cabbage cannot be left with rabbit or goat.<br>
+- Dog cannot be left with goat.<br>
+- Dog cannot be left with rabbit.<br><br>
+<button onclick="location.reload();">Restart</button>
+</p>
+
+<div style="text-align:center;">
+  <button onclick="crossTheRiver()">Cross the river</button>
+</div>
+
+<!-- Landscape -->
+<span id="landLeft"></span>
+<span id="water"></span>
+<span id="landRight"></span>
+
+<!-- Left side items -->
+<span id="cabbageLeft" class="item" onclick='load("cabbage","Left")'>Cabbage</span>
+<span id="rabbitLeft" class="item" onclick='load("rabbit","Left")'>Rabbit</span>
+<span id="goatLeft" class="item" onclick='load("goat","Left")'>Goat</span>
+<span id="dogLeft" class="item" onclick='load("dog","Left")'>Dog</span>
+
+<!-- Raft -->
+<div id="raft">
+  <span id="raftSlot1" class="raftSlot" onclick="unload(1)"></span>
+  <span id="farmer">Farmer</span>
+  <span id="raftSlot2" class="raftSlot" onclick="unload(2)"></span>
+</div>
+
+<!-- Right side items -->
+<span id="cabbageRight" class="item" onclick='load("cabbage","Right")'>Cabbage</span>
+<span id="rabbitRight" class="item" onclick='load("rabbit","Right")'>Rabbit</span>
+<span id="goatRight" class="item" onclick='load("goat","Right")'>Goat</span>
+<span id="dogRight" class="item" onclick='load("dog","Right")'>Dog</span>
+</div>
+
+<script>
+// Track side of each item
+const state = { cabbage:'Left', rabbit:'Left', dog:'Left', goat:'Left' };
+let raftIsOnLeft = true;
+
+// Check if item is on raft
+function isOnRaft(item){
+  const s1 = document.getElementById('raftSlot1');
+  const s2 = document.getElementById('raftSlot2');
+  return (s1.innerHTML && s1.innerHTML.toLowerCase()===item) ||
+         (s2.innerHTML && s2.innerHTML.toLowerCase()===item);
+}
+
+// Cross river with rules
+function crossTheRiver(){
+  const side = raftIsOnLeft?'Left':'Right';
+  const items = ['cabbage','rabbit','dog','goat'];
+  const leftBehind = items.filter(item => state[item]===side && !isOnRaft(item));
+
+  // Rule checks
+  if(leftBehind.includes('cabbage') && (leftBehind.includes('rabbit')||leftBehind.includes('goat'))){
+    alert("The cabbage will be eaten!");
+    return;
+  }
+  if(leftBehind.includes('dog') && leftBehind.includes('goat')){
+    alert("The dog and goat will fight!");
+    return;
+  }
+  if(leftBehind.includes('dog') && leftBehind.includes('rabbit')){
+    alert("The dog will attack the rabbit!");
+    return;
+  }
+
+  // Move raft
+  const raft = document.getElementById('raft');
+  const current = parseInt(raft.style.left||raft.offsetLeft);
+  const target = raftIsOnLeft ? (870-raft.offsetWidth) : 290;
+  move('raft', current, target);
+
+  // Update state of items on raft
+  const slot1=document.getElementById('raftSlot1');
+  const slot2=document.getElementById('raftSlot2');
+  [slot1,slot2].forEach(slot=>{
+    if(slot.innerHTML!==''){
+      const item=slot.innerHTML.trim().toLowerCase();
+      state[item]=raftIsOnLeft?'Right':'Left';
+    }
+  });
+
+  raftIsOnLeft = !raftIsOnLeft;
+}
+
+// Move animation
+function move(id, from, to){
+  const elem=document.getElementById(id); let pos=from;
+  const step=from<to?1:-1;
+  clearInterval(elem._intervalId);
+  elem._intervalId=setInterval(()=>{
+    if(pos===to){ clearInterval(elem._intervalId); }
+    else{ pos+=step; elem.style.left=pos+'px'; }
+  },5);
+}
+
+// Load item on raft
+function load(item,side){
+  if(!((raftIsOnLeft && side==='Left')||(!raftIsOnLeft && side==='Right'))) return;
+  const s1=document.getElementById('raftSlot1'), s2=document.getElementById('raftSlot2');
+  if(s1.innerHTML==='') placeItemOnRaft(item,side,s1);
+  else if(s2.innerHTML==='') placeItemOnRaft(item,side,s2);
+  else alert('Raft is full! Click item on raft to unload.');
+}
+
+function placeItemOnRaft(item,side,slot){
+  document.getElementById(item+side).style.visibility='hidden';
+  slot.innerHTML=item.charAt(0).toUpperCase()+item.slice(1);
+  slot.style.visibility='visible';
+  const colors={cabbage:['lightGreen','black'],rabbit:['white','black'],dog:['black','white'],goat:['saddlebrown','white']};
+  slot.style.backgroundColor=colors[item][0]; slot.style.color=colors[item][1];
+}
+
+// Unload from raft
+function unload(slotNum){
+  const slot=document.getElementById('raftSlot'+slotNum);
+  if(slot.innerHTML==='') return;
+  const item=slot.innerHTML.toLowerCase();
+  const side=raftIsOnLeft?'Left':'Right';
+  document.getElementById(item+side).style.visibility='visible';
+  state[item]=side;
+  slot.innerHTML=''; slot.style.visibility='hidden';
+  checkCompletion();
+}
+
+// Completion check
+function checkCompletion(){
+  if(['cabbageRight','rabbitRight','dogRight','goatRight'].every(id=>document.getElementById(id).style.visibility==='visible')){
+    alert('You did it! Nice work!');
+    location.reload();
+  }
+}
+</script>
+</body>
+</html>
