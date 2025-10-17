@@ -76,13 +76,6 @@
     position: absolute;
     top: 0px;
     right: 0px;
-    text-align: right;
-    line-height: 1.4;
-    font-family: Arial, sans-serif;
-    font-size: 14px;
-    background: rgba(255,255,255,0.6);
-    padding: 5px 8px;
-    border-radius: 8px;
 }
 #floor1, #floor2, #floor3, #floor4 {
     z-index: 2;   /* floors above water but below wolf normally */
@@ -139,19 +132,24 @@ function getArcY(progress, startY, endY, peak) {
 // GENERALIZED JUMP
 function jump(distance, targetBottom, jumpHeight, fail) {
     if (jumpInProgress) return;
-    stopCelebrationBounce(); // stop celebration if running
+    // if a celebration bounce is running, stop it while jumping
+    stopCelebrationBounce();
+
     jumpInProgress = true;
 
     var animate = document.getElementById("animate");
     var startLeft = parseFloat(animate.style.left) || START_LEFT;
     var startBottom = parseFloat(animate.style.bottom) || START_BOTTOM;
 
-    var totalSteps = Math.max(1, Math.floor(Math.abs(distance)));
-    var stepX = distance / totalSteps;
+    // original pace: one pixel per interval
+    var totalSteps = Math.max(1, Math.floor(Math.abs(distance))); // avoid 0
+    var stepX = distance / totalSteps; // will be 1 if distance==totalSteps
     var peak = Math.max(startBottom, targetBottom) + jumpHeight;
     var counter = 0;
 
+    // Hide new button while jumping
     document.getElementById('newButton').style.visibility = 'hidden';
+    // Wolf z-index (falls behind water on fail if needed)
     animate.style.zIndex = fail ? 1 : 4;
 
     var id = setInterval(function() {
@@ -162,38 +160,48 @@ function jump(distance, targetBottom, jumpHeight, fail) {
 
         if(counter >= totalSteps){
             clearInterval(id);
+            // ensure final precise position
             animate.style.left = (startLeft + distance) + "px";
             animate.style.bottom = targetBottom + "px";
             jumpInProgress = false;
 
+            // If this was a correct answer and it completed a 3-streak, level up now
             if(result === 'correct' && numCorrect === 3){
+                // increment level and set reset flag so newProblem() will reset
                 level++;
                 numCorrect = 0;
                 reset = true;
 
                 document.getElementById('feedbackDiv').innerHTML = 
                     'Correct!  You have made it to Level ' + level + '!';
+                document.getElementById('statsDiv').innerHTML = 'Level: ' + level;
 
-                getStats();
+                // Start continuous celebratory bounce (will not go below current bottom)
                 startCelebrationBounce();
 
+                // Show New Problem button
                 document.getElementById('newButton').style.visibility='visible';
                 document.getElementById('newButton').focus();
             } else {
+                // normal feedback path (includes incorrect and correct-but-less-than-3 cases)
                 giveFeedback();
             }
         }
-    }, 5);
+    }, 5); // original animation speed (small = smooth)
 } // end of jump()
 
+// SAFE AND FAIL JUMPS
 function jumpSafe() { jump(150, 30, 40, false); } // end of jumpSafe()
 function jumpFail() { jump(110, 5, 30, true); } // end of jumpFail()
 
-// NEW PROBLEM
+// NEW PROBLEM (user clicks)
 function newProblem() {
-    if(jumpInProgress) return;
+    if(jumpInProgress) return; // do not interrupt animation
+
+    // stop celebration if running (and restore bottom to stable base)
     stopCelebrationBounce();
 
+    // Only reset the wolf when allowed (after a wrong answer or after level-up)
     if (reset) {
       resetPosition();
       reset = false;
@@ -202,7 +210,7 @@ function newProblem() {
     getNewProblemDisplay();
     firstAttempt = true;
 
-    getStats();
+    document.getElementById('statsDiv').innerHTML = 'Level: ' + level;
     getVertexForm();
     displayProblem();
     document.getElementById('answerInput1').focus();
@@ -221,19 +229,24 @@ function getVertexForm() {
     correctAnswer3 = c;
 } // end of getVertexForm()
 
+// DISPLAY
 function displayProblem() {
     var problem = 'Convert the vertex form equation into standard form.<br /><br />';
     problem += 'y = ';
+    // correct display a
     if (a===1) {problem += '';}
     else if (a===-1) {problem += '&ndash;';}
     else if (a < 0) {problem += '&ndash;' + Math.abs(a);}
     else {problem += a;}
     problem += '(x ';
+    // correctly display x - h
     if (h<0) {problem += '+ ' + Math.abs(h)}
     else {problem += '&ndash; ' + h;}
     problem += ')<sup>2</sup> ';
+    // correct display k
     if (k<0) {problem += '&ndash; ' + Math.abs(k);}
     else if (k>0) {problem += '+ ' + k;}
+    else {problem += '';} // k is zero... nothing to display
     document.getElementById('problemDiv').innerHTML = problem;
 } // end of displayProblem()
 
@@ -248,8 +261,10 @@ function getNewProblemDisplay() {
     document.getElementById('errorDiv').style.visibility='hidden';
 } // end of getNewProblemDisplay()
 
+// RANDOM NUMBER
 function getRandom(min,max){return Math.floor(Math.random()*(max-min+1))+min;} // end of getRandom()
 
+// CHECK ANSWER
 function checkAnswer(){
     if(document.getElementById('answerInput1').value!=='' &&
        document.getElementById('answerInput2').value!=='' &&
@@ -259,23 +274,22 @@ function checkAnswer(){
         document.getElementById('checkButton').style.display='none';
 
         if(firstAttempt){
-            numberAttempted++;
             var userAnswer1=document.getElementById('answerInput1').value;
             var userAnswer2=document.getElementById('answerInput2').value;
             var userAnswer3=document.getElementById('answerInput3').value;
 
             if(userAnswer1==correctAnswer1 && userAnswer2==correctAnswer2 && userAnswer3==correctAnswer3){
                 result='correct';
-                numberCorrect++;
-                numCorrect++;
+                numCorrect++; // consecutive correct count
+                // do NOT set reset here — reset is set only after level-up (in jump) or on wrong answer below
                 jumpSafe();
             } else {
                 result='incorrect';
+                // mark for reset when newProblem is clicked
                 reset=true;
-                numCorrect=0;
                 jumpFail();
+                numCorrect=0;
             }
-            getStats();
         }
 
         firstAttempt=false;
@@ -285,6 +299,7 @@ function checkAnswer(){
     }
 } // end of checkAnswer()
 
+// FEEDBACK (runs after non-level-up jumps)
 function giveFeedback(){
     if(result==='correct') {
         document.getElementById('feedbackDiv').innerHTML='<br />Correct!';
@@ -293,63 +308,71 @@ function giveFeedback(){
         document.getElementById('feedbackDiv').innerHTML='<br />Correct answer: ';
         document.getElementById('feedbackDiv').innerHTML += 'y = ' + a + 'x<sup>2</sup> + ' + b + 'x + ' + c + '<br />Try again!';
     }
+
+    // Show New Problem button so user can proceed when ready
     document.getElementById('newButton').style.visibility='visible';
     document.getElementById('newButton').focus();
 } // end of giveFeedback()
 
+// START CELEBRATORY BOUNCE (repeating until stopped)
 function startCelebrationBounce() {
+    // If already running, do nothing
     if (celebrateID) return;
-    var animate = document.getElementById("animate");
-    var baseBottom = parseFloat(animate.style.bottom) || START_BOTTOM;
-    var bounceHeight = 18;
-    var frames = 24;
-    var frameTime = 18;
-    var t = 0;
-    var direction = 1;
 
+    var animate = document.getElementById("animate");
+    // baseBottom is the vertical position the wolf landed at; bounce from here upward only
+    var baseBottom = parseFloat(animate.style.bottom) || START_BOTTOM;
+    var bounceHeight = 18; // px above landing position
+    var frames = 24;       // frames per half-bounce (controls smoothness)
+    var frameTime = 18;    // ms per frame (~55fps)
+    var t = 0;
+    var direction = 1; // 1 = up phase, -1 = down phase
+
+    // Use a smooth ease function for each half-cycle (quadratic ease-out/in)
     celebrateID = setInterval(function() {
+        // progress in current half-cycle (0..1)
         var p = t / frames;
+        // ease: easeOutQuad then easeInQuad across the half-cycle pair
+        // for a single half cycle use eased = 1 - (1-p)^2 (easeOutQuad)
         var eased = 1 - Math.pow(1 - p, 2);
+
+        // compute current bottom depending on phase
         if (direction === 1) {
+            // moving up from baseBottom to baseBottom + bounceHeight
             animate.style.bottom = (baseBottom + eased * bounceHeight) + "px";
         } else {
+            // moving down from baseBottom + bounceHeight back to baseBottom
             animate.style.bottom = (baseBottom + (1 - eased) * bounceHeight) + "px";
         }
+
         t++;
         if (t > frames) {
             t = 0;
-            direction = -direction;
+            direction = -direction; // switch direction (up -> down or down -> up)
         }
     }, frameTime);
 } // end of startCelebrationBounce()
 
+// STOP CELEBRATORY BOUNCE
 function stopCelebrationBounce() {
     if (celebrateID) {
         clearInterval(celebrateID);
         celebrateID = null;
+        // restore to exact base bottom (in case interval left it mid-value)
         var animate = document.getElementById("animate");
         var base = parseFloat(animate.style.bottom) || START_BOTTOM;
         animate.style.bottom = base + "px";
     }
 } // end of stopCelebrationBounce()
 
+// STATS
 function getStats(){
-    if(numberAttempted===0) {
-        percentCorrect = '';
-    } else {
-        percentCorrect = roundDecimalNumber(100*numberCorrect/numberAttempted,1);
-    }
-
-    var statsText = 'Level: ' + level + '<br />';
-    statsText += 'Attempted: ' + numberAttempted + '<br />';
-    statsText += 'Correct: ' + numberCorrect + '<br />';
-    if (numberAttempted > 0) {
-        statsText += 'Percent: ' + percentCorrect + '%';
-    }
-
-    document.getElementById('statsDiv').innerHTML = statsText;
+    if(numberAttempted===0) percentCorrect='';
+    else percentCorrect = roundDecimalNumber(100*numberCorrect/numberAttempted,1);
+    document.getElementById('statsDiv').innerHTML='Level: '+level;
 } // end of getStats()
 
+// ROUND DECIMAL
 function roundDecimalNumber(number,places){
     number = number*Math.pow(10,places);
     number = number.toFixed(0);
@@ -357,6 +380,8 @@ function roundDecimalNumber(number,places){
     return number;
 } // end of roundDecimalNumber()
 </script>
+
+
 
 <body onload="loadPage()">
   <h3>Convert Vertex Form to Standard Form</h3>
