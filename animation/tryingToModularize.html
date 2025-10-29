@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Vertex to Standard Practice</title>
+  <link rel="stylesheet" href="../externalCSS/wolfGame.css" />
+  <script src="../externalJS/wolfCore.js"></script>
+  <script src="../externalJS/randomNumberGenerator.js"></script>
+</head>
+<body>
+
+  <h2>Convert from Vertex Form to Standard Form</h2>
+
+  <div id="container">
+    <!-- Floors and Water -->
+    <span id="floor1"></span>
+    <span id="water1"></span>
+    <span id="floor2"></span>
+    <span id="water2"></span>
+    <span id="floor3"></span>
+    <span id="water3"></span>
+    <span id="floor4"></span>
+
+    <!-- Wolf -->
+    <span id="animate">
+      <img src="../images/wolf transparent.png" style="width:150%; height:150%;">
+    </span>
+
+    <!-- Problem & Inputs -->
+    <div id="problem" style="position:absolute; top:10px; left:10px; z-index:5; font-size:16px;"></div>
+
+    <div id="inputs" style="position:absolute; top:40px; left:10px; z-index:5;">
+      <label>a: <input id="inputA" type="number" style="width:50px;"></label>
+      <label>b: <input id="inputB" type="number" style="width:50px;"></label>
+      <label>c: <input id="inputC" type="number" style="width:50px;"></label>
+    </div>
+
+    <button id="checkButton" style="position:absolute; top:80px; left:10px;">Check Answer</button>
+    <button id="newProblemButton" style="position:absolute; top:80px; left:120px;">New Problem</button>
+
+    <!-- Stats & Feedback -->
+    <div id="statsDiv"></div>
+    <div id="feedback" style="position:absolute; top:110px; left:10px; font-size:16px;"></div>
+  </div>
+
+  <script>
+    // ===============================
+    // Local variables (specific to this page)
+    // ===============================
+    let a, h, k, b, c;
+
+    // ===============================
+    // Function: Generate problem
+    // ===============================
+    function getVertexForm() {
+      a = getRandom(-10, 9); if (a === 0) a = 10;
+      h = getRandom(-20, 20);
+      k = getRandom(-20, 20);
+      b = -2 * a * h;
+      c = a * h * h + k;
+
+      const displayEquation = `y = ${a}(x - ${h})² + ${k}`;
+      document.getElementById("problem").textContent = displayEquation;
+      document.getElementById("feedback").textContent = "";
+    } // end of getVertexForm()
+
+    // ===============================
+    // Function: Check Answers
+    // ===============================
+    function checkAnswers() {
+      const userA = Number(document.getElementById("inputA").value);
+      const userB = Number(document.getElementById("inputB").value);
+      const userC = Number(document.getElementById("inputC").value);
+
+      giveFeedback(a, b, c, [userA, userB, userC]);
+    } // end of checkAnswers()
+
+    // ===============================
+    // Event Listeners
+    // ===============================
+    document.getElementById("checkButton").addEventListener("click", checkAnswers);
+    document.getElementById("newProblemButton").addEventListener("click", getVertexForm);
+
+    // Initialize the first problem
+    getVertexForm();
+  </script>
+
+</body>
+</html>
