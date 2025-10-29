@@ -1,0 +1,54 @@
+#container {
+  width: 500px;
+  height: 300px;
+  position: relative;
+  background: lightBlue;
+  overflow: hidden;
+}
+
+#animate {
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  bottom: 30px;
+  left: 5px;
+  z-index: 4;
+}
+
+#floor1, #floor2, #floor3, #floor4 {
+  position: absolute;
+  height: 30px;
+  background: green;
+  bottom: 0;
+  z-index: 2;
+}
+
+#floor1 { width: 45px; left: 0; }
+#floor2 { width: 40px; left: 155px; }
+#floor3 { width: 40px; left: 305px; }
+#floor4 { width: 45px; left: 455px; }
+
+#water1, #water2, #water3 {
+  position: absolute;
+  height: 10px;
+  background: blue;
+  bottom: 0;
+  z-index: 3;
+}
+
+#water1 { width: 110px; left: 45px; }
+#water2 { width: 110px; left: 195px; }
+#water3 { width: 110px; left: 345px; }
+
+#statsDiv {
+  position: absolute;
+  top: 0;
+  right: 0;
+  text-align: right;
+  line-height: 1.4;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  background: rgba(255,255,255,0.6);
+  padding: 5px 8px;
+  border-radius: 8px;
+}
