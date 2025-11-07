@@ -1,0 +1,16 @@
+* text=auto
+# Default for all text files
+* text=auto
+
+# Enforce LF for web code
+*.html text eol=lf
+*.css  text eol=lf
+*.js   text eol=lf
+
+# Leave images and binaries untouched
+*.png  binary
+*.jpg  binary
+*.gif  binary
+*.ico  binary
+*.woff binary
+*.woff2 binary

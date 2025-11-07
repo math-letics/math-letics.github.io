@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html>
+<style>
+#container {
+  width: 500px;
+  height: 300px;
+  position: relative;
+  background: lightBlue;
+  overflow: hidden;   /* clip anything outside the container */
+}
+
+#animate {
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  bottom: 30px;
+  left: 5px;
+}
+#floor1 {
+    width: 45px;
+    height: 30px;
+    position: absolute;
+    background: green;
+    bottom: 0px;
+    left: 0px;
+}
+#water1 {
+    width: 110px;
+    height: 10px;
+    position: absolute;
+    background: blue;
+    bottom: 0px;
+    left: 45px;
+}
+#floor2 {
+    width: 40px;
+    height: 30px;
+    position: absolute;
+    background: green;
+    bottom: 0px;
+    left: 155px;
+}
+#water2 {
+    width: 110px;
+    height: 10px;
+    position: absolute;
+    background: blue;
+    bottom: 0px;
+    left: 195px; 
+}
+#floor3 {
+    width: 40px;
+    height: 30px;
+    position: absolute;
+    background: green;
+    bottom: 0px;
+    left: 305px;
+}
+#water3 {
+    width: 110px;
+    height: 10px;
+    position: absolute;
+    background: blue;
+    bottom: 0px;
+    left: 345px; 
+}
+#floor4 {
+    width: 45px;
+    height: 30px;
+    position: absolute;
+    background: green;
+    bottom: 0px;
+    left: 455px; 
+}
+#statsDiv {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    text-align: right;
+    line-height: 1.4;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    background: rgba(255,255,255,0.6);
+    padding: 5px 8px;
+    border-radius: 8px;
+}
+#floor1, #floor2, #floor3, #floor4 {
+    z-index: 2;   /* floors above water but below wolf normally */
+}
+#water1, #water2, #water3 {
+    z-index: 3;   /* water above floors */
+}
+#animate {
+    z-index: 4;   /* wolf normally above everything */
+}
+</style>
+
+<script src='../externalJS/gcf.js'></script>
+
+<script>
+// GLOBAL VARIABLES
+var firstAttempt, reset=false, numCorrect=0, level=1;
+var numberAttempted=0, numberCorrect=0, percentCorrect;
+var jumpInProgress = false;
+var term1, term2, difference;
+var result; // 'correct' or 'incorrect'
+
+// celebration interval id (global so we can stop it)
+var celebrateID = null;
+
+// CONSTANTS
+var START_LEFT = 3;
+var START_BOTTOM = 30;
+
+// specific to this webpage
+var a, b, c, x, inequality;
+
+// RESET POSITION
+function resetPosition() {
+  var animate = document.getElementById("animate");
+  animate.style.left = START_LEFT + "px";
+  animate.style.bottom = START_BOTTOM + "px";
+  animate.style.zIndex = 4;
+} // end of resetPosition()
+
+// LOAD PAGE
+function loadPage() {
+  document.getElementById('newButton').focus();
+  document.getElementById('answerInput1').style.display='none';
+  document.getElementById('checkButton').style.display='none';
+  document.getElementById('inequalitySelect').style.display = 'none';
+  document.getElementById('xSpan').style.display = 'none';
+  getStats();
+  resetPosition();
+} // end of loadPage()
+
+// QUADRATIC BEZIER ARC
+function getArcY(progress, startY, endY, peak) {
+  var t = progress;
+  var oneMinusT = 1 - t;
+  return (oneMinusT*oneMinusT*startY) + (2*oneMinusT*t*peak) + (t*t*endY);
+} // end of getArcY()
+
+// GENERALIZED JUMP
+function jump(distance, targetBottom, jumpHeight, fail) {
+    if (jumpInProgress) return;
+    stopCelebrationBounce(); // stop celebration if running
+    jumpInProgress = true;
+
+    var animate = document.getElementById("animate");
+    var startLeft = parseFloat(animate.style.left) || START_LEFT;
+    var startBottom = parseFloat(animate.style.bottom) || START_BOTTOM;
+
+    var totalSteps = Math.max(1, Math.floor(Math.abs(distance)));
+    var stepX = distance / totalSteps;
+    var peak = Math.max(startBottom, targetBottom) + jumpHeight;
+    var counter = 0;
+
+    document.getElementById('newButton').style.visibility = 'hidden';
+    animate.style.zIndex = fail ? 1 : 4;
+
+    var id = setInterval(function() {
+        counter++;
+        var progress = counter / totalSteps;
+        animate.style.left = (startLeft + stepX*counter) + "px";
+        animate.style.bottom = getArcY(progress, startBottom, targetBottom, peak) + "px";
+
+        if(counter >= totalSteps){
+            clearInterval(id);
+            animate.style.left = (startLeft + distance) + "px";
+            animate.style.bottom = targetBottom + "px";
+            jumpInProgress = false;
+
+            if(result === 'correct' && numCorrect === 3){
+                level++;
+                numCorrect = 0;
+                reset = true;
+
+                document.getElementById('feedbackDiv').innerHTML = 
+                    'Correct!  You have made it to Level ' + level + '!';
+
+                getStats();
+                startCelebrationBounce();
+
+                document.getElementById('newButton').style.visibility='visible';
+                document.getElementById('newButton').focus();
+            } else {
+                giveFeedback();
+            }
+        }
+    }, 5);
+} // end of jump()
+
+function jumpSafe() { jump(150, 30, 40, false); } // end of jumpSafe()
+function jumpFail() { jump(110, 5, 30, true); } // end of jumpFail()
+
+// NEW PROBLEM
+function newProblem() {
+    if(jumpInProgress) return;
+    stopCelebrationBounce();
+
+    if (reset) {
+      resetPosition();
+      reset = false;
+    }
+
+    getNewProblemDisplay();
+    firstAttempt = true;
+
+    getStats();
+    getValues();
+    getQuestion();
+    document.getElementById('inequalitySelect').focus();
+} // end of newProblem()
+
+// get values to be used in the problem
+function getValues() {
+  a = getRandom(-10, 8); if (a===0) {a=9;} if (a===1) {a=10;}
+  b = getRandom(-99, 98); if (b===0) {b=99;}
+  x = getRandom(-99, 99);
+  
+  c = a*x + b;
+  
+  // randomly pick an inequality
+  temp1 = getRandom(0, 3);
+  switch (temp1) {
+    case 0: inequality = '&lt;'; break;
+    case 1: inequality = '&le;'; break;
+    case 2: inequality = '&gt;'; break;
+    case 3: inequality = '&ge;'; break;
+    default: alert('error - getValues()');
+  }
+  
+} // end of getValues()
+
+// get a new question
+function getQuestion() {
+  var problem = 'Solve for x.<br /><br />&nbsp;&nbsp;';
+  
+  // leading coefficient of -1
+  if (a===-1) {problem += '&ndash;';}
+  else {problem += a;}
+  problem += 'x ';
+  
+  // if. constant term is negative
+  if (b<0) {problem += '&ndash; ';}
+  else {problem += '+ ';}
+  problem += Math.abs(b) + ' ' + inequality + ' ' + c;
+  
+  problem += '<br />'; // give space
+
+  document.getElementById('problemDiv').innerHTML = problem;
+  
+} // end of getQuestion()
+
+
+function getNewProblemDisplay() {
+    document.getElementById('newButton').style.visibility='hidden';
+    document.getElementById('xSpan').style.display = 'inline';
+    document.getElementById('inequalitySelect').value = '';
+    document.getElementById('inequalitySelect').style.display = 'inline';
+    document.getElementById('answerInput1').value='';
+    document.getElementById('feedbackDiv').innerHTML='&nbsp;';
+    document.getElementById('checkButton').style.display='inline';
+    document.getElementById('answerInput1').style.display='inline';
+    document.getElementById('errorDiv').style.visibility='hidden';
+} // end of getNewProblemDisplay()
+
+function getRandom(min,max){return Math.floor(Math.random()*(max-min+1))+min;} // end of getRandom()
+
+// validate the form
+function validateForm() {
+    temp1 = document.getElementById('inequalitySelect').value;
+    temp2 = document.getElementById('answerInput1').value;
+    if (temp1==='' || temp2==='') {
+      validForm = false;
+      document.getElementById('errorDiv').style.visibility = 'visible';
+      document.getElementById('inequalitySelect').focus();
+      }
+    else {
+      validForm = true;
+      document.getElementById('checkButton').style.display = 'none';
+      document.getElementById('errorDiv').style.visibility = 'hidden';
+      document.getElementById('newButton').style.visibility = 'visible';  
+    }
+} // end of validateForm()
+
+// check the user's answer
+function checkAnswer() {
+   // validate the form
+    validateForm();
+    // form is valid, check input
+    if (validForm && firstAttempt) {
+        temp1 = document.getElementById('inequalitySelect').value;
+        switch (temp1) {
+            case 'greater': temp1 = '&gt;'; break;
+            case 'greaterOrEqual': temp1 = '&ge;'; break;
+            case 'less': temp1 = '&lt;'; break;
+            case 'lessOrEqual': temp1 = '&le;'; break;
+            default: alert('error - checkAnswer()');
+        }
+        temp2 = document.getElementById('answerInput1').value;
+        temp2 = parseInt(temp2);
+        // compute correct answer
+        temp3 = (c - b) / a;
+        
+        // flip the inequality if a is negative
+        if (a < 0) {
+            if (inequality === '&lt;') { inequality = '&gt;'; }
+            else if (inequality === '&le;') { inequality = '&ge;'; }
+            else if (inequality === '&gt;') { inequality = '&lt;'; }
+            else if (inequality === '&ge;') { inequality = '&le;'; }
+            else { alert('error - checkAnswer()'); }
+        }
+        correctAnswer = 'x ' + inequality + ' ' + temp3;
+
+        // count this attempt
+        numberAttempted++;  // ✅ NEW
+
+        if (temp1 === inequality && temp2 === temp3) {
+            result = 'correct';        
+            document.getElementById('newButton').focus();
+            jumpSafe();
+            reset = false;
+            numCorrect++;     
+            numberCorrect++;   // ✅ NEW
+        }        
+        else {
+            result = 'incorrect';        
+            jumpFail();
+            reset = true;
+            numCorrect = 0;  
+        }
+
+        getStats();  // ✅ update the on-screen stats immediately
+
+        // mark any future attempts as no longer the first attempt
+        firstAttempt = false;
+    }
+} // end of checkAnswer()
+
+
+function giveFeedback(){
+    if(result==='correct') {
+        document.getElementById('feedbackDiv').innerHTML='<br />Correct!';
+    }
+    else if(result==='incorrect') {
+        document.getElementById('feedbackDiv').innerHTML='<br />Correct answer: ';
+        document.getElementById('feedbackDiv').innerHTML += correctAnswer + '<br />Try again!';
+    }
+    document.getElementById('newButton').style.visibility='visible';
+    document.getElementById('newButton').focus();
+} // end of giveFeedback()
+
+function startCelebrationBounce() {
+    if (celebrateID) return;
+    var animate = document.getElementById("animate");
+    var baseBottom = parseFloat(animate.style.bottom) || START_BOTTOM;
+    var bounceHeight = 18;
+    var frames = 24;
+    var frameTime = 18;
+    var t = 0;
+    var direction = 1;
+
+    celebrateID = setInterval(function() {
+        var p = t / frames;
+        var eased = 1 - Math.pow(1 - p, 2);
+        if (direction === 1) {
+            animate.style.bottom = (baseBottom + eased * bounceHeight) + "px";
+        } else {
+            animate.style.bottom = (baseBottom + (1 - eased) * bounceHeight) + "px";
+        }
+        t++;
+        if (t > frames) {
+            t = 0;
+            direction = -direction;
+        }
+    }, frameTime);
+} // end of startCelebrationBounce()
+
+function stopCelebrationBounce() {
+    if (celebrateID) {
+        clearInterval(celebrateID);
+        celebrateID = null;
+        var animate = document.getElementById("animate");
+        var base = parseFloat(animate.style.bottom) || START_BOTTOM;
+        animate.style.bottom = base + "px";
+    }
+} // end of stopCelebrationBounce()
+
+function getStats(){
+    if(numberAttempted===0) {
+        percentCorrect = '';
+    } else {
+        percentCorrect = roundDecimalNumber(100*numberCorrect/numberAttempted,1);
+    }
+
+    var statsText = 'Level: ' + level + '<br />';
+    statsText += 'Attempted: ' + numberAttempted + '<br />';
+    statsText += 'Correct: ' + numberCorrect + '<br />';
+    if (numberAttempted > 0) {
+        statsText += 'Percent: ' + percentCorrect + '%';
+    }
+
+    document.getElementById('statsDiv').innerHTML = statsText;
+} // end of getStats()
+
+function roundDecimalNumber(number,places){
+    number = number*Math.pow(10,places);
+    number = number.toFixed(0);
+    number = number/Math.pow(10,places);
+    return number;
+} // end of roundDecimalNumber()
+</script>
+
+<body onload="loadPage()">
+  <h3>Two-step inequalities</h3>
+  <div id="container">
+    <button id="newButton" onclick="newProblem()">New problem</button>
+    <br /><br />
+    <span id="problemDiv">Click the button above to get a new problem</span>
+    <br /><br />
+  <span id='xSpan'>&nbsp;&nbsp;&nbsp;x </span>
+  <select id="inequalitySelect">
+    <option value=""></option>
+    <option value="greater">&gt;</option>
+    <option value='greaterOrEqual'>&ge;</option>
+    <option value="less">&lt;</option>
+    <option value='lessOrEqual'>&le;</option>
+  </select>
+  <input type='text' id='answerInput1' style='width: 20px;' />
+
+    <button id="checkButton" onclick="checkAnswer();">Check answer</button>
+    <div id="errorDiv" style="color:red; visibility:hidden;">Make sure you have selected an inequality symbol <br />and typed in a number</div>
+    <span id="statsDiv">Stats</span>
+    <span id="feedbackDiv">&nbsp;</span>
+    <span id="floor1"></span>
+    <span id="water1"></span>
+    <span id="floor2"></span>
+    <span id="water2"></span>
+    <span id="floor3"></span>
+    <span id="water3"></span>
+    <span id="floor4"></span>
+    <span id="animate"><img src="../images/wolf transparent.png" style="width:150%; height:150%"></span>
+  </div>
+</body>
+</html>
