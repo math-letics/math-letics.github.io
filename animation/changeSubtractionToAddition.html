@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html>
+<style>
+#container {
+  width: 500px;
+  height: 300px;
+  position: relative;
+  background: lightBlue;
+  overflow: hidden;   /* clip anything outside the container */
+}
+
+#animate {
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  bottom: 30px;
+  left: 5px;
+}
+#floor1 {
+    width: 45px;
+    height: 30px;
+    position: absolute;
+    background: green;
+    bottom: 0px;
+    left: 0px;
+}
+#water1 {
+    width: 110px;
+    height: 10px;
+    position: absolute;
+    background: blue;
+    bottom: 0px;
+    left: 45px;
+}
+#floor2 {
+    width: 40px;
+    height: 30px;
+    position: absolute;
+    background: green;
+    bottom: 0px;
+    left: 155px;
+}
+#water2 {
+    width: 110px;
+    height: 10px;
+    position: absolute;
+    background: blue;
+    bottom: 0px;
+    left: 195px; 
+}
+#floor3 {
+    width: 40px;
+    height: 30px;
+    position: absolute;
+    background: green;
+    bottom: 0px;
+    left: 305px;
+}
+#water3 {
+    width: 110px;
+    height: 10px;
+    position: absolute;
+    background: blue;
+    bottom: 0px;
+    left: 345px; 
+}
+#floor4 {
+    width: 45px;
+    height: 30px;
+    position: absolute;
+    background: green;
+    bottom: 0px;
+    left: 455px; 
+}
+#statsDiv {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    text-align: right;
+    line-height: 1.4;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    background: rgba(255,255,255,0.6);
+    padding: 5px 8px;
+    border-radius: 8px;
+}
+#floor1, #floor2, #floor3, #floor4 {
+    z-index: 2;   /* floors above water but below wolf normally */
+}
+#water1, #water2, #water3 {
+    z-index: 3;   /* water above floors */
+}
+#animate {
+    z-index: 4;   /* wolf normally above everything */
+}
+</style>
+
+<script src='../externalJS/gcf.js'></script>
+
+<script>
+// GLOBAL VARIABLES
+var firstAttempt, reset=false, numCorrect=0, level=1;
+var numberAttempted=0, numberCorrect=0, percentCorrect;
+var jumpInProgress = false;
+var term1, term2, difference;
+var result; // 'correct' or 'incorrect'
+
+// celebration interval id (global so we can stop it)
+var celebrateID = null;
+
+// CONSTANTS
+var START_LEFT = 3;
+var START_BOTTOM = 30;
+
+// specific to this webpage
+var term1, term2;
+
+// RESET POSITION
+function resetPosition() {
+  var animate = document.getElementById("animate");
+  animate.style.left = START_LEFT + "px";
+  animate.style.bottom = START_BOTTOM + "px";
+  animate.style.zIndex = 4;
+} // end of resetPosition()
+
+// LOAD PAGE
+function loadPage() {
+  document.getElementById('newButton').focus();
+  document.getElementById('secondNumberText').style.display='none';
+  document.getElementById('checkButton').style.display='none';
+  document.getElementById('firstNumberText').style.display = 'none';
+  document.getElementById('addSpan').style.display = 'none';
+    document.getElementById('openParenthesesSpan').style.display = 'none';
+    document.getElementById('closeParenthesesSpan').style.display = 'none';
+  getStats();
+  resetPosition();
+} // end of loadPage()
+
+// QUADRATIC BEZIER ARC
+function getArcY(progress, startY, endY, peak) {
+  var t = progress;
+  var oneMinusT = 1 - t;
+  return (oneMinusT*oneMinusT*startY) + (2*oneMinusT*t*peak) + (t*t*endY);
+} // end of getArcY()
+
+// GENERALIZED JUMP
+function jump(distance, targetBottom, jumpHeight, fail) {
+    if (jumpInProgress) return;
+    stopCelebrationBounce(); // stop celebration if running
+    jumpInProgress = true;
+
+    var animate = document.getElementById("animate");
+    var startLeft = parseFloat(animate.style.left) || START_LEFT;
+    var startBottom = parseFloat(animate.style.bottom) || START_BOTTOM;
+
+    var totalSteps = Math.max(1, Math.floor(Math.abs(distance)));
+    var stepX = distance / totalSteps;
+    var peak = Math.max(startBottom, targetBottom) + jumpHeight;
+    var counter = 0;
+
+    document.getElementById('newButton').style.visibility = 'hidden';
+    animate.style.zIndex = fail ? 1 : 4;
+
+    var id = setInterval(function() {
+        counter++;
+        var progress = counter / totalSteps;
+        animate.style.left = (startLeft + stepX*counter) + "px";
+        animate.style.bottom = getArcY(progress, startBottom, targetBottom, peak) + "px";
+
+        if(counter >= totalSteps){
+            clearInterval(id);
+            animate.style.left = (startLeft + distance) + "px";
+            animate.style.bottom = targetBottom + "px";
+            jumpInProgress = false;
+
+            if(result === 'correct' && numCorrect === 3){
+                level++;
+                numCorrect = 0;
+                reset = true;
+
+                document.getElementById('feedbackDiv').innerHTML = 
+                    'Correct!  You have made it to Level ' + level + '!';
+
+                getStats();
+                startCelebrationBounce();
+
+                document.getElementById('newButton').style.visibility='visible';
+                document.getElementById('newButton').focus();
+            } else {
+                giveFeedback();
+            }
+        }
+    }, 5);
+} // end of jump()
+
+function jumpSafe() { jump(150, 30, 40, false); } // end of jumpSafe()
+function jumpFail() { jump(110, 5, 30, true); } // end of jumpFail()
+
+// NEW PROBLEM
+function newProblem() {
+    if(jumpInProgress) return;
+    stopCelebrationBounce();
+
+    if (reset) {
+      resetPosition();
+      reset = false;
+    }
+
+    getNewProblemDisplay();
+    firstAttempt = true;
+
+    getStats();
+    getValues();
+    getQuestion();
+    document.getElementById('firstNumberText').focus();
+} // end of newProblem()
+
+// get values to be used in the problem
+function getValues() {
+    term1 = getRandom(-99, 99);
+    term2 = getRandom(-99, 98); if (term2===0) {term2 = 99;}
+} // end of getValues()
+
+// get a new question
+function getQuestion() {
+  var problem = 'Change the subtraction problem <br />to an equivalent addition problem.';
+  problem += '<br /><br />&nbsp;&nbsp;';
+  
+  problem += '(' + term1 + ') &ndash; (' + term2 + ')';
+
+  document.getElementById('problemDiv').innerHTML = problem;
+  
+} // end of getQuestion()
+
+
+function getNewProblemDisplay() {
+    document.getElementById('newButton').style.visibility='hidden';
+    document.getElementById('addSpan').style.display = 'inline';
+    document.getElementById('firstNumberText').value = '';
+    document.getElementById('firstNumberText').style.display = 'inline';
+    document.getElementById('secondNumberText').value='';
+    document.getElementById('feedbackDiv').innerHTML='&nbsp;';
+    document.getElementById('checkButton').style.display='inline';
+    document.getElementById('secondNumberText').style.display='inline';
+    document.getElementById('errorDiv').style.visibility='hidden';
+    document.getElementById('openParenthesesSpan').style.display = 'inline';
+    document.getElementById('closeParenthesesSpan').style.display = 'inline';
+} // end of getNewProblemDisplay()
+
+function getRandom(min,max){return Math.floor(Math.random()*(max-min+1))+min;} // end of getRandom()
+
+// validate the form
+function validateForm() {
+    temp1 = document.getElementById('firstNumberText').value;
+    temp2 = document.getElementById('secondNumberText').value;
+    if (temp1==='' || temp2==='') {
+      validForm = false;
+      document.getElementById('errorDiv').style.visibility = 'visible';
+      document.getElementById('firstNumberText').focus();
+      }
+    else {
+      validForm = true;
+      document.getElementById('checkButton').style.display = 'none';
+      document.getElementById('errorDiv').style.visibility = 'hidden';
+      document.getElementById('newButton').style.visibility = 'visible';  
+    }
+} // end of validateForm()
+
+// check the user's answer
+function checkAnswer() {
+    var userAnswer1 = Number(document.getElementById('firstNumberText').value);
+    var userAnswer2 = Number(document.getElementById('secondNumberText').value);
+
+   // validate the form
+    validateForm();
+    // form is valid, check input
+    if (validForm && firstAttempt) {
+        // count this attempt
+        numberAttempted++;  // 
+        if (userAnswer1===term1 && userAnswer2===-1*term2) {
+            result = 'correct';        
+            document.getElementById('newButton').focus();
+            jumpSafe();
+            reset = false;
+            numCorrect++;     
+            numberCorrect++; 
+        }      
+        else {
+            result = 'incorrect';        
+            jumpFail();
+            reset = true;
+            numCorrect = 0;  
+        }
+        correctAnswer = '(' + term1 + ')&nbsp;+&nbsp;(' + -1*term2 + ')';
+
+        getStats();  // 
+
+        // mark any future attempts as no longer the first attempt
+        firstAttempt = false;
+    }
+} // end of checkAnswer()
+
+
+function giveFeedback(){
+    if(result==='correct') {
+        document.getElementById('feedbackDiv').innerHTML='<br />Correct!';
+    }
+    else if(result==='incorrect') {
+        document.getElementById('feedbackDiv').innerHTML='<br />Correct answer: ';
+        document.getElementById('feedbackDiv').innerHTML += correctAnswer + '<br />Try again!';
+    }
+    document.getElementById('newButton').style.visibility='visible';
+    document.getElementById('newButton').focus();
+} // end of giveFeedback()
+
+function startCelebrationBounce() {
+    if (celebrateID) return;
+    var animate = document.getElementById("animate");
+    var baseBottom = parseFloat(animate.style.bottom) || START_BOTTOM;
+    var bounceHeight = 18;
+    var frames = 24;
+    var frameTime = 18;
+    var t = 0;
+    var direction = 1;
+
+    celebrateID = setInterval(function() {
+        var p = t / frames;
+        var eased = 1 - Math.pow(1 - p, 2);
+        if (direction === 1) {
+            animate.style.bottom = (baseBottom + eased * bounceHeight) + "px";
+        } else {
+            animate.style.bottom = (baseBottom + (1 - eased) * bounceHeight) + "px";
+        }
+        t++;
+        if (t > frames) {
+            t = 0;
+            direction = -direction;
+        }
+    }, frameTime);
+} // end of startCelebrationBounce()
+
+function stopCelebrationBounce() {
+    if (celebrateID) {
+        clearInterval(celebrateID);
+        celebrateID = null;
+        var animate = document.getElementById("animate");
+        var base = parseFloat(animate.style.bottom) || START_BOTTOM;
+        animate.style.bottom = base + "px";
+    }
+} // end of stopCelebrationBounce()
+
+function getStats(){
+    if(numberAttempted===0) {
+        percentCorrect = '';
+    } else {
+        percentCorrect = roundDecimalNumber(100*numberCorrect/numberAttempted,1);
+    }
+
+    var statsText = 'Level: ' + level + '<br />';
+    statsText += 'Attempted: ' + numberAttempted + '<br />';
+    statsText += 'Correct: ' + numberCorrect + '<br />';
+    if (numberAttempted > 0) {
+        statsText += 'Percent: ' + percentCorrect + '%';
+    }
+
+    document.getElementById('statsDiv').innerHTML = statsText;
+} // end of getStats()
+
+function roundDecimalNumber(number,places){
+    number = number*Math.pow(10,places);
+    number = number.toFixed(0);
+    number = number/Math.pow(10,places);
+    return number;
+} // end of roundDecimalNumber()
+</script>
+
+<body onload="loadPage()">
+  <h3>Change subtraction to addition</h3>
+  <div id="container">
+    <button id="newButton" onclick="newProblem()">New problem</button>
+    <br /><br />
+    <span id="problemDiv">Click the button above to get a new problem</span>
+    <br /><br />
+    <span id='openParenthesesSpan'>&nbsp;=&nbsp;(</span>
+    <input type='text' id='firstNumberText' style='width: 30px;'/>
+  <span id='addSpan'>)&nbsp;+&nbsp;(</span>
+
+  <input type='text' id='secondNumberText' style='width: 30px;' />
+  <span id='closeParenthesesSpan'>)</span>
+
+    <button id="checkButton" onclick="checkAnswer();">Check answer</button>
+    <div id="errorDiv" style="color:red; visibility:hidden;">Make sure you have typed numberes in both boxes</div>
+    <span id="statsDiv">Stats</span>
+    <span id="feedbackDiv">&nbsp;</span>
+    <span id="floor1"></span>
+    <span id="water1"></span>
+    <span id="floor2"></span>
+    <span id="water2"></span>
+    <span id="floor3"></span>
+    <span id="water3"></span>
+    <span id="floor4"></span>
+    <span id="animate"><img src="../images/wolf transparent.png" style="width:150%; height:150%"></span>
+  </div>
+</body>
+</html>
