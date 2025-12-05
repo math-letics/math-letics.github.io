@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>One-Step Equations — Scale</title>
+  <link rel="stylesheet" href="oneStepEquations.css">
+</head>
+<body>
+<div class="container">
+
+  <!-- SVG and expressions wrapper -->
+  <div class="svg-wrap">
+    <!-- left expression -->
+    <div id="leftExpr" class="expr expr-left">3x + 2</div>
+
+    <!-- equals sign -->
+    <div class="expr expr-equals">=</div>
+
+    <!-- right expression -->
+    <div id="rightExpr" class="expr expr-right">11</div>
+
+    <!-- minimalist SVG scale -->
+    <svg id="scaleSvg" viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg" role="img">
+      <!-- central triangle base -->
+      <polygon id="pivot" points="275,200 325,200 300,160" fill="#333" />
+
+      <!-- cross beam -->
+      <line id="beam" x1="200" y1="160" x2="400" y2="160" stroke="#333" stroke-width="6"/>
+
+      <!-- left pan connector -->
+      <line id="connectorLeft" x1="200" y1="160" x2="200" y2="120" stroke="#333" stroke-width="4"/>
+
+      <!-- right pan connector -->
+      <line id="connectorRight" x1="400" y1="160" x2="400" y2="120" stroke="#333" stroke-width="4"/>
+
+      <!-- left pan -->
+      <line id="panLeft" x1="160" y1="120" x2="240" y2="120" stroke="#333" stroke-width="8"/>
+
+      <!-- right pan -->
+      <line id="panRight" x1="360" y1="120" x2="440" y2="120" stroke="#333" stroke-width="8"/>
+    </svg>
+  </div>
+
+  <!-- controls -->
+  <div class="controls">
+    <input id="exprInput" type="text" value="3x + 2" aria-label="Left expression">
+    <input id="numInput" type="text" value="11" aria-label="Right number">
+    <button id="applyBtn">Apply</button>
+    <button id="tiltLeftBtn">Tilt Left</button>
+    <button id="tiltRightBtn">Tilt Right</button>
+    <button id="resetBtn">Reset</button>
+  </div>
+
+  <div id="feedback" class="feedback" aria-live="polite">Balanced (beam at 0°).</div>
+</div>
+
+<script src="oneStepEquations.js"></script>
+</body>
+</html>

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nim Game</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding: 20px;
+        background-color: #f0f0f0;
+        margin: 0;
+        box-sizing: border-box;
+    }
+    h1 {
+        margin-bottom: 0.5em;
+    }
+    .counter {
+        width: 30px;
+        height: 30px;
+        background-color: #007BFF;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 5px;
+        transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        font-weight: bold;
+        font-size: 18px;
+        color: white;
+    }
+    .counter.removed {
+        transform: scale(0);
+        opacity: 0;
+    }
+    .button {
+        padding: 10px 20px;
+        font-size: 16px;
+        margin: 10px;
+        cursor: pointer;
+        border: none;
+        border-radius: 5px;
+        background-color: #28a745;
+        color: white;
+    }
+    .button:hover {
+        background-color: #218838;
+    }
+    #moveOptions {
+        margin-top: 20px;
+    }
+    #winnerMessage {
+        margin-top: 20px;
+        color: red;
+        font-size: 20px;
+    }
+    #counterContainer {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 20px;
+    }
+    @media (max-width: 600px) {
+        #counterContainer {
+            gap: 5px;
+        }
+        .counter {
+            width: 22px;
+            height: 22px;
+            font-size: 14px;
+        }
+    }
+</style>
+</head>
+<body>
+
+<h1>Nim Game</h1>
+
+<div id="setupArea">
+    <label for="player1Name">Player 1 Name: </label>
+    <input type="text" id="player1Name" value="Player 1"><br><br>
+    <label for="player2Name">Player 2 Name: </label>
+    <input type="text" id="player2Name" value="Player 2"><br><br>
+    <label for="randomFirst">Randomly select who goes first:</label>
+    <input type="checkbox" id="randomFirst"><br><br>
+    <label>Number of counters: </label>
+    <input type="number" id="counterCount" value="10" min="10"><br><br>
+    <label>Max counters per turn: </label>
+    <select id="maxMove">
+        <option value="2">1-2 Nim</option>
+        <option value="3">1-2-3 Nim</option>
+        <option value="4">1-2-3-4 Nim</option>
+    </select><br><br>
+    <label>Game Mode: </label>
+    <select id="gameMode">
+        <option value="regular">Regular (last move wins)</option>
+        <option value="poison">Poison (last move loses)</option>
+    </select><br><br>
+</div>
+
+<button class="button" id="startGameBtn">Start Game</button>
+
+<div id="gameArea" style="display:none;">
+    <h3 id="turnMessage"></h3>
+    <div id="counterContainer"></div>
+    <div id="moveOptions"></div>
+    <button class="button" id="takeBtn" style="display:none;">Take Counters</button>
+    <div id="winnerMessage"></div>
+</div>
+
+<script>
+let counters = 0;
+let currentPlayer = "Player 1";
+let player1Name = "Player 1";
+let player2Name = "Player 2";
+let maxMove = 2;
+let gameMode = "regular";
+let gameOver = false;
+
+document.getElementById("startGameBtn").addEventListener("click", startGame);
+document.getElementById("takeBtn").addEventListener("click", takeTurn);
+
+function startGame() {
+    const setupVisible = document.getElementById("setupArea").style.display !== "none";
+
+    if (setupVisible) {
+        // START GAME from setup area
+        player1Name = document.getElementById("player1Name").value || "Player 1";
+        player2Name = document.getElementById("player2Name").value || "Player 2";
+        counters = parseInt(document.getElementById("counterCount").value);
+        maxMove = parseInt(document.getElementById("maxMove").value);
+        gameMode = document.getElementById("gameMode").value;
+        const randomFirst = document.getElementById("randomFirst").checked;
+        currentPlayer = randomFirst ? (Math.random() < 0.5 ? player1Name : player2Name) : player1Name;
+        gameOver = false;
+
+        document.getElementById("setupArea").style.display = "none";
+        document.getElementById("gameArea").style.display = "block";
+        document.getElementById("startGameBtn").textContent = "Restart";
+        document.getElementById("winnerMessage").textContent = "";
+
+        setupMoveRadioButtons();
+        render();
+    } else {
+        // RESTART during a game → go back to setup options
+        gameOver = true;
+        document.getElementById("setupArea").style.display = "block";
+        document.getElementById("gameArea").style.display = "none";
+        document.getElementById("startGameBtn").textContent = "Start Game";
+        document.getElementById("winnerMessage").textContent = "";
+    }
+} // end of startGame()
+
+function setupMoveRadioButtons() {
+    const moveDiv = document.getElementById("moveOptions");
+    moveDiv.innerHTML = "<h3>How many counters will you take?</h3>";
+    for (let i = 1; i <= maxMove; i++) {
+        moveDiv.innerHTML += `
+            <label>
+                <input type="radio" name="takeAmount" value="${i}">
+                ${i}
+            </label>&nbsp;&nbsp;
+        `;
+    }
+    document.getElementById("takeBtn").style.display = "inline-block";
+} // end of setupMoveRadioButtons()
+
+function render() {
+    const counterDiv = document.getElementById("counterContainer");
+    counterDiv.innerHTML = "";
+
+    for (let i = 0; i < counters; i++) {
+        const c = document.createElement("div");
+        c.classList.add("counter");
+        counterDiv.appendChild(c);
+    }
+
+    document.getElementById("turnMessage").textContent = `${currentPlayer}'s turn!`;
+
+    const radios = document.querySelectorAll("input[name='takeAmount']");
+    radios.forEach(r => r.checked = false);
+
+    // Always mark the LEFTMOST counter
+    if (counters > 0) {
+        const first = counterDiv.firstChild;
+        first.textContent = (gameMode === "regular") ? "W" : "P";
+    }
+} // end of render()
+
+function takeTurn() {
+    if (gameOver) return;
+
+    const selected = document.querySelector("input[name='takeAmount']:checked");
+    if (!selected) {
+        alert("Please select how many counters to take.");
+        return;
+    }
+
+    let amount = parseInt(selected.value);
+    if (amount > counters) {
+        alert("Not enough counters left!");
+        return;
+    }
+
+    animateCounterRemoval(amount);
+
+    setTimeout(() => {
+        counters -= amount;
+
+        if (counters === 0) {
+            endGame();
+            return;
+        }
+
+        currentPlayer = currentPlayer === player1Name ? player2Name : player1Name;
+        render();
+    }, 300);
+} // end of takeTurn()
+
+function animateCounterRemoval(amount) {
+    const counterDiv = document.getElementById("counterContainer");
+    const countersToRemove = Array.from(counterDiv.getElementsByClassName("counter")).slice(-amount);
+
+    countersToRemove.forEach(counter => {
+        counter.classList.add("removed");
+    });
+} // end of animateCounterRemoval()
+
+function endGame() {
+    gameOver = true;
+    const msg = document.getElementById("winnerMessage");
+
+    let winner;
+    if (gameMode === "regular") {
+        winner = currentPlayer;
+    } else {
+        winner = currentPlayer === player1Name ? player2Name : player1Name;
+    }
+
+    msg.textContent = `${winner} WINS!`;
+} // end of endGame()
+</script>
+
+</body>
+</html>

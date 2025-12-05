@@ -1,0 +1,93 @@
+:root {
+  --bg: #fafafa;
+  --dark: #333;
+  --muted: #666;
+}
+
+* { box-sizing: border-box; }
+html, body {
+  height: 100%;
+  margin: 0;
+  background: var(--bg);
+  font-family: Segoe UI, Roboto, Arial, sans-serif;
+}
+
+.container {
+  max-width: 600px;
+  margin: 30px auto;
+  padding: 12px;
+  text-align: center;
+}
+
+/* SVG wrapper */
+.svg-wrap {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+/* Keep same size & vertical position as before */
+.expr {
+  position: absolute;
+  font-weight: 700;
+  font-size: 28px;
+  white-space: nowrap;     /* ← prevents wrapping */
+  text-align: center;
+  transform: translateX(-50%);   /* centers by middle point */
+}
+
+/* Expressions horizontally centered over pans */
+.expr-left {
+  left: 200px;    /* center of left pan (160–240) */
+  top: 50px;
+}
+
+.expr-right {
+  left: 400px;    /* center of right pan (360–440) */
+  top: 50px;
+}
+
+/* Equals sign centered over pivot at x=300 */
+.expr-equals {
+  left: 300px;
+  top: 50px;
+}
+
+/* Controls */
+.controls {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.controls input {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  width: 150px;
+}
+
+.controls button {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: none;
+  background: #333;
+  color: white;
+  cursor: pointer;
+}
+
+/* Feedback */
+.feedback {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* small-screen tweaks */
+@media (max-width:540px) {
+  .expr { font-size: 20px; }
+  .controls input { width: 110px; }
+}
