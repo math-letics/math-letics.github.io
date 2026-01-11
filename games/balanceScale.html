@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Balance Scale</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background: #f5f5f5;
+  margin: 0;
+  padding: 20px;
+}
+
+button {
+  margin: 5px;
+  padding: 6px 14px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.optionLabel {
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.applyBtn {
+  margin-top: 20px;
+  padding: 8px 18px;
+  font-size: 16px;
+}
+
+#message {
+  margin-top: 10px;
+  color: red;
+  min-height: 20px;
+}
+
+/* Expressions */
+.expression {
+  font-size: 22px;
+  font-weight: bold;
+  white-space: nowrap;
+  display: inline-block;
+}
+
+foreignObject {
+  text-align: center;
+}
+
+/* Fractions */
+.fraction, .top, .bottom {
+  padding: 0 5px;
+}
+
+.fraction {
+  display: inline-block;
+  text-align: center;
+}
+
+.bottom {
+  border-top: 1px solid #000;
+  display: block;
+}
+
+.equals {
+  font-size: 40px;
+  font-weight: bold;
+}
+
+.exprWrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+#num {
+  width: 40px;
+  text-align: center; /* optional, centers the number */
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>Balance Scale</h1>
+
+<div>
+  <button onclick="setBalance(-30)">Left Heavy</button>
+  <button onclick="setBalance(0)">Balanced</button>
+  <button onclick="setBalance(30)">Right Heavy</button>
+</div>
+
+<svg width="600" height="400" viewBox="0 0 600 400">
+
+  <polygon points="300,260 260,320 340,320" fill="#666"/>
+
+  <g id="scaleFrame" style="transform-origin:300px 260px; transition:transform 0.6s ease;">
+    <line x1="220" y1="260" x2="380" y2="260" stroke="#444" stroke-width="6"/>
+    <line x1="220" y1="260" x2="190" y2="200" stroke="#444" stroke-width="6"/>
+    <line x1="380" y1="260" x2="410" y2="200" stroke="#444" stroke-width="6"/>
+    <line x1="160" y1="200" x2="220" y2="200" stroke="#444" stroke-width="6"/>
+    <line x1="380" y1="200" x2="440" y2="200" stroke="#444" stroke-width="6"/>
+
+    <!-- Left expression -->
+    <foreignObject x="120" y="120" width="140" height="80">
+      <div class="exprWrap">
+        <div id="leftExpr" class="expression">x + 3</div>
+      </div>
+    </foreignObject>
+
+    <!-- Right expression -->
+    <foreignObject x="340" y="120" width="140" height="80">
+      <div class="exprWrap">
+        <div id="rightExpr" class="expression">7</div>
+      </div>
+    </foreignObject>
+  </g>
+
+  <text id="equalsSign" x="300" y="165" text-anchor="middle" dominant-baseline="middle" class="equals">=</text>
+</svg>
+
+<div class="controls">
+  <div>
+    <div class="optionLabel">Operation</div>
+    <select id="op">
+      <option value="">Choose</option>
+      <option value="add">Add</option>
+      <option value="subtract">Subtract</option>
+      <option value="multiply">Multiply by</option>
+      <option value="divide">Divide by</option>
+    </select>
+  </div>
+
+  <div>
+    <div class="optionLabel">Number</div>
+    <input type="number" id="num">
+  </div>
+
+  <div>
+    <div class="optionLabel">Side(s)</div>
+    <select id="side">
+      <option value="">Choose</option>
+      <option value="left">on the left side only</option>
+      <option value="right">on the right side only</option>
+      <option value="both">on both sides</option>
+    </select>
+  </div>
+</div>
+
+<button class="applyBtn" onclick="applyMove()">Apply Move</button>
+<div id="message"></div>
+
+<script>
+function setBalance(angle){
+  document.getElementById("scaleFrame").style.transform = `rotate(${angle}deg)`;
+  document.getElementById("equalsSign").textContent = angle === 0 ? "=" : "≠";
+// end of setBalance()
+}
+
+function applyMove(){
+  const op = document.getElementById("op").value;
+  const n = parseInt(document.getElementById("num").value,10);
+  const sideSel = document.getElementById("side").value;
+  const msg = document.getElementById("message");
+
+  if(!op || !n || !sideSel){
+    msg.textContent = "Please complete all selections.";
+    return;
+  }
+  msg.textContent = "";
+
+  if(sideSel === "left" || sideSel === "both"){
+    leftExpr.innerHTML = operate(leftExpr.innerHTML, op, n);
+  }
+  if(sideSel === "right" || sideSel === "both"){
+    rightExpr.innerHTML = operate(rightExpr.innerHTML, op, n);
+  }
+// end of applyMove()
+}
+
+function operate(expr, op, n){
+  const terms = expr.split("+").map(t => t.trim());
+
+  function parseTerm(t){
+    if(t.includes("x")){
+      const c = t.replace("x","") || "1";
+      return { coeff: parseInt(c,10), hasX:true };
+    }
+    return { value: parseInt(t,10), hasX:false };
+  }
+
+  function renderTerm(obj){
+    if(obj.hasX){
+      if(obj.coeff === 1) return "x";
+      if(obj.coeff === 0) return "0";
+      return obj.coeff + "x";
+    }
+    return obj.value.toString();
+  }
+
+  if(op === "divide"){
+    return terms.map(t => divideTerm(parseTerm(t), n)).join(" + ");
+  }
+
+  if(op === "add"){
+    return expr + " + " + n;
+  }
+
+  if(op === "subtract"){
+    return expr + " − " + n;
+  }
+
+  if(op === "multiply"){
+    return terms.length > 1 ? `${n}(${expr})` : `${n}${expr}`;
+  }
+
+  return expr;
+// end of operate()
+}
+
+function divideTerm(term, n){
+  if(term.hasX){
+    const g = gcd(Math.abs(term.coeff), Math.abs(n));
+    const num = term.coeff / g;
+    const den = n / g;
+    if(den === 1) return num + "x";
+    return fractionHTML(num, den) + "x";
+  } else {
+    const g = gcd(Math.abs(term.value), Math.abs(n));
+    const num = term.value / g;
+    const den = n / g;
+    if(den === 1) return num.toString();
+    return fractionHTML(num, den);
+  }
+// end of divideTerm()
+}
+
+function fractionHTML(num, den){
+  return `<span class="fraction">
+    <span class="top">${num}</span>
+    <span class="bottom">${den}</span>
+  </span>`;
+// end of fractionHTML()
+}
+
+function gcd(a,b){ return b ? gcd(b,a%b) : a; }
+// end of gcd()
+</script>
+
+</body>
+</html>
