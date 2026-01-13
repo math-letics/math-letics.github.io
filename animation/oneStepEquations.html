@@ -249,6 +249,7 @@ function getAddition() {
     temp2 = getRandom(-50, 50);
 
     equation = variable + ' + ' + temp1 + ' = ' + temp2;
+    correctAnswer = temp2 - temp1;
 } // end of getAddition()
 
 // get a subtraction equation
@@ -257,6 +258,7 @@ function getSubtraction() {
     temp2 = getRandom(-50, 50);
 
     equation = variable + ' &ndash; ' + temp1 + ' = ' + temp2;
+    correctAnswer = temp2 + temp1;
 } // end of getSubtraction()
 
 // get a multiplication equation
@@ -266,6 +268,7 @@ function getMultiplication() {
     temp2 = temp1*temp3;
 
     equation = temp1 + variable + ' = ' + temp2;
+    correctAnswer = temp2/temp1;
 } // end of getMultiplication()
 
 // get a division equation
@@ -277,6 +280,8 @@ function getDivision() {
     equation += '</span><span class="bottom"></span>' + temp1;
     equation += '</span></td><td> = ' + temp2 + '</td></tr>';
     equation += '</table>';
+    
+    correctAnswer = temp2*temp1;
 } // end of getDivision()
 
 function displayProblem() {
