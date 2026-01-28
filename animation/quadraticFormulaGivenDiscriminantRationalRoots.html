@@ -76,7 +76,15 @@
     position: absolute;
     top: 0px;
     right: 0px;
+    text-align: right;
+    line-height: 1.4;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    background: rgba(255,255,255,0.6);
+    padding: 5px 8px;
+    border-radius: 8px;
 }
+
 #floor1, #floor2, #floor3, #floor4 {
     z-index: 2;   /* floors above water but below wolf normally */
 }
@@ -96,6 +104,10 @@ var firstAttempt, reset=false, numCorrect=0, level=1;
 var numberAttempted=0, numberCorrect=0, percentCorrect;
 var a, a1, a2, b, c, m, n, greatestCommonFactor;
 var jumpInProgress = false;
+var problem; // what is to be displayed to the user
+var jumpInProgress = false;
+var celebrateID = null;
+
 
 // CONSTANTS
 var START_LEFT = 3;
@@ -127,43 +139,67 @@ function getArcY(progress, startY, endY, peak) {
   return (oneMinusT*oneMinusT*startY) + (2*oneMinusT*t*peak) + (t*t*endY);
 }
 
-// GENERALIZED JUMP
 function jump(distance, targetBottom, jumpHeight, fail) {
     if (jumpInProgress) return;
     jumpInProgress = true;
 
+    stopCelebrationBounce(); // stop celebration if active
+
     var animate = document.getElementById("animate");
     var startLeft = parseFloat(animate.style.left) || START_LEFT;
     var startBottom = parseFloat(animate.style.bottom) || START_BOTTOM;
-    var totalSteps = distance;
+
+    var JUMP_SPEED = 1.3;
+    var totalSteps = Math.round(distance / JUMP_SPEED);
     var stepX = distance / totalSteps;
     var peak = Math.max(startBottom, targetBottom) + jumpHeight;
     var counter = 0;
 
-    // Hide new button
     document.getElementById('newButton').style.visibility = 'hidden';
-    // Wolf z-index
     animate.style.zIndex = fail ? 1 : 4;
 
-    var id = setInterval(function() {
+    var id = setInterval(function () {
         counter++;
         var progress = counter / totalSteps;
-        animate.style.left = startLeft + stepX*counter + "px";
-        animate.style.bottom = getArcY(progress, startBottom, targetBottom, peak) + "px";
 
-        if(counter >= totalSteps){
+        animate.style.left = startLeft + stepX * counter + "px";
+        animate.style.bottom =
+            getArcY(progress, startBottom, targetBottom, peak) + "px";
+
+        if (counter >= totalSteps) {
             clearInterval(id);
-            animate.style.left = (startLeft+distance)+"px";
-            animate.style.bottom = targetBottom+"px";
+            animate.style.left = (startLeft + distance) + "px";
+            animate.style.bottom = targetBottom + "px";
             jumpInProgress = false;
-            giveFeedback();
+
+            // LEVEL-UP CHECK
+            if (result === 'correct' && numCorrect === 3) {
+                level++;
+                numCorrect = 0;
+                reset = true;
+
+                document.getElementById('feedbackDiv').innerHTML =
+                    'Correct! You have made it to Level ' + level + '!';
+
+                getStats();
+                startCelebrationBounce();
+
+                document.getElementById('newButton').style.visibility = 'visible';
+                document.getElementById('newButton').focus();
+            } else {
+                giveFeedback();
+            }
         }
     }, 5);
-}
+} // end of jump()
 
-// SAFE AND FAIL JUMPS
-function jumpSafe() { jump(150, 30, 40, false); }
-function jumpFail() { jump(110, 5, 30, true); }
+function jumpSafe() {
+    jump(150, 30, 40, false);
+} // end of jumpSafe()
+
+function jumpFail() {
+    jump(110, 5, 30, true);
+} // end of jumpFail()
 
 // NEW PROBLEM
 function newProblem() {
@@ -210,10 +246,40 @@ function getTwoRationalRoots() {
 // DISPLAY
 function displayProblem() {
     var problem = 'Solve for all possible values of the variable.<br />Simplify fractions completely.<br /><br>';
-    problem += a+'x<sup>2</sup> + '+b+'x + '+c+' = 0';
-    problem += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Hint: b<sup>2</sup> – 4ac = '+(b*b-4*a*c)+')';
+    
+    // display a properly, especially if a = 1 or -1
+    if (a===1) {problem += '';}
+    else if (a===-1) {problem += '&ndash;';}
+    else {problem += a;}
+    problem += 'x<sup>2</sup> ';
+    
+    // display b properly, especially if b is pos, neg, 1, -1, or 0
+    if (b===0) {problem += '';}
+    else {
+      if (b>0) {
+        problem += '+';
+        if (b===1) {problem += '';}
+        else {problem += b;}
+      }
+      else {
+        problem += '&ndash; ';
+        if (b===-1) {problem += '';}
+        else {problem += Math.abs(b);}
+      }
+      problem += 'x ';
+    }
+    
+    // display c properly, especially if c is neg or zero
+    if (c===0) {problem += '';}
+    else if (c < 0) {problem += '&ndash; ' + Math.abs(c);}
+    else {problem += '+ ' + c;}
+    
+    problem += ' = 0';
+    problem += '&nbsp;&nbsp;&nbsp&nbsp;&nbsp;(Hint: b<sup>2</sup> &ndash; 4ac = ';
+    problem += b*b-4*a*c + ')';
+    
     document.getElementById('problemDiv').innerHTML = problem;
-}
+} // end of displayProblem()
 
 function getNewProblemDisplay() {
     document.getElementById('newButton').style.visibility='hidden';
@@ -267,12 +333,25 @@ function giveFeedback(){
     document.getElementById('newButton').focus();
 }
 
-// STATS
-function getStats(){
-    if(numberAttempted===0) percentCorrect='';
-    else percentCorrect = roundDecimalNumber(100*numberCorrect/numberAttempted,1);
-    document.getElementById('statsDiv').innerHTML='Level: '+level;
-}
+function getStats() {
+    if (numberAttempted === 0) {
+        percentCorrect = '';
+    } else {
+        percentCorrect = roundDecimalNumber(
+            100 * numberCorrect / numberAttempted, 1
+        );
+    }
+
+    var statsText = 'Level: ' + level + '<br />';
+    statsText += 'Attempted: ' + numberAttempted + '<br />';
+    statsText += 'Correct: ' + numberCorrect + '<br />';
+
+    if (numberAttempted > 0) {
+        statsText += 'Percent: ' + percentCorrect + '%';
+    }
+
+    document.getElementById('statsDiv').innerHTML = statsText;
+} // end of getStats()
 
 // ROUND DECIMAL
 function roundDecimalNumber(number,places){
@@ -281,6 +360,45 @@ function roundDecimalNumber(number,places){
     number = number/Math.pow(10,places);
     return number;
 }
+function startCelebrationBounce() {
+    if (celebrateID) return;
+
+    var animate = document.getElementById("animate");
+    var baseBottom = parseFloat(animate.style.bottom) || START_BOTTOM;
+    var bounceHeight = 18;
+    var frames = 24;
+    var frameTime = 18;
+    var t = 0;
+    var direction = 1;
+
+    celebrateID = setInterval(function () {
+        var p = t / frames;
+        var eased = 1 - Math.pow(1 - p, 2);
+
+        if (direction === 1) {
+            animate.style.bottom =
+                (baseBottom + eased * bounceHeight) + "px";
+        } else {
+            animate.style.bottom =
+                (baseBottom + (1 - eased) * bounceHeight) + "px";
+        }
+
+        t++;
+        if (t > frames) {
+            t = 0;
+            direction = -direction;
+        }
+    }, frameTime);
+} // end of startCelebrationBounce()
+
+function stopCelebrationBounce() {
+    if (celebrateID) {
+        clearInterval(celebrateID);
+        celebrateID = null;
+        resetPosition();
+    }
+} // end of stopCelebrationBounce()
+
 </script>
 
 <body onload="loadPage()">
