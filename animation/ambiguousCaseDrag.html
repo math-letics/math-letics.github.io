@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SSA Rotating Triangle Explorer</title>
+  <style>
+    canvas {
+      border: 1px solid black;
+      background: #f5f5f5;
+      display: block;
+      margin-bottom: 10px;
+    }
+    label {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="canvas" width="700" height="400"></canvas>
+<p id="status"></p>
+
+<h2>Can &Delta;ABC be formed with the given measurements?<br>
+If so, how many different triangles are possible?</h2>
+
+<div>
+  Click and drag point A to try to create one or more triangles.<br>
+  Adjust side lengths AB and BC and &ang;C with the sliders below.<br /><br />
+</div>
+
+<!-- Sliders -->
+<label>
+  AB length: <span id="abVal"></span>
+  <input type="range" id="abSlider" min="50" max="250" value="140">
+</label>
+
+<label>
+  BC length: <span id="bcVal"></span>
+  <input type="range" id="bcSlider" min="50" max="250" value="180">
+</label>
+
+<label>
+  Angle C (degrees): <span id="angleVal"></span>
+  <input type="range" id="angleSlider" min="10" max="135" value="40">
+</label>
+
+<!-- Toggles -->
+<label>
+  <input type="checkbox" id="toggleCircle">
+  Show circle (radius AB)
+</label>
+
+<label>
+  <input type="checkbox" id="toggleHeight">
+  Show height
+</label>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+// --- Fixed point C ---
+let C = { x: 150, y: 300 };
+
+// --- Adjustable values ---
+let radiusBA = 140;
+let BC = 180;
+let angleCdeg = 40;
+
+let theta = 0;
+let dragging = false;
+
+// --- Sliders ---
+const abSlider = document.getElementById("abSlider");
+const bcSlider = document.getElementById("bcSlider");
+const angleSlider = document.getElementById("angleSlider");
+
+const abVal = document.getElementById("abVal");
+const bcVal = document.getElementById("bcVal");
+const angleVal = document.getElementById("angleVal");
+
+// --- Toggles ---
+const toggleCircle = document.getElementById("toggleCircle");
+const toggleHeight = document.getElementById("toggleHeight");
+
+// --- Update slider values ---
+function updateValues() {
+  radiusBA = parseInt(abSlider.value);
+  BC = parseInt(bcSlider.value);
+  angleCdeg = parseInt(angleSlider.value);
+
+  abVal.innerText = radiusBA;
+  bcVal.innerText = BC;
+  angleVal.innerText = angleCdeg;
+} // end of updateValues()
+
+// --- Main draw ---
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.lineWidth = 2;
+
+  let angleC = angleCdeg * Math.PI / 180;
+
+  // --- Compute B ---
+  let B = {
+    x: C.x + BC * Math.cos(angleC),
+    y: C.y - BC * Math.sin(angleC)
+  };
+
+  // --- Compute A ---
+  let A = {
+    x: B.x + radiusBA * Math.cos(theta),
+    y: B.y + radiusBA * Math.sin(theta)
+  };
+
+  // --- Base line ---
+  drawHorizontalFromC();
+
+  // --- Triangle sides ---
+  drawLine(B, C);
+  drawLine(B, A);
+
+  // --- Circle (toggle) ---
+  if (toggleCircle.checked) {
+    drawCircle(B, radiusBA);
+  }
+
+  // --- Height (toggle) ---
+  if (toggleHeight.checked) {
+    let foot = { x: B.x, y: C.y };
+
+    drawDashedLine(B, foot, "blue");
+    drawRightAngleMarker(foot);
+
+    // numeric value
+    let hValue = Math.abs(B.y - C.y);
+    ctx.fillText("h = " + hValue.toFixed(1), foot.x + 10, (B.y + foot.y) / 2 + 15);
+
+    ctx.fillStyle = "black";
+  }
+
+  // --- Draw points ---
+  drawPoint(A, "A");
+  drawPoint(B, "B");
+  drawPoint(C, "C", -15, 15);
+
+  document.getElementById("status").innerText = "";
+} // end of draw()
+
+// ---------- Drawing helpers ----------
+
+function drawHorizontalFromC() {
+  ctx.save();
+
+  ctx.lineWidth = 2;
+
+  ctx.beginPath();
+  ctx.moveTo(C.x, C.y);
+  ctx.lineTo(canvas.width, C.y);
+  ctx.stroke();
+
+  ctx.restore();
+} // end of drawHorizontalFromC()
+
+function drawLine(p1, p2) {
+  ctx.save();
+
+  ctx.lineWidth = 2;
+
+  ctx.beginPath();
+  ctx.moveTo(p1.x, p1.y);
+  ctx.lineTo(p2.x, p2.y);
+  ctx.stroke();
+
+  ctx.restore();
+} // end of drawLine()
+
+function drawDashedLine(p1, p2, color) {
+  ctx.save(); // save current state
+
+  ctx.setLineDash([5, 5]);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+
+  ctx.beginPath();
+  ctx.moveTo(p1.x, p1.y);
+  ctx.lineTo(p2.x, p2.y);
+  ctx.stroke();
+
+  ctx.restore(); // restore everything (VERY important)
+} // end of drawDashedLine()
+
+function drawRightAngleMarker(p) {
+  let size = 10;
+
+  ctx.beginPath();
+  ctx.moveTo(p.x, p.y);
+  ctx.lineTo(p.x + size, p.y);
+  ctx.lineTo(p.x + size, p.y - size);
+  ctx.lineTo(p.x, p.y - size);
+  ctx.stroke();
+} // end of drawRightAngleMarker()
+
+function drawPoint(p, label, offsetX = 8, offsetY = -8) {
+  ctx.beginPath();
+  ctx.arc(p.x, p.y, 6, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillText(label, p.x + offsetX, p.y + offsetY);
+} // end of drawPoint()
+
+function drawCircle(center, r) {
+  ctx.save();
+
+  ctx.strokeStyle = "#ccc";
+  ctx.lineWidth = 2;
+
+  ctx.beginPath();
+  ctx.arc(center.x, center.y, r, 0, Math.PI * 2);
+  ctx.stroke();
+
+  ctx.restore();
+} // end of drawCircle()
+
+function distance(p1, p2) {
+  return Math.hypot(p1.x - p2.x, p1.y - p2.y);
+} // end of distance()
+
+// ---------- Interaction ----------
+
+// Drag to rotate A
+canvas.addEventListener("mousedown", () => dragging = true);
+canvas.addEventListener("mouseup", () => dragging = false);
+canvas.addEventListener("mouseleave", () => dragging = false);
+
+canvas.addEventListener("mousemove", (e) => {
+  if (!dragging) return;
+
+  let rect = canvas.getBoundingClientRect();
+  let x = e.clientX - rect.left;
+  let y = e.clientY - rect.top;
+
+  let angleC = angleCdeg * Math.PI / 180;
+
+  let B = {
+    x: C.x + BC * Math.cos(angleC),
+    y: C.y - BC * Math.sin(angleC)
+  };
+
+  theta = Math.atan2(y - B.y, x - B.x);
+
+  draw();
+});
+
+// Slider updates
+abSlider.addEventListener("input", () => { updateValues(); draw(); });
+bcSlider.addEventListener("input", () => { updateValues(); draw(); });
+angleSlider.addEventListener("input", () => { updateValues(); draw(); });
+
+// Toggle updates
+toggleCircle.addEventListener("change", draw);
+toggleHeight.addEventListener("change", draw);
+
+// Init
+updateValues();
+draw();
+
+</script>
+
+</body>
+</html>
