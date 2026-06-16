@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Custom Mastermind</title>
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+    }
+
+    .color-btn {
+      width: 40px;
+      height: 40px;
+      margin: 5px;
+      border: 1px solid black;
+      display: inline-block;
+      cursor: pointer;
+    }
+
+    .guess-row {
+      margin: 10px;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2>Custom Mastermind</h2>
+
+<div id="setup">
+  <p>How many possible colors?</p>
+  <input id="numColors" type="number" value="6"><br>
+
+  <p>How many positions?</p>
+  <input id="numSlots" type="number" value="4"><br>
+
+  <p>Allow repeats?</p>
+  <input id="allowRepeats" type="checkbox" checked><br>
+
+  <p>Allow blanks?</p>
+  <input id="allowBlanks" type="checkbox"><br>
+
+  <p>Play against CPU?</p>
+  <input id="vsCPU" type="checkbox" checked><br>
+
+  <p>Limit guesses?</p>
+  <input id="limitGuesses" type="checkbox"><br>
+
+  <p>Max guesses:</p>
+  <input id="maxGuesses" type="number" value="10"><br><br>
+
+  <button onclick="startGame()">Start Game</button>
+</div>
+
+<div id="codeSetup" class="hidden">
+  <h3>Player 1: Set the secret code</h3>
+  <div id="codePicker"></div>
+  <button onclick="confirmCode()">Confirm Code</button>
+</div>
+
+<div id="game" class="hidden">
+  <h3>Make a Guess</h3>
+  <div id="guessPicker"></div>
+  <button onclick="submitGuess()">Submit Guess</button>
+
+  <h3>Guesses</h3>
+  <div id="history"></div>
+</div>
+
+<script>
+let settings = {};
+let colors = [];
+let secretCode = [];
+let currentGuess = [];
+let guesses = 0;
+
+// Create color palette
+function generateColors(n) {
+  let base = ["red","blue","green","yellow","purple","orange","pink","brown","gray","cyan"];
+  return base.slice(0, n);
+} // end of generateColors()
+
+function startGame() {
+  settings.numColors = parseInt(document.getElementById("numColors").value);
+  settings.numSlots = parseInt(document.getElementById("numSlots").value);
+  settings.allowRepeats = document.getElementById("allowRepeats").checked;
+  settings.allowBlanks = document.getElementById("allowBlanks").checked;
+  settings.vsCPU = document.getElementById("vsCPU").checked;
+  settings.limitGuesses = document.getElementById("limitGuesses").checked;
+  settings.maxGuesses = parseInt(document.getElementById("maxGuesses").value);
+
+  colors = generateColors(settings.numColors);
+
+  document.getElementById("setup").classList.add("hidden");
+
+  if (settings.vsCPU) {
+    generateSecretCode();
+    startGuessing();
+  } else {
+    setupCodePicker();
+  }
+} // end of startGame()
+
+function generateSecretCode() {
+  secretCode = [];
+  while (secretCode.length < settings.numSlots) {
+    let choice = colors[Math.floor(Math.random() * colors.length)];
+
+    if (!settings.allowRepeats && secretCode.includes(choice)) continue;
+
+    secretCode.push(choice);
+  }
+} // end of generateSecretCode()
+
+function setupCodePicker() {
+  document.getElementById("codeSetup").classList.remove("hidden");
+  createPicker("codePicker", selectCodeColor);
+} // end of setupCodePicker()
+
+function createPicker(containerId, clickHandler) {
+  let container = document.getElementById(containerId);
+  container.innerHTML = "";
+
+  colors.forEach(color => {
+    let div = document.createElement("div");
+    div.className = "color-btn";
+    div.style.background = color;
+    div.onclick = () => clickHandler(color);
+    container.appendChild(div);
+  });
+} // end of createPicker()
+
+function selectCodeColor(color) {
+  if (!settings.allowRepeats && secretCode.includes(color)) return;
+
+  if (secretCode.length < settings.numSlots) {
+    secretCode.push(color);
+  }
+} // end of selectCodeColor()
+
+function confirmCode() {
+  if (secretCode.length !== settings.numSlots) {
+    alert("Complete the code!");
+    return;
+  }
+
+  document.getElementById("codeSetup").classList.add("hidden");
+  startGuessing();
+} // end of confirmCode()
+
+function startGuessing() {
+  document.getElementById("game").classList.remove("hidden");
+  createPicker("guessPicker", selectGuessColor);
+} // end of startGuessing()
+
+function selectGuessColor(color) {
+  if (!settings.allowRepeats && currentGuess.includes(color)) return;
+
+  if (currentGuess.length < settings.numSlots) {
+    currentGuess.push(color);
+  }
+} // end of selectGuessColor()
+
+function submitGuess() {
+  if (currentGuess.length !== settings.numSlots) {
+    alert("Incomplete guess!");
+    return;
+  }
+
+  guesses++;
+
+  let result = evaluateGuess(currentGuess, secretCode);
+  displayGuess(currentGuess, result);
+
+  if (result.correct === settings.numSlots) {
+    alert("You win!");
+    location.reload();
+  }
+
+  if (settings.limitGuesses && guesses >= settings.maxGuesses) {
+    alert("Out of guesses! Code was: " + secretCode.join(", "));
+    location.reload();
+  }
+
+  currentGuess = [];
+} // end of submitGuess()
+
+function evaluateGuess(guess, code) {
+  let correct = 0;
+  let misplaced = 0;
+
+  let codeCopy = [...code];
+  let guessCopy = [...guess];
+
+  // First pass: correct position
+  for (let i = 0; i < guess.length; i++) {
+    if (guess[i] === code[i]) {
+      correct++;
+      codeCopy[i] = null;
+      guessCopy[i] = null;
+    }
+  }
+
+  // Second pass: correct color wrong place
+  for (let i = 0; i < guessCopy.length; i++) {
+    if (guessCopy[i] && codeCopy.includes(guessCopy[i])) {
+      misplaced++;
+      codeCopy[codeCopy.indexOf(guessCopy[i])] = null;
+    }
+  }
+
+  return {correct, misplaced};
+} // end of evaluateGuess()
+
+function displayGuess(guess, result) {
+  let div = document.createElement("div");
+  div.className = "guess-row";
+
+  div.innerHTML =
+    guess.join(", ") +
+    " → Correct: " + result.correct +
+    " | Misplaced: " + result.misplaced;
+
+  document.getElementById("history").appendChild(div);
+} // end of displayGuess()
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Unit Circle Explorer</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    text-align:center;
+}
+
+canvas{
+    border:1px solid black;
+    touch-action:none;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Unit Circle Explorer</h2>
+<h4>Click and drag the red dot.</h4>
+<canvas id="canvas" width="600" height="600"></canvas>
+
+<div id="info"></div>
+
+<script>
+
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+const CENTER_X = canvas.width / 2;
+const CENTER_Y = canvas.height / 2;
+
+const SCALE = 200;     // pixels per unit
+
+let angle = 0;
+
+let dragging = false;
+
+draw();
+
+canvas.addEventListener("mousedown", startDrag);
+canvas.addEventListener("mousemove", drag);
+canvas.addEventListener("mouseup", stopDrag);
+canvas.addEventListener("mouseleave", stopDrag);
+
+function startDrag(event)
+{
+    dragging = true;
+    updateAngle(event);
+}
+
+function drag(event)
+{
+    if (!dragging) return;
+
+    updateAngle(event);
+}
+
+function stopDrag()
+{
+    dragging = false;
+}
+
+function updateAngle(event)
+{
+    const rect = canvas.getBoundingClientRect();
+
+    const mouseX = event.clientX - rect.left;
+    const mouseY = event.clientY - rect.top;
+
+    const dx = mouseX - CENTER_X;
+    const dy = CENTER_Y - mouseY;
+
+    angle = Math.atan2(dy, dx);
+
+    draw();
+}
+// end of updateAngle()
+
+function drawAxes()
+{
+    ctx.strokeStyle = "#888";
+    ctx.lineWidth = 1;
+
+    // x-axis
+    ctx.beginPath();
+    ctx.moveTo(0, CENTER_Y);
+    ctx.lineTo(canvas.width, CENTER_Y);
+    ctx.stroke();
+
+    // y-axis
+    ctx.beginPath();
+    ctx.moveTo(CENTER_X, 0);
+    ctx.lineTo(CENTER_X, canvas.height);
+    ctx.stroke();
+
+    // tick marks
+    for(let i=-2;i<=2;i++)
+    {
+        let x = CENTER_X + i*SCALE;
+        let y = CENTER_Y - i*SCALE;
+
+        // x ticks
+        ctx.beginPath();
+        ctx.moveTo(x, CENTER_Y-5);
+        ctx.lineTo(x, CENTER_Y+5);
+        ctx.stroke();
+
+        // y ticks
+        ctx.beginPath();
+        ctx.moveTo(CENTER_X-5, y);
+        ctx.lineTo(CENTER_X+5, y);
+        ctx.stroke();
+
+        if(i !== 0)
+        {
+            ctx.fillText(i, x-4, CENTER_Y+18);
+            ctx.fillText(i, CENTER_X+8, y+4);
+        }
+    }
+}
+// end of drawAxes()
+
+function draw()
+{
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    drawAxes();
+
+    // unit circle
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 2;
+
+    ctx.beginPath();
+    ctx.arc(CENTER_X, CENTER_Y, SCALE, 0, 2*Math.PI);
+    ctx.stroke();
+
+    const x = Math.cos(angle);
+    const y = Math.sin(angle);
+
+    const px = CENTER_X + x*SCALE;
+    const py = CENTER_Y - y*SCALE;
+
+    // radius
+    ctx.strokeStyle = "blue";
+    ctx.lineWidth = 3;
+
+    ctx.beginPath();
+    ctx.moveTo(CENTER_X, CENTER_Y);
+    ctx.lineTo(px, py);
+    ctx.stroke();
+
+    // endpoint
+    ctx.fillStyle = "red";
+
+    ctx.beginPath();
+    ctx.arc(px, py, 8, 0, 2*Math.PI);
+    ctx.fill();
+
+    // convert angle to standard-position angle
+    let displayAngle = angle;
+    
+    if(displayAngle < 0)
+    {
+        displayAngle += 2 * Math.PI;
+    }
+    
+    // angle arc
+    ctx.strokeStyle = "green";
+    ctx.lineWidth = 2;
+    
+    ctx.beginPath();
+    ctx.arc(
+        CENTER_X,
+        CENTER_Y,
+        40,
+        0,
+        -displayAngle,
+        true
+    );
+    ctx.stroke();
+    
+    let degrees = displayAngle * 180 / Math.PI;
+
+    document.getElementById("info").innerHTML =
+        "Angle = " + degrees.toFixed(1) + "°" +
+        "<br>x = " + x.toFixed(4) +
+        "<br>y = " + y.toFixed(4);
+}
+// end of draw()
+
+</script>
+
+</body>
+</html>

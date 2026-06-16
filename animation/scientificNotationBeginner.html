@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html>
+<style>
+#container {
+  width: 600px;
+  height: 300px;
+  position: relative;
+  background: lightBlue;
+  overflow: hidden;
+}
+
+#animate {
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  bottom: 30px;
+  left: 5px;
+  z-index: 4;
+}
+
+/* ISLANDS */
+.floor {
+  width: 60px;
+  height: 30px;
+  position: absolute;
+  background: green;
+  bottom: 0px;
+  z-index: 2;
+}
+
+.water {
+  width: 75px;
+  height: 10px;
+  position: absolute;
+  background: blue;
+  bottom: 0px;
+  z-index: 3;
+}
+
+#f1 { left: 0px; }
+#w1 { left: 60px; }
+
+#f2 { left: 135px; }
+#w2 { left: 195px; }
+
+#f3 { left: 270px; }
+#w3 { left: 330px; }
+
+#f4 { left: 405px; }
+#w4 { left: 465px; }
+
+#f5 { left: 540px; }
+
+#statsDiv {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: rgba(255,255,255,0.7);
+  padding: 5px;
+}
+
+/* smaller inputs */
+input {
+  width: 65px;
+}
+
+#coeffInput { width: 50px; }
+#expInput { width: 35px; }
+
+#answersSoFar {
+  margin-top: 8px;
+  font-size: 14px;
+}
+</style>
+
+<script>
+// ---------- GLOBALS ----------
+var step = 0;
+var sciNumber;
+var correctCoeff, correctMoves, correctSign, correctExp;
+var jumpInProgress = false;
+var result;
+var level = 1;
+
+var studentCoeff="", studentMoves="", studentSign="";
+
+var START_LEFT = 3;
+var START_BOTTOM = 30;
+var JUMP_DISTANCE = 135;
+
+var celebrateID = null;
+
+// ---------- RESET ----------
+function resetPosition() {
+  let wolf = document.getElementById("animate");
+  wolf.style.left = START_LEFT + "px";
+  wolf.style.bottom = START_BOTTOM + "px";
+}
+
+// ---------- LOAD ----------
+function loadPage(){
+  resetPosition();
+  updateLevel();
+}
+
+// ---------- ARC ----------
+function getArcY(progress, startY, endY, peak) {
+  let t = progress;
+  let oneMinusT = 1 - t;
+  return (oneMinusT*oneMinusT*startY) +
+         (2*oneMinusT*t*peak) +
+         (t*t*endY);
+}
+
+// ---------- JUMP ----------
+function jump(distance, targetBottom, jumpHeight, fail) {
+  if (jumpInProgress) return;
+  jumpInProgress = true;
+
+  stopCelebrationBounce();
+
+  let wolf = document.getElementById("animate");
+  let startLeft = parseFloat(wolf.style.left);
+  let startBottom = parseFloat(wolf.style.bottom);
+
+  let totalSteps = 80;
+  let stepX = distance / totalSteps;
+  let peak = startBottom + jumpHeight;
+  let counter = 0;
+
+  let id = setInterval(function () {
+    counter++;
+    let progress = counter / totalSteps;
+
+    wolf.style.left = startLeft + stepX * counter + "px";
+    wolf.style.bottom =
+      getArcY(progress, startBottom, targetBottom, peak) + "px";
+
+    if (counter >= totalSteps) {
+      clearInterval(id);
+      jumpInProgress = false;
+
+      if(result === 'correct'){
+        if(step === 4){
+          level++;
+          updateLevel();
+          startCelebrationBounce(); // stays bouncing
+        } else {
+          showStep();
+        }
+      } else {
+        resetPosition();
+        step = 0;
+        showStep();
+      }
+    }
+  }, 5);
+}
+
+function jumpSafe(){
+  jump(JUMP_DISTANCE, 30, 50, false);
+}
+
+function jumpFail(){
+  jump(JUMP_DISTANCE - 30, 5, 30, true);
+}
+
+// ---------- CELEBRATION ----------
+function startCelebrationBounce() {
+  if (celebrateID) return;
+
+  let wolf = document.getElementById("animate");
+  let baseBottom = parseFloat(wolf.style.bottom);
+  let t = 0;
+
+  celebrateID = setInterval(function () {
+    wolf.style.bottom =
+      baseBottom + Math.abs(Math.sin(t)) * 18 + "px";
+    t += 0.2;
+  }, 20);
+}
+
+function stopCelebrationBounce() {
+  if (celebrateID) {
+    clearInterval(celebrateID);
+    celebrateID = null;
+  }
+}
+
+// ---------- LEVEL ----------
+function updateLevel(){
+  document.getElementById("statsDiv").innerHTML = "Level: " + level;
+}
+
+// ---------- NUMBER ----------
+function generateScientificNumber() {
+  if (Math.random() < 0.5) {
+    return (Math.floor(Math.random()*90000)+1000).toString();
+  } else {
+    let zeros = Math.floor(Math.random()*4)+1;
+    let digits = Math.floor(Math.random()*900)+100;
+    return "0." + "0".repeat(zeros) + digits;
+  }
+}
+
+// ---------- PARTS ----------
+function getScientificParts(numStr) {
+  let num = Number(numStr);
+  let coeff = num;
+  let exp = 0;
+
+  if (num >= 1) {
+    while (coeff >= 10) {
+      coeff /= 10;
+      exp++;
+    }
+  } else {
+    while (coeff < 1) {
+      coeff *= 10;
+      exp--;
+    }
+  }
+
+  correctCoeff = coeff;
+  correctExp = exp;
+  correctMoves = Math.abs(exp);
+  correctSign = exp >= 0 ? "positive" : "negative";
+}
+
+// ---------- NEW ----------
+function newProblem(){
+  stopCelebrationBounce(); // stop bounce only here
+
+  sciNumber = generateScientificNumber();
+  getScientificParts(sciNumber);
+
+  step = 0;
+  studentCoeff="";
+  studentMoves="";
+  studentSign="";
+
+  resetPosition();
+  showStep();
+}
+
+// ---------- SHOW ----------
+function showStep(){
+  document.getElementById("feedbackDiv").innerHTML = "";
+  document.getElementById("answerInput").value = "";
+  document.getElementById("coeffInput").value = "";
+  document.getElementById("expInput").value = "";
+
+  document.getElementById("answerInput").style.display = "inline";
+  document.getElementById("signDiv").style.display = "none";
+  document.getElementById("finalDiv").style.display = "none";
+
+  let text = "Convert <b>" + sciNumber + "</b><br><br>";
+
+  if(step===0) text += "What is the coefficient?";
+  if(step===1) text += "How many places does the decimal move?";
+  if(step===2){
+    text += "Is the exponent positive or negative?";
+    document.getElementById("answerInput").style.display = "none";
+    document.getElementById("signDiv").style.display = "inline";
+  }
+  if(step===3){
+    text += "Write in scientific notation:";
+    document.getElementById("answerInput").style.display = "none";
+    document.getElementById("finalDiv").style.display = "inline";
+  }
+
+  let progress = "<div id='answersSoFar'>";
+  if(studentCoeff) progress += "Coefficient: " + studentCoeff + "<br>";
+  if(studentMoves) progress += "Moves: " + studentMoves + "<br>";
+  if(studentSign) progress += "Sign: " + studentSign + "<br>";
+  progress += "</div>";
+
+  document.getElementById("problemDiv").innerHTML = text + progress;
+}
+
+// ---------- CHECK ----------
+function nearlyEqual(a,b){
+  return Math.abs(a-b) < 0.00001;
+}
+
+function checkAnswer(){
+  let userAnswer;
+
+  if(step<=1){
+    userAnswer = document.getElementById("answerInput").value.trim();
+  }
+
+  if(step===2){
+    let radios = document.getElementsByName("sign");
+    for(let r of radios){
+      if(r.checked) userAnswer = r.value;
+    }
+  }
+
+  if(step===0){
+    if(!nearlyEqual(parseFloat(userAnswer), correctCoeff)) return wrong();
+    studentCoeff = userAnswer;
+  }
+
+  if(step===1){
+    if(userAnswer != correctMoves) return wrong();
+    studentMoves = userAnswer;
+  }
+
+  if(step===2){
+    if(userAnswer != correctSign) return wrong();
+    studentSign = userAnswer;
+  }
+
+  if(step===3){
+    let c = parseFloat(document.getElementById("coeffInput").value);
+    let e = parseInt(document.getElementById("expInput").value);
+
+    if(!nearlyEqual(c, correctCoeff) || e != correctExp){
+      return wrong();
+    }
+  }
+
+  result = 'correct';
+  step++;
+  jumpSafe();
+
+  if(step===4){
+    document.getElementById("feedbackDiv").innerHTML =
+      "🎉 " + correctCoeff + " × 10^" + correctExp +
+      "<br>Click New Problem";
+  }
+}
+
+function wrong(){
+  result = 'incorrect';
+  document.getElementById("feedbackDiv").innerHTML = "Incorrect!";
+  jumpFail();
+}
+</script>
+
+<body onload="loadPage()">
+<h3>Scientific Notation Jump Game</h3>
+
+<div id="container">
+  <button onclick="newProblem()">New Problem</button>
+  <br><br>
+
+  <div id="problemDiv"></div>
+
+  <input id="answerInput">
+
+  <div id="signDiv" style="display:none;">
+    <label><input type="radio" name="sign" value="positive"> Positive</label>
+    <label><input type="radio" name="sign" value="negative"> Negative</label>
+  </div>
+
+  <div id="finalDiv" style="display:none;">
+    <input id="coeffInput"> × 10^
+    <input id="expInput">
+  </div>
+
+  <button onclick="checkAnswer()">Check</button>
+
+  <div id="feedbackDiv"></div>
+  <div id="statsDiv"></div>
+
+  <!-- ISLANDS -->
+  <span id="f1" class="floor"></span>
+  <span id="w1" class="water"></span>
+  <span id="f2" class="floor"></span>
+  <span id="w2" class="water"></span>
+  <span id="f3" class="floor"></span>
+  <span id="w3" class="water"></span>
+  <span id="f4" class="floor"></span>
+  <span id="w4" class="water"></span>
+  <span id="f5" class="floor"></span>
+
+  <!-- WOLF -->
+  <span id="animate">
+    <img src="../images/wolf transparent.png" style="width:150%; height:150%">
+  </span>
+</div>
+</body>
+</html>
