@@ -144,6 +144,50 @@ function draw()
     const px = CENTER_X + x*SCALE;
     const py = CENTER_Y - y*SCALE;
 
+    // dashed altitude from terminal point to x-axis
+
+    ctx.save();
+
+    ctx.strokeStyle = "#666";
+    ctx.lineWidth = 2;
+    ctx.setLineDash([8,6]);
+
+    ctx.beginPath();
+    ctx.moveTo(px, py);
+    ctx.lineTo(px, CENTER_Y);
+    ctx.stroke();
+
+    ctx.restore();
+
+    // right angle marker
+
+    const boxSize = 12;
+
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 1.5;
+
+    if (Math.abs(py - CENTER_Y) > 2)
+    {
+        const verticalDirection = (py < CENTER_Y) ? -1 : 1;
+        const horizontalDirection = (px >= CENTER_X) ? -1 : 1;
+
+        ctx.beginPath();
+
+        ctx.moveTo(px + horizontalDirection * boxSize, CENTER_Y);
+
+        ctx.lineTo(
+            px + horizontalDirection * boxSize,
+            CENTER_Y + verticalDirection * boxSize
+        );
+
+        ctx.lineTo(
+            px,
+            CENTER_Y + verticalDirection * boxSize
+        );
+
+        ctx.stroke();
+    }
+
     // radius
     ctx.strokeStyle = "blue";
     ctx.lineWidth = 3;
