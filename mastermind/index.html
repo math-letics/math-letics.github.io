@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Custom Mastermind</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>Custom Mastermind</h1>
+
+<div id="setup">
+  <h2>Game Setup</h2>
+
+  <label>Possible Colors:
+    <input id="numColors" type="number" value="6" min="2" max="10">
+  </label><br><br>
+
+  <label>Positions:
+    <input id="numSlots" type="number" value="4" min="2" max="8">
+  </label><br><br>
+
+  <label><input id="allowRepeats" type="checkbox" checked> Allow Repeats</label><br>
+  <label><input id="allowBlanks" type="checkbox"> Allow Blanks</label><br>
+  <label><input id="vsCPU" type="checkbox" checked> Play Against CPU</label><br>
+  <label><input id="limitGuesses" type="checkbox"> Limit Guesses</label><br><br>
+
+  <label>Max Guesses:
+    <input id="maxGuesses" type="number" value="10">
+  </label><br><br>
+
+  <button onclick="startGame()">Start Game</button>
+</div>
+
+<div id="codeSetup" class="hidden">
+  <h2>Player 1: Choose Secret Code</h2>
+  <div id="codePreview"></div>
+  <div id="codePicker"></div>
+  <button onclick="clearCode()">Clear</button>
+  <button onclick="confirmCode()">Confirm Code</button>
+</div>
+
+<div id="handoff" class="hidden">
+  <h2>Pass Device to Player 2</h2>
+  <button onclick="beginGuessing()">Begin Guessing</button>
+</div>
+
+<div id="game" class="hidden">
+  <h2>Guess the Code</h2>
+
+  <div id="gameMessage"></div>
+
+  <button onclick="startGame()">
+    New Game
+  </button>
+
+  <div id="status"></div>
+
+  <h3>Current Guess</h3>
+  <div id="currentGuessDisplay"></div>
+
+  <div id="guessPicker"></div>
+
+  <button onclick="undoGuess()">Undo</button>
+  <button onclick="clearGuess()">Clear</button>
+  <button onclick="submitGuess()">Submit Guess</button>
+
+  <h3>History</h3>
+  <div id="history"></div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
